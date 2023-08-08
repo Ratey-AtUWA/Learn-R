@@ -1,0 +1,596 @@
+---
+title: "Week 1 ENVT3361 Workshop"
+output: 
+  bookdown::html_document2:
+    fig_width: 6.16
+    fig_height: 2.41
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+  word_document: 
+    toc_depth: 2
+    fig_caption: yes
+---
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+```{r load addImg fxn and palettes, include=FALSE}
+library(png)
+library(sf)
+library(maptiles)
+addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
+  if(is.null(x) | is.null(y) | is.null(width)){stop("Must provide args 'x', 'y', and 'width'")}
+  USR <- par()$usr ; PIN <- par()$pin ; DIM <- dim(obj) ; ARp <- DIM[1]/DIM[2]
+  WIDi <- width/(USR[2]-USR[1])*PIN[1] ;   HEIi <- WIDi * ARp 
+  HEIu <- HEIi/PIN[2]*(USR[4]-USR[3]) 
+  rasterImage(image = obj, xleft = x-(width/2), xright = x+(width/2),
+            ybottom = y-(HEIu/2), ytop = y+(HEIu/2), interpolate = interpolate)
+}
+palette(c("black", "#003087", "#DAAA00", "#8F92C4", "#E5CF7E", 
+          "#001D51", "#B7A99F", "#A51890", "#C5003E", "#FDC596", 
+          "#AD5D1E", "gray40", "gray85", "#FFFFFF", "transparent"))
+```
+
+```{r banner hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
+logo <- readPNG("UWA logo_text_V_wsL.png")
+par(mar = c(0,0,0,0))
+layout(matrix(c(1,1,1,1,2),nrow = 1))
+
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+text(-0.025,0.9, pos = 4, cex = 2.6, font = 2, 
+     labels="Data Analysis in R for Environmental Science")
+text(-0.025,0.6, pos = 4, cex = 2.2, 
+     labels="R and RStudio basics")
+text(-0.025,0.4, pos = 4, font = 3, cex = 1.4, col = 12,
+     labels="")
+text(1,0.1, pos = 2, font = 3, family = 'serif', cex = 1.5, col = 2,
+     labels="Andrew Rate, School of Agriculture and Environment")
+plot(1,1, axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(logo, x = 1.2, y = 1, width = 0.5)
+par(mar = c(3.5,3.5,0.5,0.5))
+```
+
+This guide gets you started with reading data into **R** (R Core Team, 2022) 
+from a file, including checking that the data have been read in correctly. We 
+will always be using **R** in the RStudio environment (Posit Software, 2022).
+
+<p style="text-align: center;"><span style="font-size: 15pt;">If you need or would like a more basic introduction to **R**, you could first read our<br>
+[Guide to R and RStudio for absolute beginners](What-is-R.html){target="_blank}.</span></p>
+
+## Reading the data
+
+We use the `read.csv()` function &ndash; we will mostly supply data to you as 
+`.csv` files. Sometimes you need to download these into your working directory 
+to use them, and sometimes you can read them directly from a web URL (*e.g*. [`https://github.com/.../afs19.csv`](https://github.com/Ratey-AtUWA/learningR/raw/main/afs19.csv){target="_blank"}).
+
+With the type of dataset we usually use, there are columns containing
+categorical information, which **R** calls `factors`. These are typically stored
+as text or character information, *i.e*. character strings, or just `strings`.
+**R** identifies `factors` in a particular way so the categories are recognised,
+so we need to use the `stringsAsFactors = TRUE` argument in the `read.csv()`
+function.
+
+The result of the `read.csv()` function is a **data frame** object stored
+in the **R** environment. We need a data frame, since it is a data structure in
+**R** which allows having columns of different classes (*e.g*. integer, numeric,
+factor, date, logical, *etc*.) in the same object (each column contains just one 
+class of data, though).
+
+Objects we create in an **R** session like data frames are only stored while we
+have our **R** session active, and disappear when we close **R**. Fortunately we
+can save our whole environment by clicking the 💾 icon on the 
+<span style="background-color:#404040; color:white;">&nbsp;Environment&nbsp;</span> 
+tab, or by running the `save.image()` function. Either of these saving methods 
+will create a file with extension `.RData` which we can then load in later **R**
+sessions using the `load()` function, or clicking the 📁 icon in the
+<span style="background-color:#404040; color:white;">&nbsp;Environment&nbsp;</span> 
+tab in RStudio.
+
+```{r read-hubbard-data, results='hold'}
+hubbard <- read.csv(file = "hubbard.csv", stringsAsFactors = TRUE)
+# ... and do a quick check
+is.data.frame(hubbard) # check that it worked; if so, the result should be TRUE
+```
+
+These data are from the [Hubbard Brook Experimental Forest](https://hubbardbrook.org/experimental-watersheds-research-sites/){target="_blank"} near Woodstock in New Hampshire, USA (Figure \@ref(fig:hubbard-pix)).
+
+```{r make map extent object, echo=FALSE, warning=FALSE, error=FALSE, results='hide'}
+library(sf)
+extent <- st_as_sf(data.frame(x=c(-127.219,-59.375),y=c(58,26)),
+                   coords = c("x","y"), crs = st_crs(4326))
+extentLCC <- st_transform(extent, crs = st_crs("ESRI:102009"))
+rectHubb <- st_as_sf(data.frame(x=c(-71.792,-71.6935),y=c(43.965,43.9215)),
+                   coords = c("x","y"), crs = st_crs(4326))
+rectHubb <- st_transform(rectHubb, crs = st_crs("ESRI:102009"))
+```
+
+```{r hubbard-pix, echo=FALSE, error=FALSE, fig.height=5, fig.width=13.6, fig.cap="Location of the Hubbard Brook Experimental Forest in New Hampshire, USA. The data used in this workshop were generated at this site.", warning=FALSE, results='hold'}
+# library(maptiles)
+# USAtiles <- get_tiles(extent, provider = "Esri.WorldGrayCanvas", 
+#                       crop = TRUE, zoom = 4)
+# par(mfrow=c(1,2), oma=c(3,3,1,1),lheight=0.8, mgp=c(1.7,0.4,0), tcl=-0.2)
+par(mfrow=c(1,1), mar=c(.1,.1,.1,.1), oma=c(.1,.1,.1,.1),
+    lheight=0.8, mgp=c(1.7,0.4,0), tcl=-0.2)
+# windowsFonts(nar="Arial Narrow")
+# plot_tiles(USAtiles)
+# mtext("Longitude (\u00B0)",1,1.7,font=2, cex=1.2)
+# mtext("Latitude (\u00B0)",2,1.7,font=2, cex=1.2)
+# axis(1); axis(2); box()
+# points(-71.744,43.942,pch=22,col="blue",bg="gold",cex=1,lwd=2,lend=2,ljoin=1)
+# text(-71.744, 43.9, labels="Hubbard Brook\nExperimental Forest",
+#      col="blue", pos=2)
+# pic1 <- png::readPNG("hubbard_iconic_2.png")
+pic1 <- 
+  readPNG("./Learn_R-2023-Week_1_basics_files/figure-html/hubbard-pix-x2.png")
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(pic1, x = 0.5, y = 0.5, width = 1)
+# addImg(pic1, x = 0.5, y = 0.5, width = 1)
+# mtext("Experimental sub-catchments at Hubbard Brook Experimental Forest.",
+      # 1,0.4, cex=1.2)
+```
+
+<p>&nbsp;</p>
+
+## First proper check - summarise some of the data
+
+We can use the `summary()` function to make a quick check of our data, to make 
+sure the file has read correctly (this may not happen if the file is improperly
+formatted, *etc*.).
+
+```{r}
+summary(hubbard[,1:9]) # just the first 9 columns to save space!
+```
+
+<p>&nbsp;</p>
+
+The `summary()` function creates a little table for each column - note that
+these little tables do not all look the same. `Integer` or `numeric` columns get a
+numeric summary with minimum, mean *etc.*, and sometime the number of missing
+(`NA`) values. Categorical (`Factor`) columns show the number of samples (rows) in
+each category (unless there are too many categories). These summaries are useful
+to check if there are zero or negative values in columns, how many missing
+observations there might be, and if the data have been read correctly into R.
+
+<p>&nbsp;</p>
+
+<table border=1><tr><td>
+**Note**: You would usually check the **whole data frame**, without restricting 
+rows or columns, by running `summary(hubbard)`. We could also:
+
+- summarise all variables, but only the first 10 rows by running `summary(hubbard[1:10,])` (we also call rows
+'observations' which often represent separate field samples);
+- summarise a defined range of both rows and columns, *e.g*. `summary(hubbard[1:20,6:10])`, which would summarise only the first 20 rows of columns 6 to 10.
+</td></tr></table>
+
+<p>&nbsp;</p>
+
+## Final checks of the data frame
+
+Usually we would not restrict the output as done below with `[,1:15]`.
+We only do it here so we're not bored with pages of similar-looking output.
+You should look at structure for the whole data frame using `str(hubbard)` 
+(or substitute `hubbard` for whatever your data object is called). The whole 
+`hubbard` data frame has 62 variables (*i.e*. columns), not 15.
+
+```{r}
+str(hubbard[,1:15]) # 'str' gives the structure of an object
+```
+
+We can see that some columns are integer (`int`) values (*e.g*. PLOT, UTM_EASTING),
+some columns contain `Factor` values *i.e*. in fixed categories
+(*e.g*. Rel.To.Brook, Transect), and some columns are numeric (`num`)
+(*e.g*. PH, OM.pct, Ni). Applying the `str()` function to a data
+object is **always** a good idea, to check that the data have read correctly
+into R. [NOTE that other variable types are possible such as character
+`chr`, date (`Date` or `POSIXct`), `logical`, *etc*.]
+
+<hr style="height: 1px; background-color: #5560A4;" />
+
+  > "Data is like garbage. You'd better know what you are going to do with it 
+  before you collect it."
+  >
+  > &mdash; Mark Twain
+
+<hr style="height: 1px; background-color: #5560A4;" />
+
+# Base R plotting: x-y plot using `plot()`
+
+We can use either `plot(x, y, ...)` OR `plot(y ~ x, ...)` <br>
+In R the `~` symbol means 'as a function of', so `~` indicates a formula.
+
+In R we need to tell the program which 'object' our
+variables are in. We've just made a Data Frame (a type
+of data object) called `hubbard`.
+
+The following 3 styles of code do exactly the same thing:
+
+1. <u>Specifying the data frame using `with()` syntax -- (we recommend this one!)</u>
+
+```{r, eval=FALSE}
+with(hubbard,
+     plot(EXCH_Al ~ PH)
+)
+```
+
+...which can just be written on a single line:
+
+```{r with-plot, fig.width=3.5, fig.height=3.5, fig.cap="Plot of exchangeable Al vs. pH using with() to specify the data frame.", message=FALSE, warning=FALSE, results='hold'}
+with(hubbard, plot(EXCH_Al ~ PH))
+```
+
+<p>&nbsp;</p>
+
+2. <u>Specifying the data frame using the dollar-sign operator</u>
+
+```{r dollar-plot, fig.width=3.5, fig.height=3.5, fig.cap="Plot of exchangeable Al vs. pH using dollar-sign syntax to specify the data frame. Notice the axis titles!", message=FALSE, warning=FALSE, results='hold'}
+plot(hubbard$EXCH_Al ~ hubbard$PH) # look at axis titles!
+```
+
+<p>&nbsp;</p>
+
+3. <u>Specifying the data frame using</u> `attach()` <u>and</u> `detach()` <u>**(not recommended)**</u>
+
+```{r plot-attach-dummy, message=FALSE, warning=FALSE, eval=FALSE}
+attach(hubbard)
+plot(EXCH_Al ~ PH)
+detach(hubbard)
+```
+
+```{r plot-attach, fig.width=3.5, fig.height=3.5, fig.cap="Plot of exchangeable Al vs. pH using `attach()` to specify the data frame.", message=FALSE, warning=FALSE, echo=FALSE}
+attach(hubbard)
+plot(EXCH_Al ~ PH)
+detach(hubbard)
+```
+
+<p>&nbsp;</p>
+
+Without changing any of the (numerous) options or parameters in 
+the `plot()` function, the plot is not very attractive (*e.g*. axis titles!).
+
+We can also change the overall plot appearance by using the function `par()` 
+before plotting; `par()` sets graphics **par**ameters. Let's try some variations:
+
+### Setting some overall graphics parameters using `par()`
+
+* `mar=` sets **mar**gins in 'lines' units: `c(bottom,left,top,right)` *e.g*. `c(4,4,3,1)`
+* `mgp=` sets distance of text from axes: `c(titles, tickLabels, ticks)`
+* `font.lab=` sets font style for axis titles: 2=**bold**, 3=*italic*, *etc*.<br>
+    - and within the `plot()` function itself, `xlab=` and `ylab=` set axis titles
+
+```{r plot-with-options, fig.width=4, fig.height=4, fig.cap="Plot of exchangeable Al vs. pH improved by changing graphics parameters and including custom axis titles.", message=FALSE, warning=FALSE, results='hold'}
+par(mar=c(4,4,1,1), mgp=c(2,0.6,0), font.lab=2)
+# We'll also include some better axis title text using xlab, ylab
+with(hubbard,
+     plot(EXCH_Al ~ PH, 
+     xlab="Soil pH", 
+     ylab="Exchangeable Al (centimoles/kg)")
+     )
+```
+ 
+<p>&nbsp;</p>
+
+This is starting to look a lot better!
+
+We can still add more information to the graph; for example, 
+by making use of the factors (categories) in the dataset. 
+We also need to learn these graphics parameters:
+
+- `col =` plotting colour(s) - it's easiest to use words like "red", "darkblue" and so on<br>
+see https://www.statmethods.net/advgraphs/images/colorchart.png <br>
+or just run the R function `colors()` for a list of all 657 names!
+
+- `pch =` plot character(s) - numbers from 0 to 24 (run `help(points)` or see <a href="https://bookdown.org/ndphillips/YaRrr/scatterplot-plot.html#symbol-types-pch" target="_blank">this page from YaRrr</a>).
+ 
+```{r plot-by-groups, fig.width=4, fig.height=4, fig.cap="Plot of exchangeable Al vs. pH with custom graphics parameters and axis titles, improved by separating points by a Factor.", message=FALSE, warning=FALSE, results='hold'}
+par(mar=c(4,4,1,1), mgp=c(2,0.6,0), font.lab=2)
+with(hubbard,
+     plot(EXCH_Al ~ PH, xlab="Soil pH",
+          ylab="Exchangeable Al (centimoles/kg)",
+          pch=c(1,16)[Rel.To.Brook], 
+          col=c("blue","darkred")[Rel.To.Brook])
+     )
+``` 
+
+<p>&nbsp;</p>
+
+The parameter `pch=c(1,16)[Rel.To.Brook]` separates the points by the
+information in the Factor column `Rel.To.Brook`, shown inside `[ ]`. This column
+is a 2-level factor, so can be one of two categories (North or South), and so we
+need a vector with two numbers in it (`pch=c(1,16)`). The code for specifying
+colour is very similar, except our vector has 2 colour names in it.
+
+There is still one thing missing; a **graph legend**. We can add one using 
+the `legend()` function. We will use the following options:
+
+- `"topleft"` position of legend -- run `help(legend)` for options, or we can use x-y coordinates
+- `legend =` a vector of names identifying the plot symbols - we have used the categories in the factor 'Rel.To.Brook', `levels(hubbard$Rel.To.Brook)`, but we could have used `legend=c("North","South")` instead
+- `pch =` plot symbols - should be exactly the same vector as in the plot function
+- `col =` plot colours - should be exactly the same vector as in the plot function
+- `title =` a title for the legend - optional
+
+```{r plot-add-legend, fig.width=4, fig.height=4, fig.cap="Plot of exchangeable Al vs. pH by sample location, with custom graphics parameters and axis titles, and a legend to explain the plot symbols.", message=FALSE, warning=FALSE, results='hold'}
+par(mar=c(4,4,1,1), mgp=c(2,0.6,0), font.lab=2)
+with(hubbard,
+       plot(EXCH_Al ~ PH, xlab="Soil pH", 
+            ylab="Exchangeable Al (centimoles/kg)",
+            pch=c(1,16)[Rel.To.Brook], 
+            col=c("blue","darkred")[Rel.To.Brook])
+       )
+legend("topleft", legend=levels(hubbard$Rel.To.Brook), pch=c(1,16), 
+       col=c("blue","darkred"), title="Location")
+```
+
+<hr style="height: 3px; background-color: #5560A4;" />
+
+# Alternative to base-R plot: `scatterplot()` (from the `car` package) 
+
+The R package `car` (Companion to Applied Regression) has many useful 
+additional functions that extend the capability of **R**. 
+The next two examples produce nearly the same plot as in the previous examples, 
+using the `scatterplot()` function in the `car` package.
+
+```{r car-sp-1, fig.height=3.5, fig.width=3.5, fig.cap="Plot of exchangeable Al vs. pH made using the car::scatterplot() function.", message=FALSE, warning=FALSE, results='hold'}
+# load required package(s)
+library(car)
+# par() used to set overall plot appearance using options within 
+# par(), e.g.
+#     mar sets plot margins, mgp sets distance of axis title and 
+#     tick labels from axis
+par(font.lab=2, mar=c(4,4,1,1), mgp=c(2.2,0.7,0.0))
+# draw scatterplot with customised options 
+# remember pch sets plot character (symbol); 
+# we will also use the parameter cex which sets symbol sizes and
+# 
+scatterplot(EXCH_Al ~ PH, data=hubbard, smooth=FALSE, 
+            legend = c(coords="topleft"), 
+            cex=1.5, cex.lab=1.5, cex.axis=1.2)
+```
+
+<p>&nbsp;</p>
+
+Note that we get some additional graph features by default:
+
+1. boxplots for each variable in the plot margins &ndash; these are useful for evaluating the distribution of our variables and any extreme values 
+2. a linear regression line showing the trend of the relationship (it's possible to add this in base R plots, too) 
+3. grid lines in the plot area (also available in base R)
+
+We can turn all of these features off if we want - run `help(scatterplot)` in 
+the RStudio Console, and look under **Arguments** and **Details**.
+
+Also, we separately specify the dataset to be used as a function argument, 
+*i.e*., `data=hubbard`.
+
+### Scatterplot (`car`) with groups, Hubbard Brook soil data
+
+```{r car-sp-2, fig.width=3.5, fig.height=3.5, fig.cap="Plot of exchangeable Al vs. pH with points grouped by location, made using the car::scatterplot() function.", message=FALSE, warning=FALSE, results='hold'}
+# 'require()' loads package(s) if they haven't already been loaded
+require(car)
+# adjust overall plot appearance using options within par()
+# mar sets plot margins, mgp sets distance of axis title and tick 
+#   labels from axis
+par(font.lab=2, mar=c(4,4,1,1), mgp=c(2.2,0.7,0.0))
+# create custom palette with nice colours :)
+# this lets us specify colours using numbers - try it!
+palette(c("black","red3","blue3","darkgreen","sienna"))
+# draw scatterplot with points grouped by a factor (Rel.To.Brook) 
+scatterplot(EXCH_Al ~ PH | Rel.To.Brook, data=hubbard, smooth=FALSE,
+            legend = c(coords="topleft"), col=c(5,3,1), 
+            pch=c(16,0,2), cex=1.2, cex.lab=1.3, cex.axis=1.0)
+```
+ 
+<p>&nbsp;</p>
+
+The `scatterplot()` function creates a legend automatically if we plot by factor 
+groupings (note the different way that the legend position is specified within 
+the `scatterplot()` function). This is pretty similar to the base R plot above 
+(we can also customise the axis titles in `scatterplot()`, using `xlab=` and 
+`ylab=` as before).
+
+<hr style="height: 3px; background-color: #5560A4;" />
+
+# Other types of data presentation: Plot types and Tables
+
+We'll give you some starting code chunks, and the output from them. 
+You can then use the help in RStudio to try to customise the plots according to 
+the suggestions below each plot!
+
+## Histograms
+
+Histograms are an essential staple of statistical plots, because we always need
+to know something about the distribution of our variable(s). Histograms are a
+good visual way to assess the shape of a variable's distribution, whether it's
+symmetrical and bell-shaped (*normal*), left- or right-skewed, bimodal (two
+'peaks') or even multimodal. As with any check of a distribution, the 'shape'
+will be clearer if we have more observations.
+
+```{r basic-hist, fig.width=3.5, fig.height=3.5, fig.cap="Histogram of percent soil moisture content at Hubbard Brook.", message=FALSE, warning=FALSE, results='hold'}
+with(hubbard, hist(MOISTURE.pct))
+```
+
+<p>&nbsp;</p>
+
+For histograms, try the following:
+
+- add suitable axis labels (titles)
+- make bars a different colour (all the same)
+- change the number of cells (bars) on the histogram to give wider or narrower intervals
+- log~10~-transform the x-axis (horizontal axis)
+- remove the title above the graph (this information would usually go in a caption)<br>
+...and so on.
+ 
+## Box plots 
+
+Box plots also give us some information about a variable's distribution, but one
+of their great strengths is in comparing values of a variable between different
+groups in our data.
+
+*Tukey box plots* implemented by **R** have 5 key values; from least to 
+greatest these are: 
+
+1. the **lower whisker**, which is the greatest of the minimum or the *lower hinge* &minus; 1.5 &times; IQR^a^
+2. the **lower hinge**, which is the lower quartile (25^th^ percentile)
+3. the **median** (*i.e*. the 50^th^ percentile)
+4. the **upper hinge**, which is the upper quartile (75^th^ percentile)
+5. the **upper whisker**, , which is the least of the maximum or the *upper hinge* + 1.5 &times; IQR
+
+Any points less than the lower whisker, or greater than the upper whisker, are 
+plotted separately and represent **potential outliers**.
+
+^a^**IQR** is the interquartile range between the upper and lower quartiles (25^th^ and 75^th^ percentiles)
+
+```{r basic-boxplot-notRun, eval=FALSE}
+boxplot(MOISTURE.pct ~ Rel.To.Brook, data=hubbard)
+```
+
+```{r basic-boxplot, fig.width=5.5, fig.height=4, fig.cap="Box plot of percent soil moisture content at Hubbard Brook. Only default `boxplot()` arguments have been used (except for the annotations explaining the boxplot features).", message=FALSE, warning=FALSE, echo=FALSE, results='hold'}
+par(mar=c(4,4,1,1))
+boxplot(MOISTURE.pct ~ Rel.To.Brook, data=hubbard, xlim=c(0.4,3.8))
+bps <- with(hubbard[which(hubbard$Rel.To.Brook=="South"),], 
+            boxplot.stats(MOISTURE.pct))
+arrows(rep(2.7,5), bps$stats, c(2.22,2.4,2.4,2.4,2.22), bps$stats, angle=15, 
+       length=0.08, col="steelblue")
+text(c(rep(2.7,5),2), c(bps$stats, mean(bps$out)), pos=4, 
+     labels=c("lower whisker","lower hinge","median","upper hinge",
+              "upper whisker","\u2191\npotential\noutliers\n\u2193"), col="steelblue")
+```
+
+<p>&nbsp;</p>
+
+For box plots, try the following:
+
+- include informative axis labels (titles)
+- plotting boxes separated by categories in a Factor
+- make boxes a different colour (all the same, and all different!)
+- add notches to boxes representing approximate 95% confidence intervals around the median
+- give the (vertical) y-axis a log~10~ scale<br>...and so on.
+ 
+## Strip Charts
+
+Strip charts, or one-dimensional scatter plots, can be a useful companion (or
+alternative) to box plots, especially when we don't have many observations of a 
+variable.
+
+```{r basic-mfrow, fig.width=5, fig.height=3, fig.cap="Soil organic matter content (%) at Hubbard Brook: as a one-dimensional scatterplot (`stripchart()`).", message=FALSE, warning=FALSE, results='hold'}
+stripchart(hubbard$OM.pct)
+```
+ 
+<p>&nbsp;</p>
+
+For stripcharts, try the following:
+
+- add suitable axis labels (titles), in bold font;
+- make symbols a different shape &#177; colour (all the same, and all different!);
+- make the strip chart vertical instead of horizontal;
+- apply some 'jitter' (noise) to the symbols so that overlapping points are easier to see;
+- log~10~-transform the numerical axis, so that overlapping points are easier to see;
+- rotate the y-axis titles 90° clockwise (make sure the left margin is wide enough!);
+- remove the titles above the graphs (this information would usually go in caption/s)<br>...and so on.
+
+<hr style="height: 1px; background-color: #5560A4;" />
+
+  > "With data collection, 'the sooner the better' is always the best answer."
+  >
+  > &mdash; [Marissa Mayer](https://en.wikipedia.org/wiki/Marissa_Mayer){target="_blank"}
+
+<hr style="height: 1px; background-color: #5560A4;" />
+
+## Tables
+
+There are a few ways to make useful tables in R to summarise your data. Here are a couple of examples.
+
+### Using the `tapply()` function in base R
+
+We can use the `tapply()` function to make very simple tables:
+
+```{r tapply-tables, message=FALSE, warning=FALSE, results='hold'}
+# use the cat() [conCATenate] function to make a Table heading 
+#     (\n is a line break)
+cat("One-way table of means\n")
+with(hubbard, tapply(X = EXCH_Ni, INDEX=Transect, 
+       FUN=mean, na.rm=TRUE))
+cat("\nTwo-way table of means\n")
+with(hubbard, tapply(X = EXCH_Ni, 
+       INDEX=list(Transect,Rel.To.Brook), 
+       FUN=mean, na.rm=TRUE))
+```
+
+<p>&nbsp;</p>
+
+For `tapply()` tables, try the following:
+
+- we have used the `mean` function (`FUN=mean`) &ndash; try another function to get minima, maxima, standard deviations, *etc*.
+- try copying the output to Word or Excel and using this to make a table in that software<br>
+...and so on.
+
+### Using the `numSummary()` function in the 'RcmdrMisc' R package
+
+```{r numSummary tables, message=FALSE, warning=FALSE, results='hold'}
+require(RcmdrMisc)
+# use the cat() [conCATenate] function to make a Table heading 
+#   (\n is a line break)
+cat("Summary statistics for EXCH_Ni\n")
+numSummary(hubbard$EXCH_Ni)
+cat("\nSummary statistics for EXCH_Ni grouped by Rel.To.Brook\n")
+numSummary(hubbard$EXCH_Ni, groups=hubbard$Rel.To.Brook)
+```
+
+For `numSummary()` tables, try the following:
+
+- generating summary tables for more than one variable at a time
+- generating summary tables with fewer statistical parameters (*e.g*. omit IQR) or more statistical parameters (*e.g*. include skewness)<br>
+(use R Studio Help!)
+- try copying the output to Word or Excel and using this to make a table in that software<br>...and so on.
+
+### Tables using `print()` on a data frame
+
+Data frames are themselves tables, and if they already contain the type of summary we need, we can just use the  `print()` function to get output. Let's do something [slightly] fancy (see if you can figure out what is going on here&#185;):
+
+```{r table-print, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+output <- 
+  numSummary(hubbard[,c("PH","MOISTURE.pct","OM.pct","Al.pct","Ca.pct","Fe.pct")],
+             statistics = c("mean","sd","quantiles"), quantiles=c(0,0.5,1))
+mytable <- t(cbind(output$table,output$NAs))
+row.names(mytable) <- c("Mean","Std.dev.","Min.","Median","Max.","Missing")
+# here's where we get the output
+print(mytable, digits=3)
+write.table(mytable,"clipboard",sep="\t")
+cat("\nThe table has now been copied to the clipboard, so you can paste it into Excel!\n")
+```
+
+If you want to take this further, we can start making really nice Tables for
+reports with various **R** packages. I use the `flextable` package and sometimes
+the `kable()` function from the `knitr` package.
+
+<hr style="height: 2px; background-color: #5560A4;" />
+
+&#185;Hints: we have made two data frame objects, one from the output of
+`numSummary()`; `t()` is the transpose function; there are also some other
+useful functions which might be new to you like: `row.names()`, `cbind()`,
+`print()`, `write.table()` . . .
+
+<table border=1><tr><td>
+<span style="font-size: 14pt;">The following two excellent websites can extend your basic knowledge of using **R** and RStudio:</span>
+
+- A great free resource for **R** beginners is [An Introduction to R](https://intro2r.com/) by Alex Douglas, Deon Roos, Francesca Mancini, Ana Couto & David Lusseau.
+ 
+- [Getting used to R, RStudio, and R Markdown](https://bookdown.org/chesterismay/rbasics/){target="_blank"} is an awesome (and free) eBook by Chester Ismay which is super-helpful if you want to start using **R Markdown** for reproducible coding and reporting.
+</td></tr></table>
+
+<p>&nbsp;</p>
+
+## References
+
+Fox J (2022). *RcmdrMisc: R Commander Miscellaneous Functions*. R package version 2.7-2, [https://CRAN.R-project.org/package=RcmdrMisc](https://CRAN.R-project.org/package=RcmdrMisc){target="_blank"}.
+
+Fox J, Weisberg S (2019). *An {R} Companion to Applied Regression, Third Edition*. Thousand Oaks CA: Sage. [https://socialsciences.mcmaster.ca/jfox/Books/Companion/](https://socialsciences.mcmaster.ca/jfox/Books/Companion/){target="_blank"} (**car** package).
+
+Posit Software (2022) *RStudio 2022.12.0+353 "Elsbeth Geranium" Release*. [https://posit.co/products/open-source/rstudio/](https://posit.co/products/open-source/rstudio/){target="_blank"}.
+
+R Core Team (2022). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL [https://www.R-project.org/](https://www.R-project.org/){target="_blank"}.
+
+<p>&nbsp;</p>

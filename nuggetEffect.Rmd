@@ -1,0 +1,70 @@
+---
+title: "nugget effect microplastics"
+output: html_document
+---
+
+Current protocol specifies a 10g subsample for Fenton digestion, and from that 
+a 2g subsample for density separation.
+
+We can change this later, but for now let's assume 1000 microplastic particles/kg
+So in a 10g subsample, we should have 10 particles. There are 100 possible 10g 
+subsamples from 1kg of material, so:
+
+```{r fig.height=6, fig.width=12, paged.print=FALSE}
+# setup
+par(mfrow=c(1,2), mar=c(4,4,1,1), font.lab=2, mgp=c(2,0.3,0), tcl=0.25)
+perkg <- 1000
+sbsmpl <- 10
+reps <- 100
+palette(c("#000000FF", viridis::turbo(100, alpha = 0.5)))
+# object to store output
+counts_out <- as.data.frame(matrix(rep(NA,2600), nrow = 100))
+colnames(counts_out) <- paste0("n_",seq(0,25))
+
+# derived input
+mean_n <- perkg*(sbsmpl/1e3)
+n_sbsmpl <- 1e3/sbsmpl
+sampl1 <- rpois(100,10)
+
+plot(density(sampl1), main="", xlim=c(0,25), ylim=c(0,0.2), 
+     col=1, xlab="Simulated Counts")
+# do 1st simulation
+for (j in 0:25){
+  counts_out[1,j+1] <- length(which(sampl1==j))
+}
+# do remaining reps-1 simulations
+for (i in 2:reps){
+  sampl1 <- rpois(n_sbsmpl,mean_n)
+  lines(density(sampl1), col=i, lwd=sample(1:2,1))
+  # simulation output
+  for (j in 0:25){
+    counts_out[i,j+1] <- length(which(sampl1==j))
+  }
+}
+# mtext(paste("In 100 samples of 100,",sum(zeros),"had subsamples with count =",n))
+mtext("Each curve is density distribution for n=reps simulated subsamples",
+      side=3, line = -1.2)
+mtext(paste("Poisson distribution, mean =", mean_n),
+      side=3, line = -2.2)
+
+barplot(apply(counts_out[,1:26], MARGIN = 2, FUN = sum), 
+        xlab="Number of microplastics in subsample", 
+        ylab="Total µ-plastic counts for 100×100 subsamples",
+        names.arg = 0:25);axis(1, labels = NA)
+```
+
+```{r paged.print=FALSE}
+(data.frame(n=0:25,Counts=as.numeric(apply(counts_out[,1:26], MARGIN = 2, FUN = sum))))
+rbind(0:12,  as.numeric(apply(counts_out[,1:13], MARGIN = 2, FUN = sum)),
+      rep("",13),
+      13:25, as.numeric(apply(counts_out[,14:26], MARGIN = 2, FUN = sum)))
+```
+
+```{r paged.print=FALSE}
+out2 <- as.data.frame(matrix(c(0:12,  as.numeric(apply(counts_out[,1:13], MARGIN = 2, FUN = sum)),
+      rep("",13),
+      13:25, as.numeric(apply(counts_out[,14:26], MARGIN = 2, FUN = sum))),nrow=5,byrow = T))
+row.names(out2) <- c("Counts_0-12","     n_0-12","-","Counts_13-25","     n_13-25")
+colnames(out2) <- paste0("n",0:12);out2
+```
+

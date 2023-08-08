@@ -1,0 +1,44 @@
+---
+title: "Basics of Maps in R"
+subtitle: "Data Practical for ENVT3361 and ENVT4461"
+documentclass: article
+classoption: a4paper
+geometry: margin=0.787in
+output: 
+  bookdown::pdf_document2: 
+    fig_caption: FALSE
+    number_sections: no
+    toc: no
+    highlight: breezedark
+fontsize: 11pt
+header-includes:
+  \usepackage{sourcesanspro}
+  \usepackage[T1]{fontenc}
+  \renewcommand{\familydefault}{\sfdefault}
+---
+
+```{r load packages and data, message=FALSE, warning=FALSE, include=FALSE}
+load(".RData")
+library(OpenStreetMap)
+library(prettymapr)
+```
+
+### Currently, the possible styles are 
+
+\texttt{default, tango, pygments, kate, monochrome, espresso, zenburn, haddock, }and\texttt{ breezedark.}
+
+### ...then plot the map in its new projection.
+
+```{r plot-UTM-UWA-map, eval=FALSE, include=TRUE, message=FALSE}
+# plot the map in its new projection
+par(mar = c(3, 3, 0.5, 0.5), mgp = c(1.6, 0.3, 0), tcl = 0.4)
+plot(UWA_utm, removeMargin = FALSE)
+axis(1)
+mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.6, font = 2, cex = 1.2)
+axis(2)
+mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.6, font = 2, cex = 1.2)
+addnortharrow(scale = 1.2)
+addscalebar(plotepsg = 32750, htin = 0.15, label.cex = 1.2)
+box()
+```
+

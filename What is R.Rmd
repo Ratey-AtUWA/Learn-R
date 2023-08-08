@@ -1,0 +1,415 @@
+---
+title: "R and RStudio for absolute beginners"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    fig_width: 6.16
+    fig_height: 2.41
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+```{r addimg function, include=FALSE}
+library(png)
+addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
+  if(is.null(x) | is.null(y) | is.null(width)){stop("Must provide args 'x', 'y', and 'width'")}
+  USR <- par()$usr ; PIN <- par()$pin ; DIM <- dim(obj) ; ARp <- DIM[1]/DIM[2]
+  WIDi <- width/(USR[2]-USR[1])*PIN[1] ;   HEIi <- WIDi * ARp 
+  HEIu <- HEIi/PIN[2]*(USR[4]-USR[3]) 
+  rasterImage(image = obj, xleft = x-(width/2), xright = x+(width/2),
+            ybottom = y-(HEIu/2), ytop = y+(HEIu/2), interpolate = interpolate)
+}
+```
+
+```{r page 1 header hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
+logo <- readPNG("UWA logo_text_V_wsL.png")
+par(mar = c(0,0,0,0))
+layout(matrix(c(1,1,1,1,2),nrow = 1))
+
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+text(-0.025,0.9, pos = 4, cex = 2.6, font = 2, col = "#003087", 
+     labels="School of Agriculture and Environment")
+text(-0.025,0.6, pos = 4, cex = 2.2, col = "#997500", 
+     labels="R for data analysis and visualization in Environmental Science")
+text(-0.025,0.1, pos = 4, font = 3, family = 'serif', cex = 1.5, col = "#636363",
+     labels="Andrew Rate, School of Agriculture and Environment, The University of Western Australia")
+plot(1,1, axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(logo, x = 1.2, y = 1, width = 0.5)
+par(mar = c(3.5,3.5,0.5,0.5))
+layout(matrix(c(1),nrow = 1))
+```
+
+# What is R?
+
+**R** is called a "**statistical computing environment**". This means two things:
+
+1.  **R** is software that allows us to perform statistical analysis of data;
+2.  **R** is a type of computer programming code (a language).
+
+In **R** these two features are combined so that we perform the tasks we need to by writing instructions in **R** code. We commonly want to:
+
+-   create or input data
+-   format, store, and save our data
+-   perform statistical and numerical analysis of our data
+-   display our data and report our analysis in graphs and tables
+
+By using **R** code to do this, we can easily *reproduce* our analyses, that is, use *exactly* the same procedures again on additional data, or simply re-create what we have done. We can save our **R** code in simple 'text' files, or even in a document called an **R Notebook** which uses a few additional coding features (called 'R markdown') to let us save our code and the results of our analysis in the same document. We use R markdown to produce documents such as reports (this document is created using R markdown).
+
+<hr style="height: 2px; background-color: #660F00;" />
+
+> "...R has developed into a powerful and much used open source tool ... for advanced statistical data analysis..."
+>
+> --- [Reimann *et al*. (2008) &ndash; *Statistical Data Analysis Explained: Applied Environmental Statistics with R*](https://onesearch.library.uwa.edu.au/permalink/61UWA_INST/1vk1d8f/alma99584168302101){target="_blank"}, p.3.
+
+<hr style="height: 2px; background-color: #660F00;" />
+
+## R and RStudio
+
+To make our job of using **R** easier, we'll be using the **RStudio** program. RStudio is an IDE or 'integrated development environment' which puts everything we need for R coding in one place, and has some helpful tools (such as predictive text for code, and some menu-driven functions) to make coding easier. In this document, when we say '**R**', we really mean 'R in the RStudio environment'.
+
+```{r fig-RStudio, fig.height=5.4, fig.width=7.2, fig.align='center', fig.cap="The RStudio window with a very brief explanation of some different sub-panes.", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+fig1 <- readPNG("RStudio.png")
+par(mar = c(0,0,0,0))
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(fig1, x = 0.5, y = 0.5, width = 1)
+```
+
+## Three things we really need to know about using **R**
+
+1.  **How data are stored**. **R** can handle many different types of data, such as numbers, text, categories, spatial coordinates, images, and so on. **R** uses various types of *objects* to store different types of data in different ways.
+
+2.  **Code-based instructions**. If we want **R** to do something for us, we need to give it instructions. We do this in other software too, commonly by using a mouse or other pointing device to click and select options from a menu. For example, in Excel we can sort a table of data by:
+
+    (a) using the mouse to select the cells we want to sort;
+    (b) clicking on the Data menu;
+    (c) clicking on the Sort button;
+    (d) choosing the column we want to sort by in the dialog box that appears;
+    (e) clicking 'OK'.
+
+    In **R**, we can do the same thing, but we would write the instructions in **R** code, such as that shown below:
+
+    You don't have to remember this (yet). The code here is also to illustrate that, in this document, **R** code will be shown in blocks like the one below having a `shaded background and fixed-space font`.
+
+```{r compare Excel sorting, eval=FALSE, include=TRUE}
+data_sorted <- data[order(data$column1, data$column2),] 
+```
+
+3.  (We did say three things.) **R** is **very** literal, and needs precise instructions to do everything. A small error in our code will mean we get wrong, or no, results. For example, all **R** code is case-sensitive. Also, if we don't tell R where to look for things, it won't try anywhere else just in case we might have intended another location!
+
+## Types of data we commonly use in **R**
+
+### Single numbers
+
+**R** can work with single numbers, much like a complex calculator.
+
+To "run" **R** code, we can type it into the RStudio Console and press the 
+`enter` key. We will see the results of running the code also in the Console, 
+below the code we just entered.
+
+```{r as a calculator 1}
+123 + 456
+```
+
+```{r as a calculator 2}
+sqrt(731)
+```
+
+```{r fig-1, fig.height=2.41, fig.width=6.16, fig.align='center', fig.cap="Understanding simple R functions and output.", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+fig1 <- readPNG("function_results.png")
+par(mar = c(0,0,0,0))
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(fig1, x = 0.5, y = 0.5, width = 1)
+```
+
+We don't usually use R like this, but it's handy to know that we have a calculator handy if we need in in the **R** Console!
+
+<table border=2 width="100%" cellpadding="5" style="border-collapse: collapse; width: 100%; border-color: #3F57B8;">
+<tr><td>**R functions**
+
+This is also the place to introduce Functions in **R**. We just used a function -- to calculate a square root: `sqrt(731)`.
+
+An R function is identified by a **name** such as `sqrt`, `t.test` or `plot`, followed by **arguments** in parentheses `( )` (the parentheses can be empty, for example `help.start()` -- try it!). We used the argument `731` in the `sqrt()` function -- some functions require several arguments, as you will see. Some arguments have default 'built-in' values.
+
+There are huge numbers of built-in functions in **R** which we can use after first installing **R**, "straight out of the box" (we call this "**base R**"). For instance, see the 
+<a href="https://cran.r-project.org/doc/contrib/Baggott-refcard-v2.pdf" target="_blank">R reference card v2 by Matt Baggott</a>.
+
+If we can't find the functions we need, they may be available in **R packages** which are additional libraries of functions that we can install from within the **R** environment. A commonly used package is `car`, the <u>c</u>ompanion to <u>a</u>pplied <u>r</u>egression. We would install this into **R** using a function `install.packages("car")`, which stores the library on our device. To use the functions in the `car` package we would load the library into our **R** session by running `library(car)`.
+
+We can also write our own functions in **R** and we may show you examples of these as you progress through this course.</td></tr>
+<table>
+
+### Vectors
+
+A vector is a one-dimensional set of numbers, similar to a column or row of values in a spreadsheet. We use the simple function `c()` to **c**ombine, or put together, a set of values. The code below shows how we can make a vector **object** using the assign code `\<-` to give our vector a name of our choice. Just by entering the vector object's name, we can then see its contents:
+
+```{r make and view a vector}
+a <- c(1,3,5,7,9,2,4,6,8,10)
+a
+```
+
+We can also check the type of object using the `class()` function, or using another function that asks if the object is in a specific class (*e.g*. `is.vector()` or `is.character()`).
+
+```{r}
+class(a)
+is.vector(a)
+is.character(a)
+```
+
+We can also make use of the square brackets: remember from Figure 1 that the values in square brackets `[ ]` are the index for a set of values. For a vector, which is one dimensional, we just need one value in `[ ]` at the end of our object name to select particular values:
+
+```{r}
+a[3]
+# we can also use a range of values
+a[7:10]
+```
+
+There are some other useful ways to make vectors in **R**, such as the functions `seq()` (**seq**uence) and `rep()` (**rep**eat) (and many others!). Try changing some of the code below and running it, to make sure you understand the results each time.
+
+```{r vector with sequence}
+# make a vector with a sequence of numbers from 2 to 80 in steps of 2
+b <- seq(2,80,2)
+b
+```
+
+Notice that if we have a long vector, the number in square brackets at the beginning of each line tells us which item the line starts with.
+
+```{r vector by repeating}
+# make a vector of the number 12 repeated 20 times
+d <- rep(12,20)
+d
+```
+
+### Matrices
+
+A matrix is a two-dimensional set of data with rows and columns. All of the entries must be the same type (*e.g*. integer, numeric, character). We can make a matrix using a vector (*e.g*. `b` from above), so long as we specify how many rows and/or columns we want:
+
+```{r matrix from vector}
+m <- matrix(b, nrow = 5)
+m
+```
+
+By default we fill each column in order, but we can change this by using the [byrow = ]{style="font-family: monospace; background-color:#e8e8e8;"}[TRUE]{style="font-family: monospace; color:#600080; background-color:#e8e8e8;"} option.
+
+```{r matrix from vector byrow}
+m <- matrix(b, ncol = 8, byrow = TRUE)
+m
+```
+
+We can locate each value in the matrix using a two-part index in square brackets `[row, column]`. Here are some examples (note that we *always* need the comma):
+
+```{r select value in matrix with index}
+# single value at [row,column]
+selection <- m[2,3] 
+selection
+```
+
+```{r select row using index}
+# a whole row by itself
+selection <- m[4,]
+selection
+```
+
+```{r select column using index}
+# a whole column by itself
+selection <- m[,8]
+selection
+```
+
+### Data frames
+
+Data frames are one of the most common ways to store data in **R**. They are two-dimensional like matrices, with rows and columns, but the columns can contain different types of data such as numbers (integer or numeric), text (character), or categories (factor), *etc*..
+
+Data frame are one of the best ways to store "real" data which can contain information such as sample IDs, treatments, replicates, coordinates, categories, measurements, dates/times, *etc*. Let's make one and look at its properties.
+
+```{r make data frame from scratch, paged.print=FALSE}
+df <- data.frame(Name = c("Sample 1","Sample 2","Sample 3","Sample 4","Sample 5"),
+                 Group = as.factor(c("New","New","Old","Old","Old")),
+                 Value = c(2.34,4.56,3.45,5.67,6.54),
+                 Count = as.integer(c(21,35,19,18,27)))
+df
+```
+
+We can see that we made a data frame '`df`' with 4 columns and 5 rows (the first column of output is the row number, not part of the data frame's column count). All the columns contain a different type of information which we can see using the `str()` (**str**ucture) function:
+
+```{r str function}
+str(df)
+```
+
+The output of str() shows that the column called `Name` contains `chr` (character = text) information, `Group` is a `Factor` *(i.e*. categorical information) with two `levels` or categories, `Value` is `num` (numeric = real numbers), and `Count` is `int` (integer).
+
+**Data frames** are a very common way of storing our data in the **R**
+environment. The rows of our data frame represent our **observations** or
+'samples'. The columns of a data frame  are the **variables** -- information
+about the samples which may be identifying information (character or categorical
+information), or measurements (usually numeric information such as counts or
+concentrations).
+
+We should notice that each column name is preceded by a dollar sign `$`, and we also use this to specify single columns from a data frame:
+
+```{r dollar for columns}
+# both lines of code below should give the same output!
+df$Value
+df[,3]
+```
+
+### Other types of object in R
+
+There are *many* other object types in **R**! Many of these are specialised to
+handle specific types of data, such as time series, spatial data, or raster
+images. One of the more common **R** objects is the **list**, which is a 
+collection of different object types -- often if we save the output of a 
+function, it will be as an object of class `list`.
+
+## Working with files
+
+### Telling RStudio where to find our files
+
+We've just seen how we can create data in R by typing it in, and some of our examples in class will do this, but the most common way of getting our data into **R** is to **read (input) from a file**.
+
+Before we read any files, though, we need to tell **R** where to find the files we've saved, downloaded, or created. There are 2 ways to do this in RStudio:
+
+1.  In the top level menu, click Session » Set Working Directory » Choose Directory. This will open a window showing just folders (= *directories*). Click on the folder where your files are, and click the [&nbsp;Open&nbsp;]{style="background-color:#808080; color:white;"} button.
+
+2.  With the RStudio [&nbsp;Files&nbsp;]{style="background-color:#808080; color:white"} pane already showing the files you are working with, click [&nbsp;More&nbsp;]{style="background-color:#808080; color:white;"}, then [&nbsp;Set As Working Directory&nbsp;]{style="background-color:#808080; color:white;"}.
+
+### Opening a data file
+
+In classes, we will mainly supply data as CSV ([C]{.underline}omma [S]{.underline}eparated [V]{.underline}alue, or .csv) files. These are a simple and widely-used way to store tabular data such as found in an **R** data frame, and can also be opened in Excel and other software.
+
+**R** has a specific function for reading .csv files, `read.csv()`. If we know that our file contains categorical information present as text, we should also include the option [stringsAsFactors = ]{style="font-family: monospace; background-color:#e8e8e8;"}[TRUE]{style="font-family: monospace; color:#6000A0; background-color:#e8e8e8;"} (we can shorten [TRUE]{style="font-family: monospace; color:#6000A0; background-color:#e8e8e8;"} to [T]{style="font-family: monospace; color:#6000A0; background-color:#e8e8e8;"}).
+
+```{r dataframe from file, message=FALSE, warning=FALSE, paged.print=FALSE}
+df <- read.csv(file = "df.csv", stringsAsFactors = T)
+df
+```
+
+If the file is not in our Working Directory, we would need to specify the whole path. We can also read directly from an internet address:
+
+```{r read csv full path or url, eval=FALSE, include=TRUE}
+df <- read.csv(file = "C:/Users/neo/LocalData/R Projects/Learning R/df.csv",
+               stringsAsFactors = T)
+df <- read.csv("https://raw.githubusercontent.com/Ratey-AtUWA/learningR/main/df.csv",
+               stringsAsFactors = T)
+```
+
+You might notice that we didn't include `file = ` in the second example above. We can do this because `file = ` is the option **R** expects first in the `read.csv()` function.
+
+### Saving and running code in files
+
+In **R** we usually run code from a file rather than typing lines of code into
+the **R** Console. **R** code files that we provide for you to use will usually 
+have the extension `.R`. We can:
+
+- **Open** files by clicking File/Open File... (or typing `ctrl-O` on the keyboard), then choosing from our computer or network file system
+- **Create** new `.R` code files by clicking File/New File/R Script (or typing `ctrl-shift-N` on the keyboard), then typing in code. *Don't forget to save the file!*
+
+```{r fig-RStudio-file, fig.height=4, fig.width=7.2, fig.align='center', fig.cap="The RStudio window showing the `Source` sub-pane (and the other panes).", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+fig1 <- readPNG("RStudio2.png")
+par(mar = c(0,0,0,0))
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(fig1, x = 0.5, y = 0.5, width = 1.0)
+```
+
+In an open **R** code file, we can **run** lines or chunks of code by selecting
+the code to be run with our pointing device, then clicking the <span
+style="background-color:#808080; color:white">&#9646;<span
+style="color:#80FF00;">&#10152;</span><span
+style="color:white;">Run&nbsp;</span></span> button at the top of the
+source pane, or typing `ctrl-enter`.<br />
+We can actually just put our cursor anywhere in a line of code and click 
+<span style="background-color:#808080; color:white">&#9646;<span style="color:#80FF00;">&#10152;</span><span style="color:white;">Run&nbsp;</span></span> or type `ctrl-enter`.
+
+<hr style="height: 1px; background-color: #5560A4;" />
+
+<p>&nbsp;</p>
+
+<center>![](helpStress.png){width=326 height=300}</center>
+
+## Built-in R Help
+
+How do we find out the order of options in a function? Well, **R** and RStudio have excellent **Help** utilities. For example, if we run the code `help("read.csv")` or just `?read.csv` in the RStudio Console (usually the bottom-left pane), this will open the relevant help page in the Help pane at (lower) right. We can also search directly in the help pane.
+
+If we're unsure about anything in R, especially, we may be able to find it in the Help system. A very useful place to start is by running the code below to get to the general help page:
+
+```{r help start page, eval=FALSE}
+help.start()
+```
+
+Hopefully we don't need to manually open the <http://127.0.0.1:30394/doc/html/index.html> link; either way we will see a page like that below in our RStudio help pane, or in our web browser.  More detailed help is always available here: <strong><a href="https://www.r-project.org/help.html" title="Detailed R help" target="_blank" rel="noopener">https://www.r-project.org/help.html</a></strong>
+
+[Go here for a great page on common errors in **R** and how to fix them](https://statsandr.com/blog/top-10-errors-in-r/){target="_blank"}
+
+<table width="100%" border="1" style="border-color: black">
+<tbody>
+<tr>
+<td>
+<h2>Statistical Data Analysis&nbsp;<img style="width: 4em;" alt="[R logo]" src="https://www.r-project.org/logo/Rlogo.png" /></h2>
+
+<hr style="height: 2px; background-color: #5560A4;" />
+
+<h3>Manuals</h3>
+<table width="100%" cols="2">
+<tbody>
+<tr>
+<td width="50%" align="center">[An Introduction to R](https://cran.r-project.org/doc/manuals/r-release/R-intro.html){target="_blank"}</td>
+<td width="50%" align="center">[The R Language Definition](https://cran.r-project.org/doc/manuals/r-release/R-lang.html){target="_blank"}</td>
+</tr>
+<tr>
+<td width="50%" align="center">[Writing R Extensions](https://cran.r-project.org/doc/manuals/r-release/R-exts.html){target="_blank"}</td>
+<td width="50%" align="center">[R Installation and Administration](https://cran.r-project.org/doc/manuals/r-release/R-admin.html){target="_blank"}</td>
+</tr>
+<tr>
+<td width="50%" align="center">[R Data Import/Export](https://cran.r-project.org/doc/manuals/r-release/R-data.html){target="_blank"}</td>
+<td width="50%" align="center">[R Internals](https://cran.r-project.org/doc/manuals/r-release/R-ints.html){target="_blank"}</td>
+</tr>
+</tbody>
+</table>
+<h3>Reference</h3>
+<table width="100%" cols="2">
+<tbody>
+<tr>
+<td width="50%" align="center">[Packages](https://cran.r-project.org/web/packages/index.html){target="_blank"}</td>
+<td width="50%" align="center"><a href="http://127.0.0.1:30394/doc/html/Search.html" target="_blank">Search Engine &amp; Keywords</a></td>
+</tr>
+</tbody>
+</table>
+<h3>Miscellaneous Material</h3>
+<table width="100%" cols="3">
+<tbody>
+<tr>
+<td width="33%" align="center">[About R](https://www.r-project.org/about.html){target="_blank"}</td>
+<td width="33%" align="center">[Authors](https://www.r-project.org/contributors.html){target="_blank"}</td>
+<td width="33%" align="center">[Resources](https://cran.r-project.org/web/views/){target="_blank"}</td>
+</tr>
+<tr>
+<td width="33%" align="center"><a href="http://127.0.0.1:30394/doc/COPYING" target="_blank">License</a></td>
+<td width="33%" align="center">[Frequently Asked Questions](https://cran.r-project.org/faqs.html){target="_blank"}</td>
+<td width="33%" align="center"><a href="http://127.0.0.1:30394/doc/THANKS" target="_blank">Thanks</a></td>
+</tr>
+<tr>
+<td width="33%" align="center">[NEWS](https://www.r-project.org/news.html){target="_blank"}</td>
+<td width="33%" align="center">[User Manuals](https://cran.r-project.org/manuals.html){target="_blank"}</td>
+<td width="33%" align="center">[Technical papers](https://journal.r-project.org/){target="_blank"}</td>
+</tr>
+</tbody>
+</table>
+</td>
+</tr>
+</tbody>
+</table>
+
+```{r clean up unneeded objects, include=FALSE}
+rm(list = c("a","b","d","m","df","fig1","logo"))
+```
+
+<p>&nbsp;</p>

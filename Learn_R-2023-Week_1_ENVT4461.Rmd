@@ -1,0 +1,133 @@
+---
+title: "Introduction to R for ENVT4461"
+output:
+  bookdown::html_document2:
+    fig_width: 6
+    fig_height: 4
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+```{r addimg function, include=FALSE}
+library(png)
+addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
+  if(is.null(x) | is.null(y) | is.null(width)){stop("Must provide args 'x', 'y', and 'width'")}
+  USR <- par()$usr ; PIN <- par()$pin ; DIM <- dim(obj) ; ARp <- DIM[1]/DIM[2]
+  WIDi <- width/(USR[2]-USR[1])*PIN[1] ;   HEIi <- WIDi * ARp 
+  HEIu <- HEIi/PIN[2]*(USR[4]-USR[3]) 
+  rasterImage(image = obj, xleft = x-(width/2), xright = x+(width/2),
+            ybottom = y-(HEIu/2), ytop = y+(HEIu/2), interpolate = interpolate)
+}
+```
+
+```{r save-default-par, include=FALSE}
+defpar <- par(no.readonly = TRUE)
+```
+
+```{r page 1 header hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
+logo <- readPNG("UWA logo_text_V_wsL.png")
+par(mar = c(0,0,0,0))
+layout(matrix(c(1,1,1,1,2),nrow = 1))
+
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+text(-0.025,0.9, pos = 4, cex = 2.6, font = 2, col = "#003087", 
+     labels="School of Agriculture and Environment")
+text(-0.025,0.6, pos = 4, cex = 2.2, col = "#997500", 
+     labels="R for data analysis and visualization in Environmental Science")
+# text(-0.025,0.4, pos = 4, font = 3, cex = 1.4, col = 12,
+#      labels="Geochemical data for international samples of whole rocks (USGS)")
+text(-0.025,0.1, pos = 4, font = 3, family = 'serif', cex = 1.5, col = "#636363",
+     labels="James Fogarty and Andrew Rate, School of Agriculture and Environment")
+plot(1,1, axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(logo, x = 1.2, y = 1, width = 0.5)
+par(mar = c(3.5,3.5,0.5,0.5))
+layout(matrix(c(1),nrow = 1))
+```
+
+### Files to work with or refer to during the Workshop class
+
+- [`IntroductionPractice.R`](https://lms.uwa.edu.au/bbcswebdav/xid-42740876_1){target="_blank"}
+- [`ProgramingDataManipulations.R`](https://lms.uwa.edu.au/bbcswebdav/xid-42740897_1){target="_blank"}
+- [`Book - ENVT4461.pdf`](https://lms.uwa.edu.au/bbcswebdav/xid-42740857_1){target="_blank"}
+
+<span style="font-size: 12pt;"><span style="font-size: 18pt;">☝</span> <strong>The files attached above</strong> are some <span style="color: #003087;"><strong>R</strong></span> script (code) practice examples (ending in `.R`) &ndash; *you'll need to download these*. The video below wil help. You will also find a core reference textbook (the `.pdf` file) that covers introductory R operations.&nbsp;</span>
+
+### Getting started with R Studio
+
+This recording provides a overview of how to get started with R Studio, using files downloaded from LMS. &nbsp; Setting the *working directory *is an essential skill. &nbsp; Instructions for setting the working directory start about 4:20 in this recording.&nbsp;&nbsp;So (i) make sure you watch all the way to the end and (ii) if you forget how to set the working directory, come back to this recording. </span><span style="font-size: 10pt;">*You can ignore the comment at the end about this being the &ldquo;last activity&rdquo;*.</span>
+
+<table border="0" cellpadding="2" style="border-collapse: collapse; width: 100%;">
+<tbody>
+<tr>
+<td style="width: 42.3336%; vertical-align: center;"><iframe width="360" height="240" src="https://www.youtube.com/embed/tYLBAJuN0-E?rel=0" frameborder="0" allowfullscreen="allowfullscreen"></iframe></td>
+<td style="width: 32.7001%; vertical-align: top;">
+<p><span style="font-size: 12pt;">Followup to video at left, explaining some of the basic but potentially mysterious features of <span style="color: #003087;"><strong>R</strong></span> and <strong><span style="color: #003087;">RStudio</span></strong></span></p>
+<p><span style="font-size: 12pt;"><strong><span style="color: #003087;"><iframe width="360" height="240" src="/webapps/echo-library-BB5ddb108fe0c42/ltiLaunch.jsp?mediaId=1dfcc93a-b00f-46a9-8746-396e6eb132f5&amp;course_id=@X@course.id@X@" title="ENVT4461+Workshop_1+Intro_2" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe>&nbsp;<br /><br /></span></strong></span></p>
+</td>
+<td style="width: 24.9664%; vertical-align: top;">
+<p><strong><span style="font-size: 12pt;">&nbsp;<br /><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355655-dt-content-rid-35008394_1/xid-35008394_1" target="_blank" rel="noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355655-dt-content-rid-35447805_1/xid-35447805_1" alt="ENVT4461 R book cover" align="left" style="border: 2px solid #C0C0C0;" height="200" width="141" /></a>&nbsp;<a alt="" href="https://lms.uwa.edu.au/bbcswebdav/pid-3355655-dt-content-rid-35008394_1/xid-35008394_1" target="_blank" rel="noopener">Book &ndash; Introduction to R and Statistics &ndash; ENVT4461</a></span></strong></p>
+<p><span style="font-size: 12pt;"> by <a href="https://research-repository.uwa.edu.au/en/persons/james-fogarty" target="_blank" rel="noopener">James Fogarty</a>&nbsp;*et al*.</span></p>
+</td>
+</tr>
+<tr>
+<td style="width: 42.3336%; vertical-align: top;">
+<div style="font-size: 15px; font-weight: bold; margin-bottom: 5px; text-align: left;"><a href="http://www.youtube.com/watch?v=LNw6hzGgyxM" target="_blank" rel="noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355655-dt-content-rid-37870070_1/xid-37870070_1" alt="Youtube video icon" align="left" style="border: 0px solid #000000;" height="48" width="48" />&nbsp;alternative to above: RStudio Basics: Setting your Working Directory</a></div>
+<div id="thumbnail-metadata" style="font-size: 11px; margin-bottom: 5px;"><strong>Duration:</strong> 2:01 <br /><strong>User:</strong> n/a - <strong>Added:</strong> 22/03/16</div>
+</td>
+<td colspan="2" style="vertical-align: top; width: 57.6664%;">
+<p><a href="https://rbasics.netlify.app/" title="Getting used to R, RStudio, and R Markdown" target="_blank" rel="noopener"><strong><span style="font-size: 12pt;">Getting used to R, RStudio, and R Markdown</span></strong></a></p>
+<p><span style="font-size: 12pt;">An excellent (and free) eBook by <a href="https://github.com/ismayc" title="Chester Ismay on github" target="_blank" rel="noopener">Chester Ismay</a> and <a href="https://github.com/pkq" target="_blank" rel="noopener">Patrick C. Kennedy</a> which is a great place to start using R.</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<p><span style="font-size: 12pt;"><strong>You will need to download <span style="color: #003087; font-size: 14pt;">R</span> first</strong>. Follow the instructions on the relevant page for your device. Other operating system installers are linked from <a href="https://cran.r-project.org/" target="_blank" rel="noopener">https://cran.r-project.org/</a></span></p>
+<table border="0" style="border-collapse: collapse; width: 80%;">
+<tbody>
+<tr>
+<td style="width: 40%; vertical-align: top;"><span style="font-size: 12pt;"><a href="https://cran.r-project.org/bin/windows/base/" target="_blank" rel="noopener">Download page: R for Windows</a><br /><span style="font-size: 10pt; color: #606060;">We recommend the 64-bit installation (don't worry if you don't know what this means)</span><br /></span></td>
+<td style="width: 40%;"><span style="font-size: 12pt;"><a href="https://cran.r-project.org/bin/macosx/" target="_blank" rel="noopener">Download page: R for macOS</a><br /><span style="font-size: 10pt; color: #606060;">Make sure you choose the version that matches *your* MacOS</span><br /></span></td>
+</tr>
+</tbody>
+</table>
+<p><span style="font-size: 12pt;">&nbsp;<br />Install R first, as this is required by RStudio.</span></p>
+<table border="1" style="border-collapse: collapse;">
+<tbody>
+<tr>
+<td>
+<p><span style="font-size: 12pt;"><strong>Next, install a free version of RStudio</strong> by <a href="https://www.rstudio.com/products/rstudio/download/" target="_blank" rel="noopener">going here</a>. You should choose this version:&nbsp;<span style="text-decoration: underline;"><span style="color: #003087; text-decoration: underline;">RStudio Desktop,<span style="font-size: 10pt;">Open Source License</span>,&nbsp;<span style="font-size: 14pt;">Free</span></span></span>.<br />Click on the <a href="https://www.rstudio.com/products/rstudio/download/#download" target="_blank" rel="noopener"><strong><span style="color: #ffffff; background-color: #236fa1;">&nbsp;DOWNLOAD&nbsp;</span></strong></a> button which will take you to a page where you can select the correct download for your device.</span></p>
+</td>
+</tr>
+</tbody>
+</table>
+<p><span style="font-size: 12pt;">Hopefully that's all you need to do 😊</span></p>
+<hr />
+<h4><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355655-dt-content-rid-42741916_1/xid-42741916_1" target="_blank" rel="noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355655-dt-content-rid-42743028_1/xid-42743028_1" alt="html icon" align="left" style="border: 0px solid #000000;" width="48" height="48" /></a><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355655-dt-content-rid-42741916_1/xid-42741916_1" target="_blank" rel="noopener">&nbsp;R and RStudio for absolute beginners</a><br /><span style="font-size: 12pt;">(just in case)</span></h4>
+<hr />
+<p></p>
+<table width="100%" style="width: 100%;">
+<tbody>
+<tr>
+<td width="50%" style="width: 50.0329%; vertical-align: top;">
+<p style="text-align: left;"><a href="https://echo360.net.au/media/96e1a499-d6fb-431c-90d7-deff72b93ae1/public" target="_blank" rel="noopener"><span style="font-size: 10pt; font-family: arial, helvetica, sans-serif; color: #000000;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355655-dt-content-rid-28393578_1/xid-28393578_1 align=" left="" alt="Video icon" style="border: 0px solid #000000;" height="38" width="48" /><span style="font-size: 12pt;"> Part 1 - Inputs: Getting information into R</span></span></a></p>
+</td>
+<td width="50%" style="width: 49.9671%; vertical-align: top;">
+<p style="text-align: left;"><a href="https://echo360.net.au/media/b9aad7aa-9976-4898-b71b-9c8d2f5353a4/public" target="_blank" rel="noopener"><span style="font-size: 10pt; font-family: arial, helvetica, sans-serif; color: #000000;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355655-dt-content-rid-28393578_1/xid-28393578_1 align=" left="" alt="Video icon" style="border: 0px solid #000000;" height="38" width="48" /><span style="font-size: 12pt;"> Part 2 - Outputs: Getting information from R</span></span></a></p>
+</td>
+</tr>
+<tr>
+<td colspan="2" style="width: 100%; vertical-align: middle; text-align: center;"><span style="font-size: 11pt;">We suggest that you <strong>go through the exercises in the first box at the top of this page <img src="http://static.skaip.org/img/emoticons/180x180/f6fcff/pointupindex.gif" height="40" width="40" /> before viewing</strong> these two videos, to reinforce some of the material covered in the workshop class</span></td>
+</tr>
+</tbody>
+</table>
+

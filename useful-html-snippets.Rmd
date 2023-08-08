@@ -1,0 +1,113 @@
+---
+title: "html code snippets often used in R markdown"
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+    fig_caption: yes
+    self_contained: no
+    number_sections: no
+    toc: no
+---
+
+<style type="text/css">
+  body{
+  font-size: 11pt;
+}
+</style>
+
+**Note** this &#8594; 11 point sans, is the default font.
+
+### Font size and colour
+```{html}
+The next sentence (not this one) is blue 9 pt font. 
+<span style="font-size:9pt; color:blue;">This sentence is in blue 9pt font.</span>
+```
+The next sentence (not this one) is blue 9 pt font. 
+<span style="font-size:9pt; color:blue;">This sentence is in blue 9pt font.</span>
+
+### Font shading and typeface
+```{html}
+The next sentence (not this one) is serif font in cyan shading. 
+<span style="font-family: cambria, serif; background-color:cyan;">This sentence is serif font in cyan shading.</span>
+```
+The next sentence (not this one) is serif font in cyan shading. 
+<span style="font-family: cambria, serif; background-color:cyan;">This sentence is serif font in cyan shading.</span>
+
+### Horizontal rule with defined color and thickness
+```{html}
+<hr style="height: 5px; background-color: #5560A4;" />
+```
+<hr style="height: 5px; background-color: #5560A4;" />
+
+### Table formatting
+```{html}
+<table width="90%">
+<tr>
+<td align="center" colspan=2>**double-width cell value**</td>
+<td align="left" style="background-color: #e0e0e0;">*grey-shaded* cell</td>
+</tr>
+<tr style="background-color: #c0c0f0;">
+<td align="right">right-aligned<br>(whole row shaded blue)</td>
+<td align="center">center-aligned<br>(whole row shaded blue)</td>
+<td align="left">left-aligned<br>(whole row shaded blue)</td>
+</tr>
+</table>
+```
+<table width="90%">
+<tr>
+<td align="center" colspan=2>**double-width cell value**</td>
+<td align="left" style="background-color: #e0e0e0;">*grey-shaded* cell</td>
+</tr>
+<tr style="background-color: #c0c0f0;">
+<td align="right">right-aligned<br>(whole row shaded blue)</td>
+<td align="center">center-aligned<br>(whole row shaded blue)</td>
+<td align="left">left-aligned<br>(whole row shaded blue)</td>
+</tr>
+</table>
+<p>&nbsp;</p>
+
+```{html}
+<table cellpadding="4" border="4" style="border-collapse: collapse; width: 100%; border-color: #FFD700;">
+<tr>
+  <td style="text-align: center;">Some text in a table with <span style="color:#FFD700;">gold</span> border showing the markdown way (the **best** way) of doing ~sub~scripts and ^super^scripts</td>
+  </tr>
+</table>
+```
+
+<table cellpadding="4" border="4" style="border-collapse: collapse; width: 100%; border-color: #FFD700;">
+<tr>
+  <td style="text-align: center;">Some text in a table with <span style="color:#FFD700;">gold</span> border showing the markdown way (the **best** way) of doing ~sub~scripts and ^super^scripts</td>
+  </tr>
+</table>
+
+### Special characters
+
+<table width="100%" border="0">
+<tr align="right" style="background-color: #FFF8E8;"><td>`&lt;`</td> <td>&lt;</td> <td>&nbsp;</td> <td>`&gt;`</td> <td>&gt;</td> <td>&nbsp;</td> <td>`&le;`</td> <td>&le;</td> <td>&nbsp;</td> <td>`&ge;`</td> <td>&ge;</td> <td>&nbsp;</td> <td>`&asymp;`</td> <td>&asymp;</td> <td>&nbsp;</td> <td>`&ne;`</td> <td>&ne;</td></tr>
+
+<tr align="right"><td>`&equiv;`</td> <td>&equiv;</td> <td>&nbsp;</td> <td>`&frac12;`</td> <td>&frac12;</td> <td>&nbsp;</td> <td>`&frac14;`</td> <td>&frac14;</td> <td>&nbsp;</td> <td>`&frac34;`</td> <td>&frac34;</td> <td>&nbsp;</td> <td>`&#8652;`</td> <td>&#8652;</td> <td>&nbsp;</td> <td>`&#8680;`</td> <td>&#8680;</td></tr>
+
+<tr align="right" style="background-color: #FFF8E8;"><td>`&alpha;`</td> <td>&alpha;</td> <td>&nbsp;</td> <td>`&beta;`</td> <td>&beta;</td> <td>&nbsp;</td> <td>`&gamma;`</td> <td>&gamma;</td> <td>&nbsp;</td> <td>`&theta;`</td> <td>&theta;</td> <td>&nbsp;</td> <td>`&mu;`</td> <td>&mu;</td> <td>&nbsp;</td> <td>`&pi;`</td> <td>&pi;</td></tr>
+
+<tr align="right"><td>`&#176;`</td> <td>&#176;</td> <td>&nbsp;</td> <td>`&#177;`</td> <td>&#177;</td> <td>&nbsp;</td> <td>`&#185;`</td> <td>&#185;</td> <td>&nbsp;</td> <td>`&#178;`</td> <td>&#178;</td> <td>&nbsp;</td> <td>`&#179;`</td> <td>&#179;</td> <td>&nbsp;</td> <td>`&#215;`</td> <td>&#215;</td></tr>
+
+<tr align="right" style="background-color: #FFF8E8;"><td>`&sum;`</td> <td>&sum;</td> <td>&nbsp;</td> <td>`&infin;`</td> <td>&infin;</td> <td>&nbsp;</td> <td>`&prop;`</td> <td>&prop;</td> <td>&nbsp;</td> <td>`&isin;`</td> <td>&isin;</td> <td>&nbsp;</td> <td>`&minus;`</td> <td>&minus;</td> <td>&nbsp;</td> <td>`&#247;`</td> <td>&#247;</td></tr>
+
+<tr align="right"><td>`&ndash;`</td> <td>&ndash;</td> <td>&nbsp;</td> <td>`&mdash;`</td> <td>&mdash;</td> <td>&nbsp;</td> <td>`&bull;`</td> <td>&bull;</td> <td>&nbsp;</td> <td>`&permil;`</td> <td>&permil;</td> <td>&nbsp;</td> <td>`&there4;`</td> <td>&there4;</td> <td>&nbsp;</td> <td>`&Delta;`</td> <td>&Delta;</td></tr>
+
+</table>
+See Tim Trott's page at <https://lonewolfonline.net/html-character-codes-ascii-entity-unicode-symbols/> for a complete list.
+
+### Miscellaneous but no less useful
+```{html}
+# sets default font size for knitting R markdown to html documents
+# include directly after yaml header
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+```
+
+<p>&nbsp;</p>

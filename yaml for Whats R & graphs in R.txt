@@ -1,0 +1,29 @@
+---
+title: "Graphs in R"
+output:
+  bookdown::html_document2:
+    fig_width: 6
+    fig_height: 4
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+
+---
+title: "R and RStudio for absolute beginners"
+output: 
+  bookdown::html_document2:
+    fig_width: 6.16
+    fig_height: 2.41
+    number_sections: yes
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+  word_document: 
+    toc_depth: 2
+    fig_caption: yes
+---

@@ -1,0 +1,300 @@
+---
+title: "Statistics for Comparing Means"
+output: 
+  bookdown::html_document2: 
+    fig_caption: yes
+    self_contained: no
+    number_sections: no
+    toc: no
+---
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+```{r load addImg fxn and palettes, include=FALSE}
+library(png)
+addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
+  if(is.null(x) | is.null(y) | is.null(width)){stop("Must provide args 'x', 'y', and 'width'")}
+  USR <- par()$usr ; PIN <- par()$pin ; DIM <- dim(obj) ; ARp <- DIM[1]/DIM[2]
+  WIDi <- width/(USR[2]-USR[1])*PIN[1] ;   HEIi <- WIDi * ARp 
+  HEIu <- HEIi/PIN[2]*(USR[4]-USR[3]) 
+  rasterImage(image = obj, xleft = x-(width/2), xright = x+(width/2),
+            ybottom = y-(HEIu/2), ytop = y+(HEIu/2), interpolate = interpolate)
+}
+palette(c("black", "#003087", "#DAAA00", "#8F92C4", "#E5CF7E", 
+          "#001D51", "#B7A99F", "#A51890", "#C5003E", "#FDC596", 
+          "#AD5D1E", "gray40", "gray85", "#FFFFFF", "transparent"))
+```
+
+```{r banner hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
+logo <- readPNG("UWA logo_text_V_wsL.png")
+par(mar = c(0,0,0,0))
+layout(matrix(c(1,1,1,1,2),nrow = 1))
+
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+text(-0.025,0.9, pos = 4, cex = 2.6, font = 2, 
+     labels="Data Analysis in R for Environmental Science")
+text(-0.025,0.6, pos = 4, cex = 2.2, 
+     labels="Comparing Means: advanced (non-parametric comparisons)")
+text(-0.025,0.4, pos = 4, font = 3, cex = 1.4, col = 12,
+     labels="")
+text(1,0.1, pos = 2, font = 3, family = 'serif', cex = 1.5, col = 2,
+     labels="Andrew Rate, School of Agriculture and Environment")
+plot(1,1, axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(logo, x = 1.2, y = 1, width = 0.5)
+par(mar = c(3.5,3.5,0.5,0.5))
+```
+
+## Activities for this Workshop
+<table border="0" style="width: 100%; padding: 10px; background-color: #e0e0ff;">
+<tr valign="top">
+<td colspan="2">
+<p><span style="font-size: 12pt; background-color: #ffff99;">There is a **Short Report due **based on this and the previous Workshop on means comparisons - go to the <a href="https://lms.uwa.edu.au/webapps/blackboard/content/listContent.jsp?course_id=_56851_1&amp;content_id=_2001230_1&amp;mode=reset">Assignments Hub</a> for details.</span></p>
+<h5><span style="color: #800000;">**<span style="font-size: 12pt;">Before you leave this week&rsquo;s lab, make sure you know <span style="text-decoration: underline;">how</span> and <span style="text-decoration: underline;">when</span> to:</span>**</span></h5>
+<ol style="list-style-type: upper-alpha;">
+<li><span style="font-size: 12pt;">Use a non-parametric *Wilcoxon test* to compare the means of 2 groups of a variable <br />(*i.e*. categorised with a 2-level factor)</span>
+<ul>
+<li><span style="font-size: 12pt;">estimate effect size<br />&nbsp;</span></li>
+</ul>
+</li>
+<li><span style="font-size: 12pt;">Use a non-parametric *Kruskal-Wallis test* to compare the means of 3 or more groups of a variable <br />(*i.e*. categorised with a &ge;3-level factor)</span></li>
+<ul>
+<li><span style="font-size: 12pt;">conduct relevant pairwise comparisons<br /><br /></span></li>
+</ul>
+<li><span style="font-size: 12pt;"> Make *relevant high-quality graphics* to illustrate means comparisons: box plots with means, and plots-of-means [`plotMeans()`] </span></li>
+</ol>
+<p>**<span style="font-size: 12pt;">Last week we asked you to learn:</span>**</p>
+<ol>
+<li><span style="font-size: 12pt;">Use a *single-sided t- test* to compare the mean of a variable with a fixed value (*e.g*. an environmental guideline)</span></li>
+<li><span style="font-size: 12pt;">Use a *two -sided Welch's t-test* to compare the means of 2 groups of a variable (*i.e*. categorised with a two-two-level factor)</span></li>
+<li><span style="font-size: 12pt;">Calculate a C*ohen's d effect size for a 2-group mean comparison*</span></li>
+<li><span style="font-size: 12pt;">*Make a new factor* using the `cut()` function in R</span></li>
+<li><span style="font-size: 12pt;">Repeat 1 &amp; 2 above using *analysis of variance* (ANOVA) to compare means for 3 or more groups<span style="color: #ccffff;">.</span></span></li>
+<li><span style="font-size: 12pt;">Generate a *pairwise comparison of means* from the analysis in step 5.</span></li>
+</ol>
+<hr style="height: 4px; background-color: #5560A4;" />
+</td>
+</tr>
+</tbody>
+</table>
+
+### Videos and other learning materials
+<table border="0" style="width: 100%; padding: 10px; background-color: #e0e0ff;">
+<tbody>
+<tr>
+<td valign="top" style="width: 50%; background-color: #ffffe0;">
+<p>**Videos**</p>
+<span style="color: #000000; font-size: 12pt;"><a href="https://echo360.net.au/media/b92bf5fa-bbbb-42dd-9567-697591b2e6c9/public" target="_blank" rel="noopener">🎬&nbsp;Video - **Means Comparisons 2 &ndash; Pairwise comparisons**</a>.</span>
+<p>&nbsp;</p>
+<p><span style="color: #000000; font-size: 12pt;"><a href="https://echo360.net.au/media/2eb6c92b-8b13-4c0c-a575-1de857a31166/public" target="_blank" rel="noopener">🎬&nbsp;Video - **Means Comparisons 3 &ndash; Non-parametric tests**</a>.</span></p>
+<p>&nbsp;</p>
+<p><a href="https://echo360.net.au/media/3a49397c-92c6-47a9-86e7-2c840fd19d81/public" target="_blank" rel="noopener">🎬&nbsp;<span style="font-size: 12pt;">Video - **Means Comparisons 4 &ndash; How to make a Factor from a Variable**</span></a>.</p>
+</td>
+<td valign="top" style="width: 50%;" rowspan="3">
+<p>**Supporting Information**</p>
+<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091994-dt-content-rid-40243037_1/xid-40243037_1" target="_blank" rel="noopener">📰**<span style="font-size: 12pt;">Decision tree for means comparisons methods</span>**</a></p>
+<p>(as used in ENVT3361)</p>
+<p>&nbsp;</p>
+<hr />
+<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091994-dt-content-rid-40243821_1/xid-40243821_1" target="_blank" rel="noopener">**<span style="font-size: 12pt;">📰&nbsp;Means comparisons: Null hypothesis testing and Effect size</span>**</a><br />(PDF of slides from 2017, still OK for 2019)</p>
+<p><span style="font-size: 12pt;">**NB** based on unsing <em>R Commander*<span style="font-size: 9pt;"><sup>&para;</sup></span>, but the code shown on screen should still work!</span></p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<span style="font-size: 10pt;"><sup>&para;</sup> a package which allows some point-and-click operation of R</span></td>
+<td valign="top" style="width: 2%;">&nbsp;</td>
+</tr>
+<tr>
+<td valign="top" style="width: 35%; background-color: #d0f0ff;">
+<p>**Code and Data files**</p>
+<p><span style="font-size: 12pt;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091994-dt-content-rid-40243070_1/xid-40243070_1" target="_blank" rel="noopener">🔣 R code file for **Workshop: Advanced Means Comparisons**</a><br />for Week 6, start at<br />**<span style="font-family: 'courier new', courier, monospace;">Non-parametric tests (line 409)</span>**</span></p>
+<hr />
+<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091994-dt-content-rid-40243016_1/xid-40243016_1" target="_blank" rel="noreferrer noopener"><span style="font-size: 12pt;">🔣 R code for means&nbsp;on boxplots</span></a></p>
+<p><span style="font-size: 12pt;">&nbsp;</span></p>
+<hr />
+<p><span style="font-size: 12pt;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091994-dt-content-rid-40243019_1/xid-40243019_1" target="_blank" rel="noreferrer noopener">🔣 R code for means and confidence intervals&nbsp;on boxplots</a>&nbsp;<br />(more complex)</span></p>
+<hr />
+<p><span style="font-size: 12pt;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091994-dt-content-rid-40243084_1/xid-40243084_1" target="_blank" rel="noreferrer noopener">🔣 R code for calculating&nbsp;pairwise Cohen's d effect sizes</a>&nbsp;<br />(advanced)</span></p>
+<hr />
+<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091994-dt-content-rid-40243097_1/xid-40243097_1">📊<span style="font-size: 12pt;">Smith's Lake / Veryard Reserve data (sv2017) in CSV format</span></a></p>
+</td>
+<td valign="top" style="width: 2%;">&nbsp;</td>
+<td valign="top" style="width: 35%; vertical-align: top;">&nbsp;
+</td>
+</tr>
+</tbody>
+</table>
+
+<p>&nbsp;</p>
+
+As usual, we first need to read the data and load the necessary packages:
+
+```{r load workspace and packages invisibly, echo=FALSE, include=FALSE}
+# load("//uniwa.uwa.edu.au/userhome/staff8/00028958/My Documents/_R Projects/Learning R/.RData")
+setwd("C:/Users/00028958/LocalData/R Projects/Learning R")
+sv2017 <- read.csv("sv2017_original.csv", stringsAsFactors = TRUE)
+sv2017$Reserve <- cut(sv2017$Northing,
+                      breaks = c(0,6466530,9999999),
+                      labels = c("Smiths","Veryard"))
+sv17_soil <- subset(sv2017, subset=sv2017$Type=="Soil")
+library(png)
+library(car)
+library(RcmdrMisc)
+library(effsize)
+library(multcomp)
+library(rcompanion)
+library(multcompView)
+library(PMCMRplus)
+```
+
+```{r load workspace and packages visible notrun, eval=FALSE}
+sv2017 <- read.csv("sv2017_original.csv", stringsAsFactors = TRUE)
+sv2017$Reserve <- cut(sv2017$Northing,
+                      breaks = c(0,6466530,9999999),
+                      labels = c("Smiths","Veryard"))
+sv17_soil <- subset(sv2017, subset=sv2017$Type=="Soil")
+
+library(car)
+library(RcmdrMisc)
+library(effsize)
+library(multcomp)
+library(rcompanion)
+library(multcompView)
+library(PMCMRplus) # needed for non-parametric pairwise comparisons
+```
+
+## Non-Parametric Comparisons
+
+We need to use a different type of statistical test if our variable(s) do not 
+have a normal distribution (even when log~10~- or power-transformed). The 
+*non-parametric* tests are not based on the actual values of our variable, but 
+are calculated using the *ranking* (numerical ordering) of each observation.
+
+### 1. Wilcoxon test
+
+<center>![](distributions-clique.png){width=500 height=240}</center>
+
+From previous sessions we know that most untransformed variables are not
+normally distributed. For comparison between exactly 2 groups we use the
+**Wilcoxon test** (via the `wilcox.test()` function). The Wilcoxon test is based 
+on ranking of observations, so should be independent of transformation -- as in 
+the example below:
+
+```{r transform-Na, include=FALSE}
+sv17_soil$Na.pow <- sv17_soil$Na^(powerTransform(sv17_soil$Na)$lambda)
+```
+
+```{r wilcoxon rank sum test, results='hold'}
+wilcox.test(sv17_soil$Na ~ sv17_soil$Reserve)
+{cat("Means for original (untransformed) variable\n")
+meansNa <- tapply(sv17_soil$Na, sv17_soil$Reserve, mean,
+                  na.rm=TRUE)
+print(signif(meansNa, 3))
+cat("\n--------------------------------------------\n")}
+wilcox.test(sv17_soil$Na.pow ~ sv17_soil$Reserve)
+{cat("Means for transformed variable\n")
+meansNa <- tapply(sv17_soil$Na.pow, sv17_soil$Reserve, mean, na.rm=TRUE)
+print(signif(meansNa, 3))}
+rm(meansNa) # remove temporary object(s)
+```
+
+#### Effect size
+```{r}
+require(effsize)
+cohen.d(sv17_soil$Na.pow ~ sv17_soil$Reserve)
+```
+
+### 2. Kruskal-Wallis test
+
+We use the Kruskal-Wallis test (via the `kruskal.test()` function) for 
+non-parametric comparisons between three or more groups defined by a factor.
+
+This example is testing differences in Fe between sample Types in the complete
+Smith's -- Veryard 2017 dataset.
+
+```{r Kruskal-Wallis test, results='hold'}
+kruskal.test(sv2017$Fe ~ sv2017$Type)
+meansFe <- tapply(sv2017$Fe, sv2017$Type, mean,
+                  na.rm=TRUE)
+cat("Means for original (untransformed) variable\n")
+print(signif(meansFe),4)
+rm(meansFe)
+```
+
+With a p-value of &asymp; 0.016, H~0~ can be rejected. We still have the
+problem of not knowing which means are significantly different from each other.
+The `PMCMRplus` **R** package allows multiple comparisons of means following
+statistically significant Kruskal-Wallis comparisons (there are several options;
+we will use the Conover's non-parametric all-pairs comparison test for
+Kruskal-type ranked data).
+
+### Pairwise comparisons following a Kruskal-Wallis test
+
+```{r Kruskal-Wallis test - Conover pairwise dummy, eval=FALSE}
+require(PMCMRplus)
+kwAllPairsConoverTest(Fe~Type, data=sv2017)
+```
+
+```{r Kruskal-Wallis test - Conover pairwise comps, echo=FALSE, warning=FALSE, results='hold'}
+kwAllPairsConoverTest(Fe~Type, data=sv2017)
+```
+
+The pairwise comparisons show that only Soil and Street dust have significantly 
+different Fe concentration. *Note* the p-value adjustment -- not Holm's this
+time.
+
+We can also get a pairwise compact letter display based on the results of
+non-parametric tests. As before, we need the **R** packages `rcompanion` and 
+`multcompView` to do this easily.
+
+```{r}
+require(rcompanion)
+require(multcompView)
+pwFe_Type <- with(sv2017, kwAllPairsConoverTest(Fe ~ Type)) # from PMCMRplus
+pwFe_Type_pv <- fullPTable(pwFe_Type$p.value)               # from rcompanion
+multcompLetters(pwFe_Type_pv)                               # from multcompView
+```
+
+The output from `kwAllPairsConoverTest()` shows that p &le; 0.05 only for the
+Soil-Street dust comparison (`"ab"` matches `"a"` OR `"b"`). We can't reject 
+H~0~ for any other pairwise comparisons. [We would get slightly different
+results using the functions `kwAllPairsDunnTest()` or `kwAllPairsNemenyiTest()`
+- see below. In this example, the conclusions are the same for each type of
+pairwise test, but this isn't always the case.]
+
+```{r alt nonparam pairwise dummy, eval=FALSE, echo=TRUE}
+kwAllPairsDunnTest(Fe~Type, data=sv2017)
+kwAllPairsNemenyiTest(Fe~Type, data=sv2017)
+```
+
+```{r Dunn nonparam pairwise tests, echo=FALSE, results='hold'}
+kwAllPairsDunnTest(Fe~Type, data=sv2017)
+```
+
+```{r Nemenyi nonparam pairwise tests, echo=FALSE, results='hold'}
+kwAllPairsNemenyiTest(Fe~Type, data=sv2017)
+```
+
+## References and R Packages
+
+Cohen, J. (1988). *Statistical power analysis for the behavioral sciences (2nd ed.)*. 
+New York:Academic Press.
+
+Sawilowsky, S.S. (2009). New Effect Size Rules of Thumb. *Journal of Modern Applied Statistical Methods* **8**:597-599.
+
+**Run the R code below to get citation information for the R packages used in** 
+**this document**.
+
+```{r R package citations, eval=FALSE}
+citation("car", auto = TRUE)
+citation("RcmdrMisc", auto = TRUE)
+citation("effsize", auto = TRUE)
+citation("multcomp", auto = TRUE)
+citation("PMCMRplus", auto = TRUE)
+citation("rcompanion", auto = TRUE)
+citation("multcompView", auto = TRUE)
+```
+

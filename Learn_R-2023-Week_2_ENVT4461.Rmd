@@ -1,0 +1,96 @@
+---
+title: "Introduction to R for ENVT4461"
+output:
+  bookdown::html_document2:
+    fig_width: 6
+    fig_height: 4
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+```{r addimg function, include=FALSE}
+library(png)
+addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
+  if(is.null(x) | is.null(y) | is.null(width)){stop("Must provide args 'x', 'y', and 'width'")}
+  USR <- par()$usr ; PIN <- par()$pin ; DIM <- dim(obj) ; ARp <- DIM[1]/DIM[2]
+  WIDi <- width/(USR[2]-USR[1])*PIN[1] ;   HEIi <- WIDi * ARp 
+  HEIu <- HEIi/PIN[2]*(USR[4]-USR[3]) 
+  rasterImage(image = obj, xleft = x-(width/2), xright = x+(width/2),
+            ybottom = y-(HEIu/2), ytop = y+(HEIu/2), interpolate = interpolate)
+}
+```
+
+```{r save-default-par, include=FALSE}
+defpar <- par(no.readonly = TRUE)
+```
+
+```{r page 1 header hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
+logo <- readPNG("UWA logo_text_V_wsL.png")
+par(mar = c(0,0,0,0))
+layout(matrix(c(1,1,1,1,2),nrow = 1))
+
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+text(-0.025,0.9, pos = 4, cex = 2.6, font = 2, col = "#003087", 
+     labels="School of Agriculture and Environment")
+text(-0.025,0.6, pos = 4, cex = 2.2, col = "#997500", 
+     labels="R for data analysis and visualization in Environmental Science")
+# text(-0.025,0.4, pos = 4, font = 3, cex = 1.4, col = 12,
+#      labels="Geochemical data for international samples of whole rocks (USGS)")
+text(-0.025,0.1, pos = 4, font = 3, family = 'serif', cex = 1.5, col = "#636363",
+     labels="James Fogarty and Andrew Rate, School of Agriculture and Environment")
+plot(1,1, axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(logo, x = 1.2, y = 1, width = 0.5)
+par(mar = c(3.5,3.5,0.5,0.5))
+layout(matrix(c(1),nrow = 1))
+```
+
+# computer lab files
+
+<p>&nbsp;</p>
+
+<img style="height: auto;" width="136" height="200" alt="brushtail possum" align="right" src="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-42743113_1/xid-42743113_1" /><span style="font-size: 12pt;">The **Distributions chapter in the Textbook**, also available here:&nbsp;<a rel="noopener" target="_blank" href="https://saestatsteaching.tech/section-distributions">https://saestatsteaching.tech/section-distributions</a>&nbsp;covers the theory elements that underlie the worked script example material</span>
+
+- &nbsp;<a rel="noopener" href="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-27747553_1/xid-27747553_1" target="_blank"><img style="height: auto;" width="32" height="32" src="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-42743115_1/xid-42743115_1" alt="File" />&nbsp;Computer lab 2 exercise 1 distributions.R</a>
+
+- <a rel="noopener" href="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-27747554_1/xid-27747554_1" target="_blank"><img style="height: auto;" width="32" height="32" src="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-42743115_1/xid-42743115_1" alt="File" />&nbsp;Computer lab 2 exercise 2 histogram.R</a>
+
+- &nbsp;<a rel="noopener" href="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-27747555_1/xid-27747555_1" target="_blank"><img style="height: auto;" width="32" height="32" src="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-42743115_1/xid-42743115_1" alt="File" />&nbsp;Computer lab 2 exercise 3 data transformations.R</a>
+
+- <a rel="noopener" href="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-27747580_1/xid-27747580_1" target="_blank"><img style="height: auto;" width="32" height="32" src="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-42740840_1/xid-42740840_1" alt="File" />&nbsp;mine.sample.csv</a>
+
+- <a rel="noopener" href="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-27747587_1/xid-27747587_1" target="_blank"><img style="height: auto;" width="32" height="32" src="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-42740840_1/xid-42740840_1" alt="File" />&nbsp;sv2017_original.csv</a>
+
+- <a rel="noopener" href="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-27747592_1/xid-27747592_1" target="_blank"><img style="height: auto;" width="32" height="32" src="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-42740840_1/xid-42740840_1" alt="File" />&nbsp;wingspanMALES.csv</a>
+
+<p>&nbsp;</p>
+
+## Videos and other learning materials
+
+<table style="width: 100%;" border="0">
+<tbody>
+<tr>
+<td valign="top" style="width: 56%;">
+<div style="margin-left: 30px; font-size: 11px; margin-bottom: 5px;"><iframe width="480" height="360" src="https://echo360.net.au/media/fcbcb5dd-ac16-4c94-910c-4ca1b3f3d499/public?autoplay=false&amp;automute=false" title="E3361+cat+and+transformations.mp4" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe>&nbsp; <br />The 'cat video' version ( *and thanks to [Dream Theater](http://dreamtheater.net/){target="_blank"}</a> for the mood music*)</div>
+<div style="margin-left: 30px; font-size: 11px; margin-bottom: 5px;"><span style="background-color: #ffff80;">**<span style="font-size: 12pt; background-color: #ffff80;">Ignore the reference near the end of the video to a Short Report!!</span>**</span></div>
+<p>&nbsp;</p>
+</td>
+<td valign="top" style="width: 44%; vertical-align: top;">
+
+<span style="font-size: 12pt;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-42740883_1/xid-42740883_1" target="_blank" rel="noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355657-dt-content-rid-40243195_1/xid-40243195_1" width="48" height="48" alt="pdf file icon" style="float: left;" /><span style="background-color: #ffff40;">**<span style="font-size: 10pt; background-color: #ffff40;">NEW </span>**</span>Distributions and transformations of variables - Annotated R code</a></span></p>
+
+<span style="font-size: 12pt;"><span class="mce-nbsp-wrap" contenteditable="false">&nbsp;</span></span></p>
+
+<span style="font-size: 12pt;">See Chapter 10&nbsp;in Riemann *et al*. (2008)</span><br /><span style="font-size: 12pt;">&ldquo;<a target="_blank" href="http://onesearch.library.uwa.edu.au/UWA:Blended:UWA_ALMA51321155750002101" rel="noopener">**Improving Data Behaviour for Statistical Analysis: Ranking and Transformations**</a>&rdquo;</span></p>
+</td>
+</tr>
+</tbody>
+</table>

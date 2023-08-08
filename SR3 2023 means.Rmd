@@ -1,0 +1,157 @@
+```{r load data}
+afs2020 <- read.csv("afs20_orig.csv", stringsAsFactors = T)
+colnames(afs2020)
+```
+
+```{r distribution check loop, paged.print=FALSE}
+library(car)
+names.of.cols <- names(afs2020)
+colz <- c(9:14,16:38) # omit Cd
+nr <- length(colz)
+k <- 1
+table <- data.frame("Variable"=rep(NA,nr), 
+                    "W_orig"=rep(NA,nr), "p_orig"=rep(NA,nr), 
+                    "W_log_tr"=rep(NA,nr), "p_log_tr"=rep(NA,nr), 
+                    "W_pow_tr"=rep(NA,nr), "p_pow_tr"=rep(NA,nr), 
+                    "Pow_term"=rep(NA,nr), "Best_transf"=rep(NA,nr))
+for (i in colz) {
+  pt1 <- powerTransform(afs2020[, i])
+  
+  # generate and print test statistics
+  sw0 <- shapiro.test(afs2020[, i])
+  sw1 <- shapiro.test(log10(afs2020[, i]))
+  sw2 <- shapiro.test((afs2020[, i]) ^ as.vector(pt1$lambda))
+  if (as.vector(sw0$p.value) >= 0.05) {
+    best <- "untransformed"
+  } else if (as.vector(sw1$p.value >= 0.05)) {
+    best <- "log"
+  } else if (as.vector(sw2$p.value >= 0.05)) {
+    best <- "power"
+  } else {
+    best <- "not normalised"
+  }
+
+  table[k,] <- c(names.of.cols[i], 
+                        signif(sw0$statistic, 4), signif(sw0$p.value, 4), 
+                        signif(sw1$statistic, 4), signif(sw1$p.value, 4), 
+                        signif(sw2$statistic, 4), signif(sw2$p.value, 4),
+                        signif(as.vector(pt1$lambda), 4), best)
+  k <- k + 1
+}
+
+{cat("\nTable. Shapiro-Wilk statistics and p-values for untransformed (_orig) and transformed
+    (_log, _pow) variables from soil and sediment analysis at Ashfield Flats Reserve.\n\n")
+print(table, row.names = FALSE)}
+
+# to keep R workspace tidy
+rm(list=c("names.of.cols","pt1","sw0","sw1","sw2","best","i","table"))
+```
+
+```{r make Zone factor}
+afs2020$Zone <- as.character(afs2020$Group)
+afs2020$Zone <- gsub("10","S",afs2020$Zone)
+afs2020$Zone <- gsub("9","S",afs2020$Zone)
+afs2020$Zone <- gsub("8","S",afs2020$Zone)
+afs2020$Zone <- gsub("7","N",afs2020$Zone)
+afs2020$Zone <- gsub("6","N",afs2020$Zone)
+afs2020$Zone <- gsub("5","N",afs2020$Zone)
+afs2020$Zone <- gsub("4","N",afs2020$Zone)
+afs2020$Zone <- gsub("3","NW",afs2020$Zone)
+afs2020$Zone <- gsub("2","NW",afs2020$Zone)
+afs2020$Zone <- gsub("1","NW",afs2020$Zone)
+
+afs2020$Zone <- as.factor(afs2020$Zone)
+class(afs2020$Zone)
+summary(afs2020$Zone)
+```
+
+```{r check Zones with map, fig.height=4, fig.width=4}
+with(afs2020, plot(Easting, Northing, asp = 1, col=c(3,5,7)[Zone], pch = 19))
+with(afs2020, text(Easting, Northing, labels = Zone, cex = 0.65, 
+                   font=c(2,3,4)[Zone]))
+```
+
+*Based on Shapiro-Wilk*:
+- normal = pH, Gd
+- power = Pb
+- nonparam = EC, As, Zn
+
+```{r power transform Pb}
+afs2020$Pb.pow <- afs2020$Pb^powerTransform(afs2020$Pb)$lambda
+```
+
+```{r check homoscedasticity for parametric tests}
+with(afs2020, bartlett.test(pH, Zone)) # heteroscedastic
+with(afs2020, bartlett.test(Gd, Zone)) # heteroscedastic
+with(afs2020, bartlett.test(Pb.pow, Zone)) # homoscedastic
+```
+
+```{r parametric mean comparisons}
+with(afs2020, oneway.test(pH ~ Zone)) # P < 0.001
+with(afs2020, oneway.test(Gd ~ Zone)) # P < 0.001
+anova_Pb <- with(afs2020, aov(Pb.pow ~ Zone)) # P < 0.001
+cat("Model:",as.character(anova_Pb$call),"\n"); summary(anova_Pb)
+```
+
+```{r nonparametric tests}
+with(afs2020, kruskal.test(EC ~ Zone)) # P < 0.001
+with(afs2020, kruskal.test(As ~ Zone)) # P < 0.001
+with(afs2020, kruskal.test(Zn ~ Zone)) # P < 0.001
+```
+
+```{r pairwise tests, message=FALSE, warning=FALSE}
+library(PMCMRplus)
+library(rcompanion)
+library(multcompView)
+pw_pH <- with(afs2020, pairwise.t.test(pH, Zone, pool.sd = F))
+pw_Gd <- with(afs2020, pairwise.t.test(Gd, Zone, pool.sd = F))
+pw_Pb <- with(afs2020, pairwise.t.test(Pb.pow, Zone, pool.sd = T))
+pw_EC <- kwAllPairsConoverTest(afs2020$EC ~ afs2020$Zone)
+pw_As <- kwAllPairsConoverTest(afs2020$As ~ afs2020$Zone)
+pw_Zn <- kwAllPairsConoverTest(afs2020$Zn ~ afs2020$Zone)
+
+pw_pH_pv <- fullPTable(pw_pH$p.value)
+pw_EC_pv <- fullPTable(pw_EC$p.value)
+pw_As_pv <- fullPTable(pw_As$p.value)
+pw_Gd_pv <- fullPTable(pw_Gd$p.value)
+pw_Pb_pv <- fullPTable(pw_Pb$p.value)
+pw_Zn_pv <- fullPTable(pw_Zn$p.value)
+
+cat("Compact letters for pH\n"); multcompLetters(pw_pH_pv)
+cat("\nCompact letters for EC\n"); multcompLetters(pw_EC_pv)
+cat("\nCompact letters for As\n"); multcompLetters(pw_As_pv)
+cat("\nCompact letters for Gd\n"); multcompLetters(pw_Gd_pv)
+cat("\nCompact letters for Pb\n"); multcompLetters(pw_Pb_pv)
+cat("\nCompact letters for Zn\n"); multcompLetters(pw_Zn_pv)
+```
+
+```{r boxplots}
+cldMat <- rbind(as.character(multcompLetters(pw_pH_pv)$Letters), 
+                as.character(multcompLetters(pw_EC_pv)$Letters),
+                as.character(multcompLetters(pw_As_pv)$Letters),
+                as.character(multcompLetters(pw_Gd_pv)$Letters),
+                as.character(multcompLetters(pw_Pb_pv)$Letters),
+                as.character(multcompLetters(pw_Zn_pv)$Letters))
+names.of.cols <- names(afs2020)
+colz <- c(9,10,12,21,32,38)
+row.names(cldMat) <- names.of.cols[colz]
+colnames(cldMat) <- levels(afs2020$Zone)
+par(mfrow = c(2,3), mar = c(4,4,1,1), mgp = c(1.7,0.3,0), 
+    font.lab = 2, las=0, tcl = 0.3, xpd=TRUE)
+boxplot(afs2020[, colz[1]] ~ afs2020$Zone, cex = 1,
+        xlab = "Zone", ylab = names.of.cols[colz[1]], las = 1)
+text(c(1,2,3),rep(par("usr")[4],3), labels = rep("\u2588",3), col = "white")
+text(c(1,2,3),rep(par("usr")[4],3), labels = cldMat["pH",], col = "red")
+for (i in colz[-1]) {
+  boxplot(afs2020[, i] ~ afs2020$Zone, log="y",
+          xlab = "Zone", ylab = names.of.cols[i], cex = 1.)
+  text(c(1,2,3),rep(max(afs2020[,i],na.rm=T)*1.25,3), 
+       labels = rep("\u2588",3), col = "white")
+  text(c(1,2,3),rep(max(afs2020[,i],na.rm=T)*1.25,3), 
+       labels = cldMat[names.of.cols[i],], col = "red")
+}
+
+# to keep R workspace tidy
+rm(list=c("names.of.cols","colz","cldMat"))
+```
+

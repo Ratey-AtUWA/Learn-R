@@ -1,0 +1,145 @@
+---
+documentclass: article
+classoption: a4paper
+geometry: margin=0.6in
+output: 
+  pdf_document: 
+    fig_caption: TRUE
+    number_sections: no
+    toc: no
+    highlight: tango
+fontsize: 10pt
+header-includes:
+  \usepackage{sourcesanspro}
+  \usepackage[T1]{fontenc}
+  \renewcommand{\familydefault}{\sfdefault}
+---
+
+```{r load data & packages, message=FALSE, warning=FALSE, include=FALSE}
+library(RcmdrMisc)
+library(knitr)
+library(Rmisc)
+metal <- read.csv("metal.csv", stringsAsFactors = TRUE)
+metal$Title <- as.character(metal$Title)
+```
+
+\textbf{One page short report format: the report needs a title} \verb+. . . . . don't forget your name and UWA ID . . . . .+
+
+\textbf{Introduction}. The objective was to analyse $\chi\chi\chi$ data by applying $\pi\pi\pi$ statistical / numerical procedure or creating $\theta\theta\theta$ model supported by $\psi\psi\psi$ checking, and then to interpret the results in terms of real biological-chemical-physical processes. At most 1-2 sentences; you can save space using 10pt font (like this).
+
+\textbf{Methods}. A concise description of checking variable distributions and any transformations, and some details e.g. which tests for means comparisons and why, selection of predictors for models and why, and so on. You might need one or at most two sentences here as well, depending on the complexity of the methods and the nature of the report; you can save space by using single spacing (like this).
+
+\textbf{Results}. Present mainly tables and figures with supporting text which refers to the correct figure/table. Some examples are below.
+
+```{r make table of means and SE, include=FALSE, echo=FALSE}
+tabl0 <- round(as.data.frame(numSummary(metal[,c("Growl","Chug","Shred","Riffage")],
+                    statistics=c("mean","sd","se(mean"),groups=metal$Band)$table),1)
+rzlt <- data.frame(Band = levels(metal$Band),
+                   Growl = c(paste(tabl0[1,1],"\u00B1",tabl0[1,3]),
+                            paste(tabl0[2,1],"\u00B1",tabl0[2,3]),
+                            paste(tabl0[3,1],"\u00B1",tabl0[3,3])),
+                   Chug = c(paste(tabl0[1,4],"\u00B1",tabl0[1,6]),
+                            paste(tabl0[2,4],"\u00B1",tabl0[2,6]),
+                            paste(tabl0[3,4],"\u00B1",tabl0[3,6])),
+                   Shred = c(paste(tabl0[1,7],"\u00B1",tabl0[1,9]),
+                            paste(tabl0[2,7],"\u00B1",tabl0[2,9]),
+                            paste(tabl0[3,7],"\u00B1",tabl0[3,9])),
+                   Riffage = c(paste(tabl0[1,10],"\u00B1",tabl0[1,12]),
+                            paste(tabl0[2,10],"\u00B1",tabl0[2,12]),
+                            paste(tabl0[3,10],"\u00B1",tabl0[3,12])))
+print(rzlt)
+```
+
+```{r make a table in a figure, fig.height=4, fig.width=10, echo=FALSE, out.width="95%"}
+par(mfrow=c(1,2), mar = c(3,3,1,1), mgp = c(1.7,0.3,0), tcl = 0.25, font.lab = 2, 
+    lend = "square", ljoin = "mitre", xpd = TRUE)
+palette(c("black","red3","darkgreen","blue2","#DDEE99",
+          "#FFCC99","#e0e0e0","white","grey40","thistle", "purple"))
+plot(c(0,1), c(0,1), bty="n", xaxt="n", yaxt="n", type="n", xlab="", ylab="")
+text(0.55,0.95,pos=3,labels="Table 1. Metalness parameters as a function of \nband (mean \u00B1 SE)")
+text(c(0.1, 0.35, 0.55, 0.75, 0.95),rep(0.8,5), pos=3, labels = colnames(rzlt), font=2)
+text(c(0.1, 0.35, 0.55, 0.75, 0.95),rep(0.7,5), pos=3, labels = rzlt[1,])
+text(c(0.1, 0.35, 0.55, 0.75, 0.95),rep(0.6,5), pos=3, labels = rzlt[2,])
+text(c(0.1, 0.35, 0.55, 0.75, 0.95),rep(0.5,5), pos=3, labels = rzlt[3,])
+text(0.2,0.4, labels = "Compact letter pairwise analysis", pos = 3, font = 3)
+text(c(0.1, 0.35, 0.55, 0.75, 0.95),rep(0.32,5), pos=3, labels = colnames(rzlt), font=2)
+text(c(0.1, 0.35, 0.55, 0.75, 0.95),rep(0.24,5), pos=3, labels = c(rzlt[1,1],"b","b","a","c"))
+text(c(0.1, 0.35, 0.55, 0.75, 0.95),rep(0.16,5), pos=3, labels = c(rzlt[2,1],"a","ab","b","b"))
+text(c(0.1, 0.35, 0.55, 0.75, 0.95),rep(0.08,5), pos=3, labels = c(rzlt[3,1],"a","a","b","a"))
+text(-0.1, 0, pos = 4, labels = "(Mean comparisons by Welch's f test with pairwise comparisons \nusing t-tests with Holm's correction)", cex = 0.85)
+
+require(Rmisc) 
+ci0 <- group.CI(Chug~Band, data=metal)
+boxplot(metal$Chug~metal$Band, varwidth=T, col=c(6,7,5),
+        xlab = "Metal Band", ylab="Chug score",
+        cex.lab=1.2, xaxt = "n") 
+axis(1, tcl = 0.4, at = seq(1,3), 
+     labels = as.character(levels(metal$Band)))
+arrows(x0=seq(1,NROW(ci0)), y0=ci0[,3], y1=ci0[,2], 
+       col=8, angle=90, length=0.1, lwd=6) # optional
+arrows(x0=seq(1,NROW(ci0)), y0=ci0[,3], y1=ci0[,4], 
+       col=8, angle=90, length=0.1, lwd=6) # optional
+lines(seq(1,NROW(ci0)), ci0[,3], col=8, lwd=3, 
+      type="c") # optional
+lines(seq(1,NROW(ci0)), ci0[,3], col=4, lwd=1, 
+      type="c", lty=3) # optional
+arrows(x0=seq(1,NROW(ci0)), y0=ci0[,3], y1=ci0[,2], 
+       col=4, angle=90, length=0.1, lwd=2)
+arrows(x0=seq(1,NROW(ci0)), y0=ci0[,3], y1=ci0[,4], 
+       col=4, angle=90, length=0.1, lwd=2)
+points(seq(1,NROW(ci0)), ci0[,3], col=8, pch=16, lwd=2, cex=1.6)
+points(seq(1,NROW(ci0)), ci0[,3], col=4, pch=16, lwd=2, 
+       cex=1.2)
+legend("topright", legend=c("Mean \u00B1 95% CI","Potential outliers"),
+       pch=c(16,1), cex=1., pt.cex=c(1.4,1.2), col=c(4,1), lwd=c(1,NA),
+       lty=c(3,NA), bty="n", inset=0.01, y.intersp=1.5)
+rm(ci0)
+```
+\begin{tabular}{p{0.45\linewidth}p{0.45\linewidth}}
+\; & Figure 1. An example of a box plot showing differences in mean chug score for selected bands. Try to make all the text in figures large enough to read! \\
+\end{tabular}
+
+```{r fig.height=3, fig.width=12, echo=FALSE}
+par(mfrow=c(1,4), mar = c(3,3,1,1), mgp = c(1.7,0.3,0), tcl = 0.25, font.lab = 2, 
+    lend = "square", ljoin = "mitre", xpd = TRUE, cex = 0.85)
+palette(c("black","red3","darkgreen","blue2","#DDEE99",
+          "#FFCC99","#e0e0e0","white","grey40","thistle", "purple"))
+with(metal, plot(Growl ~ Riffage, pch = c(0,4,2)[Band], col = c(1,2,4)[Band], lwd = c(1,2,1)[Band]))
+mtext("(a)", 3, -1.2, adj = 0.05)
+with(metal, plot(Chug ~ Riffage, pch = c(0,4,2)[Band], col = c(1,2,4)[Band], lwd = c(1,2,1)[Band]))
+mtext("(b)", 3, -1.2, adj = 0.05)
+with(metal, plot(Shred ~ Riffage, pch = c(0,4,2)[Band], col = c(1,2,4)[Band], lwd = c(1,2,1)[Band]))
+mtext("(c)", 3, -1.2, adj = 0.05)
+corz <- rcorr.adjust(metal[,c("Growl","Chug","Shred","Riffage")])
+cortab <- round(as.data.frame(corz$R[[1]]),3)
+plot(c(0,1), c(0,1), bty="n", xaxt="n", yaxt="n", type="n", xlab="", ylab="")
+text(-0.2,0.95,pos=4,labels="Table 2. Correlation (Pearsons) between\nmetalness parameters over all bands.")
+text(c(-0.1, 0.2, 0.45, 0.7, 0.95),rep(0.7,5), pos=3, labels = c("",colnames(cortab)), cex = 1.2)
+lines(c(-0.2,1.05), c(0.71,0.71))
+text(c(-0.1, 0.2, 0.45, 0.7, 0.95),rep(0.6,5), pos=3, labels = c(rownames(cortab)[1],cortab[1,]), cex = 1.2)
+text(c(-0.1, 0.2, 0.45, 0.7, 0.95),rep(0.5,5), pos=3, labels = c(rownames(cortab)[2],cortab[2,]), cex = 1.2)
+text(c(-0.1, 0.2, 0.45, 0.7, 0.95),rep(0.4,5), pos=3, labels = c(rownames(cortab)[3],cortab[3,]), cex = 1.2)
+text(c(-0.1, 0.2, 0.45, 0.7, 0.95),rep(0.3,5), pos=3, labels = c(rownames(cortab)[4],cortab[4,]), cex = 1.2)
+lines(c(-0.2,1.05), c(0.31,0.31))
+legend(-0.25,0.15, legend=levels(metal$Band), pch = c(0,4,2), col = c(1,2,4), pt.lwd = c(1,2,1),
+       title = "Legend for plots", ncol=3, x.intersp = 0.5)
+```
+Figure 2. Bivariate plots for metalness parameters \textit{vs.} Riffage, over all tracks, for (a) Growl, (b) Chug, and (c) Shred. \linebreak 
+\quad
+
+Correlations between Growl-Chug, Growl-Riffage, and Chug-Riffage were significant at p $\le$ 0.05 (Holm's adjusted values for multiple comparisons). There is a little more space here for some text describing your results if you need it. There is a little more space here for some text describing your results if you need it.
+
+\textbf{Discussion}. The tendency for \textit{Gojira} tracks to have greater metalness scores (Table 1, Figure 1) was expected, given their reported history in $\mathfrak{Death Metal}$ (Balas, 2017). The exception was Shred (Table 1), where \textit{Megadeth} and \textit{Triosphere} both had significantly greater scores, consistent with the known virtuosity of the principal guitar players (Sonic Cathedral, 2010; Florino, 2017). This different trend in means for Shred was supported by the lack of correlation of Shred with other parameters (Table 2), with only predominantly bass-register metalness (Growl, Chug, and Riffage) being significantly correlated.
+
+\subsubsection{References (which can be in \textit{slightly} smaller font)}
+
+\footnotesize 
+
+Balas, J. 2017. \textit{GOJIRA - From an Underground Beast to the Very Top of the Metal World}.  https://www.hardwiredmagazine.com/gojira-from-the-beast-from-the-underground-to-the-very-top-of-the-metal-world/ \linebreak
+Sonic Cathedral, 2010. \textit{Triosphere -- CD Review -- A Road Less Travelled}. https://www.soniccathedral.com/zine/index.php/cd-reviews/908-Triosphere%20-%20The%20Road%20Less%20Travelled. \linebreak
+Florino, R. 2017. \textit{Think Piece: Why Megadeth's Dystopia Is So Important}. https://allaxess.com/think-piece-megadeths-dystopia-important/
+
+\scriptsize
+\begin{flushright}
+[This whole page was made in RStudio using R Markdown]
+\end{flushright}

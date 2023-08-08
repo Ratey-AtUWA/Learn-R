@@ -1,0 +1,84 @@
+---
+documentclass: article
+classoption: a4paper
+geometry: margin=0.6in
+output: 
+  pdf_document: 
+    fig_caption: TRUE
+    number_sections: no
+    toc: no
+    highlight: tango
+fontsize: 10pt
+header-includes:
+  \usepackage{sourcesanspro}
+  \usepackage[T1]{fontenc}
+  \renewcommand{\familydefault}{\sfdefault}
+  columns.tex
+---
+
+```{r load data & packages, message=FALSE, warning=FALSE, include=FALSE}
+library(RcmdrMisc)
+library(knitr)
+metal <- read.csv("metal.csv", stringsAsFactors = TRUE)
+metal$Title <- as.character(metal$Title)
+```
+
+\textbf{One page short report format: the report needs a title} \verb+. . . . . don't forget your name and UWA ID . . . . .+
+
+\textbf{Introduction}. The objective was to analyse $\chi\chi\chi$ data by applying $\pi\pi\pi$ statistical / numerical procedure or creating $\theta\theta\theta$ model supported by $\psi\psi\psi$ checking, and then to interpret the results in terms of real biological-chemical-physical processes. At most 1-2 sentences; you can save space using 10pt font (like this).
+
+\textbf{Methods}. A concise description of checking variable distributions and any transformations, and some details e.g. which tests for means comparisons and why, selection of predictors for models and why, and so on. You might need one or at most two sentences here as well, depending on the complexity of the methods and the nature of the report; you can save space by using single spacing (like this).
+
+\textbf{Results}. Present mainly tables and figures with supporting text which refers to the correct figure/table. Some examples are below.
+
+```{r make table of means and SE, include=FALSE}
+tabl0 <- round(as.data.frame(numSummary(metal[,c("Chug","Shred","Riffage")],
+                    statistics=c("mean","sd","se(mean"),groups=metal$Band)$table),1)
+rzlt <- data.frame(Band = levels(metal$Band),
+                   Chug = c(paste(tabl0[1,1],"\u00B1",tabl0[1,3]),
+                            paste(tabl0[2,1],"\u00B1",tabl0[2,3]),
+                            paste(tabl0[3,1],"\u00B1",tabl0[3,3])),
+                   Shred = c(paste(tabl0[1,4],"\u00B1",tabl0[1,6]),
+                            paste(tabl0[2,4],"\u00B1",tabl0[2,6]),
+                            paste(tabl0[3,4],"\u00B1",tabl0[3,6])),
+                   Riffage = c(paste(tabl0[1,7],"\u00B1",tabl0[1,9]),
+                            paste(tabl0[2,7],"\u00B1",tabl0[2,9]),
+                            paste(tabl0[3,7],"\u00B1",tabl0[3,9])))
+```
+
+:::::: {.cols data-latex=""}
+
+::: {.col data-latex="{0.55\textwidth}"}
+```{r print table of means and SE, echo=FALSE, message=FALSE, warning=FALSE, comment='', paged.print=FALSE, fig.cap="\\label{meanSE}"}
+print(rzlt, row.names = FALSE)
+#, format = "latex", caption = "Metalness parameters as a function of band (mean \u00B1 SE)", )
+```
+:::
+
+::: {.col data-latex="{0.05\textwidth}"}
+\ 
+<!-- an empty Div (with a white space), serving as
+a column separator -->
+:::
+
+::: {.col data-latex="{0.4\textwidth}"}
+The figure on the left-hand side shows the metalness data.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+enim ad minim veniam, quis nostrud exercitation ullamco laboris
+nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+nulla pariatur.
+:::
+::::::
+
+There is more space here for some text describing your results if you need it. There is more space here for some text describing your results if you need it. There is more space here for some text describing your results if you need it. 
+
+\textbf{Discussion}. There is a clear effect of alien life forms on fruit (Table 1) especially when Zyglons are involved. The small effect for bananas contrasts with the findings of Scott (1979) who observed large effects of Xenomorphs. The higher pH in tidal drains (Figure 1) most likely reflects the higher pH of marine-influenced estuarine water, controlled by the bicarbonate-carbonate buffer system (Chester, 2009).
+
+\textbf{References}
+\begin{verse}
+Chester, R., 2009. \emph{Marine Geochemistry}. Wiley/Blackwell Science, Hoboken, USA, 522 pp.\\
+Scott, Ridley, 1979. \textit{Alien: The Director's Cut}. Brandywine Productions, Twentieth Century-Fox Productions, Hollywood, California, USA.
+\end{verse}

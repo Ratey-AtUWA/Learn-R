@@ -1,0 +1,303 @@
+Department of Water and Environmental Regulation (DWER)
+Metadata Statement
+
+
+======================
+ CITATION INFORMATION 
+======================
+
+DATASET TITLE:  
+Acid Sulfate Soil Risk Map, Swan Coastal Plain			
+
+CUSTODIAN:		
+Department of Water and Environmental Regulation (DWER)
+
+JURISDICTION:		
+Western Australia.
+
+
+=============================================================
+
+=====================
+ TEXTUAL DESCRIPTION 
+=====================
+
+ABSTRACT: 
+Predicted and mapped risk of Acid Sulfate Soil (ASS) materials occurring within shallow soil layers on the Swan Coastal Plain that could be disturbed by normal land development activities (drainage, excavations, dewatering). 
+
+Full Description: 
+Map of the risk of Acid Sulfate Soil (ASS) materials being disturbed by land development activities principally based on the likelihood of ASS materials occurring within soil profiles. This map was developed to assist planners in assessing whether proposals for development require conditions for ASS investigation and management where there is a risk that the development activities could disturb ASS (ie disturbance risk). Disturbance risk is assessed with respect to depth below natural ground-surface using the assumption that most land development activities including drainage, excavations and dewatering generally do not extend to greater than 3m below natural ground-level. 
+
+This map is not intended to assess risk of ASS being disturbed by activities that extend to greater than 3m below natural ground-surface. 
+
+No distinction is made between whether potential and actual acidity (due to historical disturbance) occurs the risks of further environmental degradation from disturbance and management responses are similar for both situations. 
+
+ASS disturbance risk for map unit polygons has been assessed as one of three classes: 
+(1) High to moderate risk of ASS occurring within 3 m of natural soil surface that could be disturbed by most land development activities 
+(2) Moderate to low risk of ASS occurring within 3 m of natural soil surface that could be disturbed by most land development activities (activities disturbing soils at depths greater than 3m carry a high to moderate risk of disturbing ASS). 
+(3) No known risk of ASS occurring within 3m of natural surface (or deeper) that could be disturbed by most land development activities. 
+
+Note: Class 2 also includes the likelihood of there being localised shallow occurrences of ASS disturbance risk (within map units, generally <1ha areas), particularly in floodplains, sand-plain or upland valleys (>5mAHD) not identified as being Class 1. 
+
+The map is comprised of: 
+- ASS risk has been predicted using available desk-top information and limited ground-truthing; and 
+- ASS risk identified and improved by on-ground mapping and detailed soil investigations. 
+
+Prediction of ASS risk for much of the coverage largely achieved by classification of map units from 1:50 000 Urban Geology and Environmental Geology map series (Department of Industry and Resources) for the Swan Coastal Plain into three risk classes. Risk within each map unit was predicted on the basis of whether map units were likely to contain PASS materials. Assessments were largely conducted using geological information (expected geological age), topographical elevation data, depth to water-table (where available), geomorphic wetland mapping and aerial imagery to identify environments where PASS materials were likely to occur within map units (after Dent, D. 1986, Acid sulphate soils: a baseline for research and development. Publication 39. International Institute for Land Rehabilitation and Improvement ILRI, Wageningen, The Netherlands). This included permanently waterlogged, shallow ground-water and wetland/dampland environments, floodplains with likely previous or present hydrological connection to estuarine waters and tidal flats supratidal, extratidal, intratidal). Judgements were also based on understanding of environments in which PASS materials occurred in southern WA (Degens, B.P. and Wallace-Bell, P., 2006. Acid Sulphate Soil Survey of Shallow Regolith on the Scott Coastal Plain, Commissioned report for Department of Water and Environmental Regulation). For example, Class 1 units included Holocene sediments with shallow ground-water (<1m); Class 2: Pleistocene sediments with shallow ground-water; Class 3: Pleistocene and Holocene sediments where ground-water is below 3m). 
+
+For the low-lying (<5mAHD) coastal lands between Mandurah and Dunsborough, ASS risk was mapped using standard soil mapping techniques (completed in stages between November 2004 and June 2006). Areas mapped (and included as part of this dataset) are defined as the following (using 1:25 000 map sheet index codes): 
+1. Peel-Harvey –2033-II SW (Lower Serpentine River), 2032-IV NE (Mandurah), 2032-I NW (Lower Murray and Serpentine Rivers), NW corner of 2032-I NW (Austin Bay), 2032-IV SE (Harvey Estuary), 2032-IV SW (Lake Clifton), 2032-III NE (Lower Harvey River; Lake Clifton). 
+2. Lakes-Clifton Preston – 2032-III SE (Lake Preston) 
+3. Leschenault - 2301-IV NE (North Leschenault), 2031-I SW (Benger Swamp), 2031-III NE (South Leschenault, Lower Preston River , Lower Collie River), 2031-III NW (Dalyellup), 2031-III SE (Gelorup), 2031-III SW (Minninup). 
+4. Vasse-Wonnerup – 2030-IV NW (Capel River mouth, Stirling Estate), 1930-I NE (Wonnerup Estuary), 1930-I SE (Vasse Estuary), 1930-I SW (Broadwater), 1930-IV SE (Toby’s Inlet, Broadwater). 
+
+On-ground risk mapping was achieved using standard field soil survey, detailed soil analysis and aerial photograph interpretation, guided by existing environmental/urban geology, soil land-scape mapping and surface contour information. Details of this approach are contained in the report: Degens, B.P. and Wallace-Bell, P. (2006). Acid Sulphate Soil Survey of Shallow Regolith Adjacent to the Peel-Harvey Estuary. Department of Environment, WA. Details of on-ground ASS investigations are contained in the associated spatial dataset – Acid_Sulphate_Soil_Site_Investigation_Summary_Doe (containing summary descriptions of ASS characteristics for investigation sites collected during on-ground mapping ASS disturbance risk). 
+
+Map units have also been classified according to National Coastal Acid Sulphate Soil (NatCASS) Risk classification scheme (National Coastal ASS Committee, 2005), which broadly provides an indication of the main landform landscape features in which the Potential ASS materials are associated. These scheme also includes assessment of the likely status of ASS materials (potential or actual) and confidence associated with the risk classification (after Isbell, R.F. 1996, The Australian Soil Classification. CSIRO Publishing, Melbourne, Australia). 
+
+
+ANZLIC SEARCH WORDS: 
+Acid, Sulfate
+
+=============================================================
+
+================
+ SPATIAL EXTENT 
+================
+
+GEOGRAPHIC EXTENT: Western Australia	
+
+GEOGRAPHIC BOUNDING BOX:
+(all coordinate values expressed in Decimal Degrees)
+
+North Bounding Latitude: -31.25 
+South Bounding Latitude: -33.75 
+East Bounding Longitude: 116.0  
+West Bounding Longitude: 114.9
+
+The bounding box encloses the maximum extents of the 
+dataset. There may be voids or gaps within the bounding
+box, depending on the defined coverage of the dataset. 
+
+HORIZONTAL COORDINATE SYSTEM:
+Geographic System.
+
+GEODETIC MODEL: 
+Geocentric Datum of Australia 2020 (GDA2020)
+
+TRANSFORMATION METHOD: 
+Transformed coordinates (GDA94 to GDA2020) have had the following transformation methods applied depending on features position in realtion to NTv2 grid. 
+
+-- Conformal + Distortion [EPSG: 8447]: Within NTV2 grid, e.g. mainland Australia
+-- Conformal only [EPSG: 8444/8445]: Indian Ocean Territories
+-- 7-parameter [EPSG: 8048]: Areas outside of NTv2 grid and IOT grids. 
+
+See https://www0.landgate.wa.gov.au/business-and-government/specialist-services/geodetic/gda2020 for further information.
+
+VERTICAL COORDINATE SYSTEM:
+Unknown
+
+
+=============================================================
+
+========================
+ DATA CURRENCY & STATUS
+========================
+
+BEGINNING DATE:
+01/09/2002
+
+ENDING DATE:
+07/08/2006
+
+PROGRESS:
+Completed
+                          
+UPDATE FREQUENCY:	
+As Required 
+
+METADATA DATE:
+03/11/2020.
+ 
+ADDITIONAL METADATA:	
+
+Updates:
+Last Updated: 06/09/2006
+
+============================================================
+
+==============
+ DATA STORAGE
+==============
+
+STORED DATA FORMAT:
+ArcSDE Layer 
+
+ACCESS CONSTRAINTS:
+A Data/Product Request and License Agreement will need to be signed. An extraction fee applies as follows: 
+
+WALIS Agencies: No fee. 
+Non-WALIS Agencies: Extraction fee of $75/hour plus GST.
+
+=============================================================
+
+==============	
+ DATA QUALITY
+==============
+
+LINEAGE:
+Classification of map units in 1:50 000 Urban Geology (UG) and Environmental 
+Geology (EG) map series (Department of Mineral and Petroleum Resources) conducted by Department for Planning and Infrastructure
+2003) under advice from Department of Environment. Classification of existing environmental and urban geology map units updated
+with information from on-ground mapping program. 
+Mapping of ASS risk around Peel-Harvey Inlet was conducted using a combination geology, soil land-scape mapping and surface contour
+information guided by on-ground soil survey information and aerial photography. Soil-landscape mapping used for this process consisted
+of Department of Agriculture 1:50 000 soil-landscape map sheets Peel Harvey north, Mandurah-Murray, Peel-Harvey South and Harvey-Capel.
+				
+POSITIONAL ACCURACY:
+Dictated by method employed - usually determined from topographical maps, survey and GPS. For predicted ASS disturbance risk,
+accuracy of map units based on Department of Industry and Resources information (estimated to be +/- 50m).
+For mapped ASS disturbance risk, accuracy was largely determined by geology unit mapping and Department of Agriculture 1:50 000
+Swan Coastal Plain soil-landscape mapping supported by field soil survey and interpretation of high resolution aerial photography.
+Boundaries of high risk areas with any other risk categories identified by on-ground mapping are known to be accurate to +/- 50 m,
+whereas accuracy of boundaries between moderate to low and low to nil map units have is estimated to be at least +/- 100m.
+effected. 
+
+ATTRIBUTE ACCURACY:
+Good - all populated content for physical and environmental categories are known and verified by custodian.
+
+LOGICAL CONSISTENCY:
+Standard methods employed throughout complete process from collection to storage.
+
+COMPLETENESS:
+Initial prediction of ASS disturbance risk has been completed, but is subject to update as information from on-ground mapping comes to hand.
+Improvements in mapping of ASS risk will also occur for areas below 5m AHD around from the Peel Inlet to Dunsborough during 2004-2005. 
+
+
+=============================================================
+
+=====================	
+ CONTACT INFORMATION
+=====================
+
+DATA TRUSTEE:
+
+-- CONTACT ORGANISATION: Department of Water and Environmental Regulation (DWER) 
+-- CONTACT POSITION: Senior Soil Scientist, Aquatic Science Branch
+-- POSTAL ADDRESS: he Atrium, 168 St Georges Terrace
+-- LOCALITY: Perth
+-- STATE: Western Australia
+-- COUNTRY: Australia
+-- POSTCODE: 6000
+-- TELEPHONE: 08 6364 6754 
+-- EMAIL ADDRESS: brad.degens@dwer.wa.gov.au
+
+DATA STEWARD:
+
+-- CONTACT ORGANISATION: Department of Water and Environmental Regulation
+-- CONTACT POSITION: Senior Environmental Officer, Contaminated Sites Branch
+-- POSTAL ADDRESS: Prime House, 8 Davidson Terrace, Joondalup, 6027
+-- LOCALITY: Joondalup
+-- STATE: Western Australia
+-- COUNTRY: Australia
+-- POSTCODE: 6027
+-- TELEPHONE: (08) 6364 7188 
+-- EMAIL ADDRESS: scott.jenkinson@dwer.wa.gov.au
+
+DATA CUSTODIAN:
+
+-- CONTACT ORGANISATION: Department of Water and Environmental Regulation
+-- CONTACT POSITION: Geospatial and Data Services Manager
+-- POSTAL ADDRESS: Prime House, 8 Davidson Terrace, Joondalup, 6027
+-- LOCALITY: Joondalup
+-- STATE: Western Australia
+-- COUNTRY: Australia
+-- POSTCODE: 6027
+-- TELEPHONE: (08) 6364 7445
+-- EMAIL ADDRESS:  spatial.data@dwer.wa.gov.au
+
+=============================================================
+
+=================
+ DATA DICTIONARY 
+=================
+
+FIELD NAME: FID
+FIELD DESCRIPTION: Persistant Feature ID 
+CODE VALUES: Object ID
+
+SHAPE: Geometry of object - Polygon
+
+Riskclass 
+General risk category: 
+
+1 - High (>70%) 
+2 - Low (<70%) 
+3 - Unknown 
+4 - Not assessed 
+
+NATCODE 
+NatCASS risk ratings as outlined below: 
+
+1. High Probability of Occurrence of Acid Sulphate Soils (>70% mapping unit, <3mbgl) 
+TIDAL ZONES 
+1a : Bottom sediments- PASS material and/or monosulphidic black ooze. Often seagrasses. 
+1b : Intertidal flats - PASS within upper 1 m. Often with mangroves. 
+1c : Supratidal flats - PASS within upper 1 m. Halophytes (mainly samphire), salt marsh, salt pans. 
+1d : Extratidal flats - ASS within upper 1 m. 
+
+NON-TIDAL ZONES 
+Floodplains 
+1e : Floodplains < 2 m AHD - ASS generally within upper 1 m. Grasslands, reedlands and wetland forests (e.g. Melaleuca, Casuarina). Includes backplains, backswamps and interbarrier swamps. 
+1f : Floodplains 2 - 4 m AHD - ASS generally below 1 m from the surface. Generally wetland forests (e.g. Melaleuca, Casuarina). Includes plains and levees. 
+1g : Floodplains > 4 m AHD - ASS generally below 3 m from the surface. Generally forests. Includes plains and levees. 
+
+Sandplains and dunes 
+1h : Sandplains and dunes, 0 - 2 m AHD - ASS within 1 m of the surface. Often wet heath. Holocene or Pleistocene. 
+1i : Sandplains and dunes, 2 - 10 m AHD - ASS below 1 m from the surface. Heath, forests. Holocene or Pleistocene. 
+1j : Sandplains and dunes, > 10 m AHD - ASS generally below 1 m from the surface. Heath, forests. Mainly Pleistocene. 
+
+Profoundly disturbed 
+
+1x : Disturbed ASS terrain - Actual ASS material present in former tidal zones inside bund walls and/or anthropic ASS material > 0.3 m thick, e.g. dredge spoil, fill, ponds, excavations, urban development. 
+
+2. Low Probability of Occurrence of Acid Sulphate Soils (<70% mapping unit or >3mbgl) 
+TIDAL ZONES 
+2a : Bottom sediments - PASS material and/or MBO3. Often seagrasses. 
+2b : Intertidal flats - PASS within upper 1 m. Often with mangroves. 
+2c : Supratidal flats - ASS within upper 1 m. Halophytes (mainly samphire), salt marsh, salt pans. 
+2d : Extratidal flats - ASS within upper 1 m. 
+
+NON-TIDAL ZONES 
+Floodplains 
+2e : Floodplains < 2 m AHD - ASS, generally within upper 1 m. Grasslands, reedlands and wetland forests (e.g. Melaleuca, Casuarina). Includes backplains, backswamps and interbarrier swamps. 
+2f Floodplains 2 - 4 m AHD - ASS generally below 1 m from the surface. Generally wetland forests (e.g. Melaleuca, Casuarina). Includes plains and levees. 
+2g Floodplains > 4 m AHD - ASS generally below 3 m from the surface. Generally forests. Includes plains and levees. 
+
+NON-TIDAL ZONES 
+Sandplains and dunes 
+2h : Sandplains and dunes, 0 - 2 m AHD - ASS within 1 m of the surface. Often wet heath. Holocene or Pleistocene. 
+2i : Sandplains and dunes, 2 - 10 m AHD - ASS below 1 m from the surface. Heath, forests. Holocene or Pleistocene. 
+2j : Sandplains and dunes, > 10 m AHD - ASS generally below 1 m from the surface. Heath, forests. Mainly Pleistocene. 
+
+Profoundly disturbed 
+2x : Disturbed ASS terrain - actual ASS material present in former tidal zones inside bund walls and/or anthropic ASS material > 0.3 m thick, e.g. dredge spoil, fill, ponds, excavations, urban development. 
+
+3. No Known Occurrence of ASS 
+
+4. Not Assessed 
+
+Subscripts to codes: 
+(a) = Actual ASS confirmed by sampling or field observation. 
+(p) = Potential ASS (PASS) confirmed by sampling or field observation. 
+
+Confidence levels (after Isbell 1996) 
+1 = all necessary analytical and morphological data are available; 
+2 = analytical data are incomplete but are sufficient to classify the soil with a reasonable degree of confidence; 
+3 = no necessary analytical; data are available but confidence is fair, based on a knowledge of similar soils in similar environments; 
+4 = no necessary analytical data are available and the classifier has little knowledge or experience with this kind of soil, hence the classification is provisional. 
+
+Example: 1e (a1) – polygon is a floodplain < 2 m AHD, with actual ASS confirmed by analytical and morphological data. 
+
+=============================================================
+

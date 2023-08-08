@@ -1,0 +1,31 @@
+---
+title: "Visual editing sandbox"
+output:
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+    fig_width: 6.16
+    fig_height: 2.41
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+---
+
+```{=html}
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+```
+-   bullet.
+
+1.  numbered one
+2.  numbered two
+
+[cyboRg pages](https://ratey-atuwa.github.io/cybloRg/index.html){target="_blank"}
+
+Underneath this line there is a horizontal rule.
+
+------------------------------------------------------------------------

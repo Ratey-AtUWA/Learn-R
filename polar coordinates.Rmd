@@ -1,0 +1,42 @@
+---
+title: "Polar coordinates in R"
+output: 
+  html_document: 
+    fig_width: 5
+---
+
+All below from https://stackoverflow.com/questions/29193499/how-to-plot-polar-coordinates-in-r
+
+[answered Mar 22, 2015 at 19:17 IRTFM] Make a sequence: 
+
+```{r polar1 use sequence, fig.height=5, fig.width=10}
+t <- seq(0,10, len=600)  # the parametric index
+# Then convert ( sqrt(t), 2*pi*t ) to rectilinear coordinates
+par(mfrow = c(1,2))
+x = sqrt(t)* cos(2*pi*t) 
+y = sqrt(t)* sin(2*pi*t)
+plot(x,y, type = "b", pch = 21, bg = "blue2", col = "grey")
+x = t * cos(2*pi*t) 
+y = t * sin(2*pi*t)
+plot(x,y, type = "b", pch = 22, bg = "purple", col = "grey")
+```
+The first item is typically labeled "r" in polar coordinates, i.e. the radius, and the second item is typically labeled "theta", the angle in radians from the horizontal vector going to the right. Notice that the distance between successive loops of the spiral is decreasing. That's due to the sqrt function being applied to the radial dimension. If you just plotted (t, 2*pi*t) the space would stay constant. (more like a spiderweb.) The book is not actually correct about R not having polar plots. The package '*plotrix*' has polar.plot and package '*ggplot2*' has coord_polar
+
+[answered Nov 23, 2016 at 12:03 DorinPopescu] As already mentioned in a previous comment, R can plot using polar coordinates. The package plotrix has a function called polar.plot that does this. Polar coordinates are defined by length and angle. This function can take a sequence of lengths and a sequence of angles to plot with polar coordinates. For example to make one spiral:
+
+```{r}
+library(plotrix)
+plt.lns <- seq(1, 100, length=500)
+angles <- seq(0, 5*360, length=500)%%360
+polar.plot(plt.lns, polar.pos=angles, labels="", rp.type = "polygon")
+```
+
+[answered Jan 16, 2017 at 15:16 Fábio] An option worth a try, It is Plotly package.
+Note: If you are using RStudio, the plots are going to be shown in Viewer tab.
+
+```{r}
+library(plotly)
+p <- plot_ly(plotly::mic, r = ~r, t = ~t, color = ~nms, alpha = 0.5, type = "scatter")
+layout(p, title = "Mic Patterns", orientation = -90)
+```
+

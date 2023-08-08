@@ -1,0 +1,767 @@
+---
+title: "Statistics for exploring relationships: correlation and regression"
+output: 
+  bookdown::html_document2: 
+    fig_caption: yes
+    self_contained: no
+    number_sections: no
+    toc: false
+    toc_depth: 3
+    toc_float: false
+---
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+```{r load table making pkgs, include=FALSE}
+library(flextable)
+library(magrittr)
+library(png)
+
+set_flextable_defaults(theme_fun = "theme_zebra", 
+                       font.size = 9, fonts_ignore = TRUE)
+BorderDk <- officer::fp_border(color = "#B5C3DF", style = "solid", width = 1)
+BorderLt <- officer::fp_border(color = "#FFFFFF", style = "solid", width = 1)
+
+palette(c("black", "#003087", "#DAAA00", "#8F92C4", "#E5CF7E", 
+          "#001D51", "#B7A99F", "#A51890", "#C5003E", "#FDC596", 
+          "#AD5D1E", "gray40", "gray85", "#FFFFFF", "transparent"))
+
+addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
+  if(is.null(x) | is.null(y) | is.null(width)){stop("Must provide args 'x', 'y', and 'width'")}
+  USR <- par()$usr ; PIN <- par()$pin ; DIM <- dim(obj) ; ARp <- DIM[1]/DIM[2]
+  WIDi <- width/(USR[2]-USR[1])*PIN[1] ;   HEIi <- WIDi * ARp 
+  HEIu <- HEIi/PIN[2]*(USR[4]-USR[3]) 
+  rasterImage(image = obj, xleft = x-(width/2), xright = x+(width/2),
+            ybottom = y-(HEIu/2), ytop = y+(HEIu/2), interpolate = interpolate)
+}
+```
+
+```{r banner hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
+logo <- readPNG("UWA logo_text_V_wsL.png")
+par(mar = c(0,0,0,0))
+layout(matrix(c(1,1,1,1,2),nrow = 1))
+
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+text(-0.025,0.9, pos = 4, cex = 2.6, font = 2, 
+     labels="Data Analysis in R for Environmental Science")
+text(-0.025,0.6, pos = 4, cex = 2.2, 
+     labels="Statistics for exploring relationships: correlation and regression")
+text(-0.025,0.4, pos = 4, font = 3, cex = 1.4, col = 12,
+     labels="")
+text(1,0.1, pos = 2, font = 3, family = 'serif', cex = 1.5, col = 2,
+     labels="Andrew Rate, School of Agriculture and Environment")
+plot(1,1, axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(logo, x = 1.2, y = 1, width = 0.5)
+par(mar = c(3.5,3.5,0.5,0.5))
+```
+
+# Correlation & regression 1
+
+## Activities for Correlation and Regression Week 1
+<table border="0" style="width: 100%; padding: 10px; background-color: #e0e0ff;">
+<tr valign="top">
+<td colspan="2">
+Using the R code file provided and the `sv2017` dataset:
+
+- Run different correlation methods (Pearson’s, Spearman’s) on untransformed and transformed variables,
+    - Generate a correlation matrix (or two),
+    - Run a simple regression model,
+    - Run a grouped regression model,
+- Try the additional suggestions at the end of the R code file, and
+- Make sure you understand the concepts for all the statistical methods you use, and can interpret all the output!
+
+<p>This gets us about half-way through correlation & regression.<br>
+There’s more next week, including a short report on this topic!</p>
+</td>
+</tr>
+<tr valign="top">
+<td><span style="font-size: 12pt;"><iframe width="360" height="240" src="https://echo360.net.au/media/f444fd3e-9d67-468b-aeb2-c2b27ca26c5e/public?autoplay=false&amp;automute=false" title="E3361+Correl+Regr.mp4" allowfullscreen="allowfullscreen" webkitallowfullscreen="webkitallowfullscreen" mozallowfullscreen="mozallowfullscreen"></iframe></span></td>
+<td>
+<p><a href="https://github.com/Ratey-AtUWA/learningR/raw/main/sv2017_original.csv"><span style="font-size: 12pt;">💾&nbsp;The sv2017 dataset in csv (comma-separated) format</span></a></p>
+<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3088955-dt-content-rid-40243114_1/xid-40243114_1"><span style="font-size: 12pt;">🔣&nbsp;R code file for this workshop session</span></a></p>
+</td>
+</tr>
+</tbody>
+</table>
+
+## Basic correlation analyses
+
+```{r load necessary packages, include=FALSE}
+# load packages we need
+library(car)        # for various plotting and regression-specific functions
+library(viridis)    # colour palettes for improved graph readability
+library(Hmisc)      # utility functions
+library(RcmdrMisc)  # utility functions
+library(corrplot)   # plotting of correlation heatmaps
+library(lmtest)     # regression diagnostic tests
+library(effects)    # plots and tables for regression models
+```
+
+Let's look at the relationship between Cd and Zn in the Smiths Lake and Charles 
+Veryard Reserves data from 2017. <br>
+For Pearson's correlation we need variables with normal distributions, so first 
+log~10~-transform Cd and Zn...
+
+```{r transform variables, results='hold'}
+git <- "https://github.com/Ratey-AtUWA/learningR/raw/main/"
+sv2017 <- read.csv(paste0(git,"sv2017_original.csv"), stringsAsFactors = TRUE)
+sv2017$Cd.log <- log10(sv2017$Cd)
+sv2017$Zn.log <- log10(sv2017$Zn)
+```
+
+...and test if the distributions are normal. Remember that the null hypothesis 
+for the Shapiro-Wilk test is that "*the distribution of the variable of * 
+*interest is not different from a normal distribution*". So, if the P-value
+&ge;&nbsp;0.05, we can't reject the null and therefore our variable is normally 
+distributed.
+
+```{r test for normality, results='hold'}
+shapiro.test(sv2017$Cd)
+shapiro.test(sv2017$Cd.log)
+shapiro.test(sv2017$Zn)
+shapiro.test(sv2017$Zn.log)
+```
+
+### Pearson's r changes with transformation
+
+```{r pearson correlations, results='hold'}
+cor.test(sv2017$Cd, sv2017$Zn, alternative="two.sided", 
+         method="pearson") # is Pearson valid?
+cor.test(sv2017$Cd.log, sv2017$Zn.log, alternative="two.sided", 
+         method="pearson") # is Pearson valid?
+```
+
+For the Pearson correlation we get a `t` statistic and associated degrees of
+freedom (`df`), for which there is a `p-value`. The null hypothesis is that 
+there is "*no relationship between the two variables*", which we can reject if 
+p &le; 0.05. We also get a 95% confidence interval for the correlation 
+coefficient, and finally an estimate of Pearson's r (`cor`).
+
+A Spearman coefficient doesn't change with transformation, since it is
+calculated from the ranks (ordering) of each variable.
+
+```{r message=FALSE, warning=FALSE, results='hold'}
+cor.test(sv2017$Cd, sv2017$Zn, alternative="two.sided", 
+         method="spearman") # can we use method="pearson"?
+cor.test(sv2017$Cd.log, sv2017$Zn.log, alternative="two.sided", 
+         method="spearman") # can we use method="pearson"?
+```
+
+For the Spearman correlation we get an S statistic and associated p-value. The
+null hypothesis is that there is no relationship between the two variables,
+which we can reject if p &le; 0.05. We also get an estimate of Spearman's rho
+(analogous to Pearson's r).
+
+## Simple scatterplot by groups
+
+We're using base **R** to plot - you might like to try using `scatterplot()`
+from the car package.
+
+Before plotting, we first set our desired colour palette (optional) and graphics
+parameters (optional, but useful and recommended!). We end up with the plot in 
+Figure \@ref(fig:Cd-Zn-scatter):
+
+```{r Cd-Zn-scatter, fig.height=6, fig.width=6, fig.cap="Scatterplot showing the relationship between Cd and Zn, with observations identified by Type but showing the regression line for all data independent of grouping.", results='hold'}
+palette(c("black",viridis::cividis(8)[2:7],"white"))
+par(mfrow=c(1,1), mar=c(3,3,1,1), mgp=c(1.5,0.3,0), oma=c(0,0,0,0), tcl=0.2,
+    cex=1.2, cex.lab=1.2, cex.axis=1., lend="square", ljoin="mitre", font.lab=2)
+
+# . . . then plot the data
+plot(sv2017$Cd~sv2017$Zn, col=c(6,3,1)[sv2017$Type], log="xy", 
+     pch=c(16,1,15)[sv2017$Type], lwd=c(1,2,1)[sv2017$Type], cex=1.25,
+     xlab="Zn (mg/kg)", ylab="Cd (mg/kg)")
+abline(lm(sv2017$Cd.log~sv2017$Zn.log)) # line of best fit using lm() function
+legend("topleft", legend=c(levels(sv2017$Type),"Best-fit line ignoring Type"), 
+       cex=1, col=c(6,3,1,1), 
+       pch=c(16,1,15,NA), pt.lwd=c(1,2,1), lwd = c(NA,NA,NA,1), 
+       pt.cex=1.25, bty="n", inset=0.02,
+       title=expression(italic("Sample Type")))
+```
+
+<hr style="height: 2px; background-color: #660F00;" />
+
+> "The invalid assumption that correlation implies cause is probably among the
+  two or three most serious and common errors of human reasoning."
+>
+> --- [Stephen Jay Gould](https://en.wikipedia.org/wiki/Stephen_Jay_Gould){target="_blank"}
+
+<hr style="height: 2px; background-color: #660F00;" />
+
+# Correlation matrix - two ways of doing it
+
+We'll generate Spearman correlation matrices in these examples, but it's easy to change the code to generate Pearson (or other) correlation matrices. <br>
+The p-values give the probability of the observed relationship if the null hypothesis (*i.e*. no relationship) is true.
+
+```{r correlation matrix using Hmisc, results='hold'}
+require(Hmisc) # needed for rcorr() function
+corr_table <- rcorr(as.matrix(sv2017[c("pH","Al","Ca","Fe","Cd","Pb","Zn")]), 
+                    type="spearman")
+print(corr_table)
+```
+
+The output has three sub-tables:
+
+1. the correlation coefficients for each pair of variables (note symmetry)
+2. the number of pairs of observations for each relationship (some observations 
+may be missing)
+3. the p values for each relationship (note symmetry)
+
+[Note that for Pearson correlations we instead use `type="pearson"` in the 
+`rcorr` function.]
+
+Since a correlation coefficient is a standardised measure of association, we can 
+treat it as an 'effect size'. <br>
+Cohen (1988) suggested the following categories:
+
+<table width="40%" border="0">
+<tbody>
+<tr style="background-color: #e0e0e0;">
+<td align="center" colspan=3>**Range in r**</td>
+<td align="left">**Effect size term**</td>
+</tr>
+<tr>
+<td align="right">0 &lt;</td>
+<td align="center">|r|</td>
+<td align="left">&le; 0.1</td>
+<td align="left">negligible</td>
+</tr>
+<tr style="background-color: #e0e0e0;">
+<td align="right">0.1 &lt;</td>
+<td align="center">|r|</td>
+<td align="left">&le; 0.3</td>
+<td align="left">small</td>
+</tr>
+<tr>
+<td align="right">0.3 &lt;</td>
+<td align="center">|r|</td>
+<td align="left">&le; 0.5</td>
+<td align="left">medium</td>
+</tr>
+<tr style="background-color: #e0e0e0;">
+<td align="right">0.5 &lt;</td>
+<td align="center">|r|</td>
+<td align="left">&le; 1</td>
+<td align="left">large</td>
+</tr>
+</tbody>
+</table>
+<span style="font-size:10pt;">|r| means the absolute value of r (*i.e*. ignoring 
+whether r is positive or negative)</span>
+
+<p>&nbsp;</p>
+
+## Correlation matrix with p-values corrected for multiple comparisons
+
+We can do this using the `rcorr.adjust()` function in the `RcmdrMisc` package
+which calculates **corrected** P-values. As above,the p-values give the
+probability of the observed relationship if # the null hypothesis (*i.e*. no
+relationship) is true. Corrections are to reduce the risk of **Type 1 Errors
+(false positives)** which is greater when multiple comparisons are being made.
+
+We include `use="pairwise.complete"` in the `rcorr.adjust()` function
+parameters, otherwise the correlations are calculated on the number of
+observations for the variable with the most missing values (try changing it
+after reading `help("rcorr.adjust")`).
+
+```{r correlation matrix using RcmdrMisc package, results='hold'}
+require(RcmdrMisc) # needed for rcorr.adjust() function
+cormat0 <- rcorr.adjust(sv2017[c("pH","Al","Ca","Fe","Cd","Pb","Zn")], 
+                        type="spearman", use="pairwise.complete")
+cormat0
+```
+
+The output from `rcorr.adjust()` has a fourth sub-table:
+
+4. the adjusted p-values for each pair of variables, which depend on the number of variables being compared
+
+## Correlation heatmaps
+
+These are a handy visual way of displaying a correlation matrix. We use the 
+`corrplot()` function from the **R** package `corrplot`. We'll use some 
+different data to show a plot with both positive and negative correlations, and 
+display the text correlation matrix after the heatmap 
+(Figure \@ref(fig:correl-heat)) for reference.
+
+```{r correl-heat, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Correlation heatmap for selected variables in the 2023 Ashfield Flats sediment data. The numeric correlation matrix is below.", results='hold'}
+afs23 <- read.csv(paste0(git,"afs23.csv"), stringsAsFactors = TRUE)
+library(corrplot)
+cormat1 <- rcorr.adjust(afs23[,c("pH","EC","Al","Ca","Fe","Cu","Gd","Pb","Zn")], 
+                        type="spearman", use="pairwise.complete")
+print(cormat1$R$r, digits=2)
+corrplot(cormat1$R$r, 
+         method="ellipse", diag=F, addCoef.col = "black", 
+         tl.col = 1, tl.cex = 1.2, number.font = 1, cl.cex=1)
+```
+
+## Scatter plot matrix to check correlation matrix
+
+It's **always** a good idea to plot scatterplots for the relationships we are 
+exploring. Scatter (*x-y*) plots can show if:
+
+- a correlation coefficient is unrealistically high due to a small number of outliers, or because there are aligned groups of points
+- a correlation coefficient is low, not because of a lack of relationship, but because relationships differ for different groups of points;
+- there is a consistent relationship for all groups of observations.
+
+```{r scatter-plot-matrix, fig.height=10, fig.width=10, fig.cap="Scatter plot matrix for selected variables in the 2017 Smiths-Veryard sediment data, with observations and regression lines grouped by sample Type. Scatter plot matrices are a powerful exploratory data analysis tool.", results='hold'}
+require(car) # needed for scatterplotMatrix() function
+palette(c("black",viridis::plasma(8)[2:7],"white")); carPalette(palette())
+scatterplotMatrix(~pH+ log10(Al)+ log10(Ca)+ log10(Cd)+ 
+                    log10(Fe)+ log10(Pb)+ log10(Zn) | Type, 
+                  smooth=FALSE, ellipse=FALSE, by.groups=TRUE, 
+                  col=c(4,2,1), pch=c(16,1,15), cex.lab=1.5, data=sv2017,
+                  legend=list(coords="bottomleft"), cex=1.4, cex.axis=1.3)
+```
+
+In Figure \@ref(fig:scatter-plot-matrix), Pb and Zn are positively correlated
+(r=0.77, p<0.0001) independent of which group (Sediment, Soil, or Street dust)
+observations are from. Conversely, the relationship between pH and Cd is weak
+(r=0.23, adjusted p=0.32), but there appear to be closer relationships between
+observations from individual groups. Finally, the relationship between Al and Ca
+may be influenced by a single observation with low Al and high Ca. All issues
+like this should be considered when we explore our data more deeply.
+
+# Linear Regression
+
+We will first make a **simple linear regression** model predicting chromium from iron.
+
+We first create log-transformed variable columns and inspect the scatterplot 
+(Figure \@ref(fig:Cr-Fe-scatterplot)).
+
+```{r Cr-Fe-scatterplot, fig.height=4, fig.width=4, fig.cap="Scatterplot showing relationship between Cr and Fe at Smiths Lake and Charles Veryard Reserves in 2017. Observations and regression lines are separated by sample Type.", results='hold'}
+par(mfrow=c(1,1), mar=c(3,3,1,1), mgp=c(1.5,0.5,0), oma=c(0,0,0,0), tcl=0.2,
+    cex=1.2, cex.lab=1.1, cex.axis=1., lend="square", ljoin="mitre", font.lab=2)
+carPalette(palette())
+sv2017$Fe.log <- log10(sv2017$Fe)
+sv2017$Cr.log <- log10(sv2017$Cr)
+scatterplot(Cr ~ Fe | Type, data = sv2017, 
+            log = "xy", smooth = FALSE, pch=c(19,2,3), col = c(4,2,1),
+            xlab = "Fe (mg/kg)", ylab = "Cr (mg/kg)", 
+            legend = list(coords = "bottomright"))
+```
+
+*Check for yourself*: What do the ungrouped scatterplot and regression line look like?
+
+Next use the `lm()` function to create a linear model object (give it a 
+sensible name), then summarise it:
+
+```{r simple regression, results='hold'}
+lmCrFesimple <- with(sv2017, lm(Cr.log ~ Fe.log))
+summary(lmCrFesimple)
+```
+
+The output from a linear model summary in R is quite extensive:
+
+1. `Call`: gives the model we specified (for checking)
+2. `Residuals`: some summary statistics for the difference of the model from the measured values -- these differences are called the **residuals**
+3. `Coefficients`: a table showing the parameters of the line of best fit, shown by the estimates. The *intercept* of the line is in the first row, and the *slope* labelled by the predictor variable. The other columns in the sub-table give the uncertainty in the parameters (Std.Error), and the null hypothesis p-value (`Pr(>|t|)`) based on a t-statistic for each parameter (against H~0~ that there is no effect of a predictor, *i.e*. the slope = 0)
+4. `Signif. codes`: just explains the asterisks *** or ** or *
+5. The last block of text contains information on how well the model fits the data. We will focus on the R^2^ (R-squared) value, which is equivalent to the proportion of variance in the dependent variable (`Cr.log` in this example) which is explained by the predictor (`Fe.log` in this example). We should also note the overall **p-value**, based on the variance ratio F-statistic, which tests H~0~ = no effect of any predictor.
+
+## Predicting chromium from iron using a regression model which varies by groups 
+
+Note the syntax used to separate by factor categories:
+
+```{r grouped 1predictor regmodel, results='hold'}
+lmCrFe_byType <- with(sv2017, lm(Cr.log ~ Fe.log * Type))
+summary(lmCrFe_byType)
+```
+
+This is similar output to simple linear regression in the previous example, but the `Coefficients:` table is much more complicated.
+
+The first two rows of the `Coefficients:` table under the headings give the intercept and slope for the 'base case', which by default is the first group in the factor separating the groups. In this example the first level of the factor 'Type' is 'sediment' (frustratingly, the output does not show this). <br>
+The next rows, starting with the factor name (*i.e*. `TypeSoil` and `TypeStreetDust`), show the *difference* between the **intercepts** for 'Soil' and 'Street dust' groups compared with the base case. <br>
+Similarly, the final rows, beginning with the predictor variable name (`Fe.log:TypeSoil` and `Fe.log:TypeStreet dust`), show the *difference* between the **slopes** for 'Soil' and 'Street dust' groups compared with the base case.
+
+## Compare the two models 
+
+Sometimes models can have greater R^2^ but only because we've made them more complex by grouping our observations or by adding more predictors. **We want the simplest model possible**. We compare the models using an analysis of variance with the `anova()` function (where the null hypothesis is equal predictive ability). The models compared need to be **nested**, that is, one is a subset of the other.
+
+```{r ANOVA compare nested models, results='hold'}
+anova(lmCrFesimple,lmCrFe_byType)
+```
+
+The output here shows us on the basis of an F-test that we can reject H~0~, 
+so the more complex model in this case really is better at prediction, since 
+p &le; 0.05.
+
+## 'Base **R**' scatter plots representing regression models
+
+```{r scatter-Cr-Fe-pred-obs, fig.width=8, fig.height=4, fig.cap="SCatterplot of Cr vs. Fe in the 2017 Smith's-Veryard data, showing (a) overall relationship and (b) relationship with observations grouped by sample Type.", results='hold'}
+par(mfrow=c(1,2), mar=c(3,3,1,1), mgp=c(1.5,0.5,0), oma=c(0,0,0,0), tcl=0.2,
+    cex=1.2, cex.lab=1.2, cex.axis=1., lend="square", ljoin="mitre", font.lab=2)
+# simple scatterplot
+plot(sv2017$Cr~sv2017$Fe, log="xy")
+mtext(side=3, line=-1.2, text="(a)", adj=0.05, cex=1.4)
+abline(lmCrFesimple, col=8, lty=2)
+# grouped scatterplot
+plot(sv2017$Cr~sv2017$Fe, log="xy", col=c(1,2,4)[sv2017$Type], pch=c(0,2,16)[sv2017$Type])
+mtext(side=3, line=-1.2, text="(b)", adj=0.05, cex=1.4)
+# use for() {...} loop to add individual regression lines
+for (i in 1:NROW(levels(sv2017$Type))) {
+abline(lm(log10(sv2017$Cr)~log10(sv2017$Fe), 
+          subset=sv2017$Type==levels(sv2017$Type)[i]), col=2^(i-1), lty=2)
+  }
+legend("bottomright", legend=levels(sv2017$Type), col=c(1,2,4), pch=c(0,2,16),
+       bty="n", inset=0.02)
+```
+
+On the basis of Figure \@ref(fig:scatter-Cr-Fe-pred-obs), it seems likely that a
+grouped regression model (different slopes and intercepts for each sample Type) 
+would better describe the Cr-Fe relationship, as the deviations from the model 
+(the *residuals*) would be smaller overall.
+
+<hr style="height: 2px; background-color: #660F00;" />
+
+> "Begin challenging your own assumptions. Your assumptions are your windows on
+  the world. Scrub them off every once in awhile, or the light won't come in."
+>
+> --- [Alan Alda](https://www.imdb.com/name/nm0000257/){target="_blank"}
+
+<hr style="height: 2px; background-color: #660F00;" />
+
+## Diagnostic plots for regression
+
+### Simple linear regression, Cr ~ Fe
+
+```{r diagnostic-plots-simple, fig.width=5, fig.height=5, fig.cap="Regression diagnostic plots for Cr predicted from Fe using a simple linear regression model without grouping", results='hold'}
+par(mfrow=c(2,2), mar=c(3,3,2,1))
+plot(lmCrFesimple, col=4)
+par(mfrow=c(1,1), mar=c(3,3,1,1))
+```
+
+### Grouped linear regression, Cr ~ Fe * Type
+
+```{r diagnostic-plots-grouped, fig.width=5, fig.height=5, fig.cap="Regression diagnostic plots for Cr predicted from Fe using a grouped linear regression model with different parameters for each sample Type", results='hold'}
+par(mfrow=c(2,2), mar=c(3,3,2,1))
+plot(lmCrFe_byType, col=3)
+par(mfrow=c(1,1), mar=c(3,3,1,1)) # change back to 1 plot at a time
+```
+
+The diagnostic plots (Figures \@ref(fig:diagnostic-plots-simple) and 
+\@ref(fig:diagnostic-plots-grouped)) are a visual test of some of the 
+assumptions of linear regression models, which relate mainly to the residuals.
+<br>
+[An alternative from the `car` package is `influenceIndexPlot(yourModelName)`].
+
+The **top left** and **bottom left** plots in Figures
+\@ref(fig:diagnostic-plots-simple) and \@ref(fig:diagnostic-plots-grouped) allow
+us to assess the assumption of *homoscedasticity*, that is, the residuals should
+be of similar absolute magnitude independent of the value of the dependent
+variable (actual or predicted). The top left plot also helps us to decide if the
+residuals are *independent*. In both the top left and bottom left plots,
+residuals should appear randomly distributed with a near-horizontal smoothed
+(<span style="color: #0000FF;">blue</span>) line.
+
+The **top right** plot in Figures \@ref(fig:diagnostic-plots-simple) and
+\@ref(fig:diagnostic-plots-grouped) is a Q-Q plot which tests another assumption
+of regression; that the *residuals should be normally distributed*. The points
+should lie along (or close to) the theoretical (dotted) line.
+
+Finally the **bottom left** plot in Figures \@ref(fig:diagnostic-plots-simple) 
+and \@ref(fig:diagnostic-plots-grouped) tests whether any observations have an
+unusual influence on the regression statistics (the assumption is that they *do
+not*).
+
+We can test all of these assumptions with formal statistical tests using the 
+`car` and `lmtest` packages.
+
+The Breusch-Godfrey test is for residual autocorrelation; H~0~ is that
+residuals are not autocorrelated (*i.e*. observations probably independent)
+
+```{r bgtest, results='hold'}
+require(lmtest)
+bgtest(lmCrFe_byType) # autocorrelation (independence)
+```
+
+The Breusch-Pagan test is for heteroscedasticity; H~0~ is that residuals are
+homoscedastic (*i.e*. variance independent of value of variable).
+
+```{r}
+bptest(lmCrFe_byType) # homoscedasticity
+```
+
+The Rainbow test is to test the assumption of linearity; H~0~ is that the
+relationship is linear.
+
+```{r}
+raintest(lmCrFe_byType) # linearity
+```
+
+The `outlierTest()` function in the `car` package implements the Bonferroni
+outlier test; H~0~ is that all residuals are from the same population (*i.e*. no
+outliers). H~0~ is tested with the **Bonferroni** (NOT unadjusted) p-value. If
+no Bonferroni p-value is&le;&nbsp;0.05, so we cannot reject H~0~, the function 
+outputs the largest residual(s).
+
+```{r paged.print=FALSE}
+require(car)
+outlierTest(lmCrFe_byType) # influential observations (outliers)
+```
+
+### <span style="color: #A020F0; background-color: #fbeeb8;">More things to try (Correlation & regression Week 1)</span>
+
+Try `str(lm_object)` and/or `ls(lm_object)` to see what is stored in regression
+results. You might be able to use the contents of a `lm` object to:
+
+  1. plot calculated values (from the regression model) *vs*. measured values 
+  2. add a 1:1 relationship to the plot in 1. above
+  3. find out if any regression residuals are unusual<br>
+     ...and so on.
+     
+<center>![](cats-lightning-correlation.jpg)</center>
+
+<hr style="height: 2px; background-color: #5560A4;" />
+
+# Steps in running a multiple regression model
+
+**Multiple regression models** predict the value of one variable 
+(the *dependent variable*) from two or more *predictor variables* 
+(or just 'predictors'). They can be very useful in environmental 
+science, but there are several steps we need to take to make sure  
+that we have a valid model.
+
+In this example we're going to develop a regression model to 
+**predict copper (Cu) concentrations** from several predictors. 
+It makes sense to choose predictors that represent bulk soil properties 
+that could *plausibly* control trace element concentrations. So, 
+we choose variables like **pH, EC, organic carbon, cation exchange **
+**capacity, and the major elements** as predictors 
+(<span style="color: #B04030;">**but NOT other trace elements**</span>, 
+as their concentrations are probably too low to control the concentration of
+anything else!)
+
+Since we don't have organic carbon or cation exchange capacity 
+in this dataset, and there are many missing values for EC, our initial 
+predictors will be **Al, Ca, Fe, K, Mg, Na, pH, and S**. 
+Both the predictors and dependent variable need to be 
+**appropriately transformed** before we start!
+
+Also, some of our initial predictors may be highly correlated 
+(co-linear) with each other. In multiple regression, we don't want to 
+include co-linear predictors, since then we'll have two (or more) 
+predictors which effectively contain the same information &ndash; see below.
+
+## Read input data
+```{r read input data, paged.print=FALSE}
+sv2017 <- read.csv("sv2017_original.csv")
+print(sv2017[1:5,2:11], row.names = FALSE)
+```
+
+## Assess collinearity between initial set of predictors
+
+First we inspect the correlation matrix. It's useful to include the 
+dependent variable as well, just to see which predictors are 
+most closely correlated.
+
+(We try to generate a 'tidier' table by restricting numbers to 3 significant 
+digits, based on the smallest r value in each column. We don't need to use
+`rcorr()` or `rcorr.adjust()`, since we're not so interested in P-values for
+this purpose.)
+
+Note that all variables are **appropriately transformed**!<br>
+*You will need to do this yourself...*
+
+```{r invisibly transform variables, echo=FALSE, results='hide'}
+sv2017$Al.pow <- sv2017$Al^powerTransform(sv2017$Al)$lambda
+sv2017$Ca.pow <- -1*(sv2017$Ca^powerTransform(sv2017$Ca)$lambda)
+sv2017$Fe.pow <- -1*(sv2017$Fe^powerTransform(sv2017$Fe)$lambda)
+sv2017$K.log <- log10(sv2017$K)
+sv2017$Mg.log <- log10(sv2017$Mg)
+sv2017$Na.pow <- -1*(sv2017$Na^powerTransform(sv2017$Na)$lambda)
+sv2017$S.pow <- -1*(sv2017$S^powerTransform(sv2017$S)$lambda)
+sv2017$Cu.pow <- -1*(sv2017$Cu^powerTransform(sv2017$Cu)$lambda)
+```
+
+```{r correlation matrix}
+cor0 <- 
+  cor(sv2017[,c("Al.pow","Ca.pow","Fe.pow","K.log","Mg.log","Na.pow","pH","S.pow","Cu.pow")],
+   use="pairwise.complete")
+print(cor0,digits=3)
+rm(cor0)
+```
+
+The rule of thumb we use is that **if predictor variables are correlated with
+Pearson's r &ge; 0.8 or r &le; &minus;0.8, then the collinearity is too large
+and one of the correlated predictors should be omitted**. In the correlation
+table above this applies to the correlation between [transformed] Ca and Mg,
+with **r=0.85**. In this example we will run two versions of the model, one
+keeping both Ca and Mg, and one omitting Mg.
+
+In either case, whether we run the model with or without omitting predictors, 
+it's a good idea to calculate *Variance Inflation Factors* on the predictor 
+variables in the model (see below) which can tell us if collinearity is a 
+problem.
+
+## Generate multiple regression model for Cu (co-linear predictors NOT omitted)
+
+We first delete any observations (rows) with missing (`NA`) values, otherwise
+when we reduce the number of predictors we may not have the same number of
+observations for all models, in which case we can't compare them.
+
+```{r lm all variables, results='hold'}
+# make new data object containing relevant variables with no missing values
+sv2017_multreg <- na.omit(sv2017[c("Cu.pow","pH","Al.pow","Ca.pow","Fe.pow",
+                                   "K.log","Mg.log","Na.pow","S.pow")])
+# run model using correctly transformed variables
+lm_multi <- lm(Cu.pow ~ pH + Al.pow + Ca.pow + Fe.pow + K.log + Mg.log + 
+               Na.pow + S.pow, data=sv2017_multreg)
+summary(lm_multi)
+```
+
+Note that the null hypothesis probability `Pr(>|t|)` for some predictors is
+&le;&nbsp;0.05, so we can't reject the null hypothesis &ndash; that this
+predictor has no effect on the dependent variable.
+
+## Calculate variance inflation factors (VIF) for the predictors in the 'maximal' model 
+
+To calculate variance inflation factors we use the function `vif()` from the 
+`car` package. The input for `vif()` is a `lm` object (in this case `lm_multi`).
+
+```{r VIFs for maximal model, results='hold'}
+require(car)
+{cat("Variance Inflation Factors\n")
+vif(lm_multi)}
+```
+
+A general rule of thumb is that if **VIF > 4** we need to do some further
+investigation, while serious multi-collinearity exists
+**requiring correction if VIF > 10** (Hebbali, 2018). As we probably expected 
+from the correlation coefficient (above), VIFs for both Ca and Mg are >4 in this 
+model, which may be OK, but we will try a model which omits Ca or Mg (we'll 
+choose Mg)...
+
+## Generate multiple regression model for Cu, omitting co-linear predictors
+
+```{r multi lm omitting collinear, results='hold'}
+# make new data object containing relevant variables with no missing values
+sv2017_multreg <- na.omit(sv2017[c("Cu.pow","pH","Al.pow","Ca.pow","Fe.pow",
+                                   "K.log","Mg.log","Na.pow","S.pow")])
+# run model using correctly transformed variables (omitting co-linear predictors)
+lm_multi2 <- lm(Cu.pow ~ pH + Al.pow + Ca.pow + Fe.pow + 
+                  K.log + Na.pow + S.pow, data=sv2017_multreg)
+summary(lm_multi2)
+```
+
+Note that again the null hypothesis probability `Pr(>|t|)` for some predictors 
+is >0.05, so we can't reject the null hypothesis -- that this predictor has no 
+effect on the dependent variable.
+
+## Calculate variance inflation factors (VIF) for the model omitting co-linear predictors
+
+```{r VIFs for maximal model omitting co-linear predictors, results='hold'}
+require(car)
+{cat("Variance Inflation Factors\n")
+vif(lm_multi2)}
+```
+
+**With the co-linear variable(s) omitted (on the basis of |Pearson's r| > 0.8), we now have no VIFs > 4**. So we can move on to stepwise refinement of our [new] 'maximal' model...<br>
+[**BUT** note that in this case, with no VIF > 10, we could have simply skipped 
+omitting Mg and moved on to the next step below.]
+
+## Stepwise refinement of maximal multiple regression model (omitting co-linear predictors)
+
+We don't want to have too many predictors in our model -- just the predictors
+which explain significant proportions of the variance in our dependent variable.
+In addition, our data may be insufficient to generate a very complex model; one
+rule-of-thumb suggests 10-20 observations are needed to calculate coefficients
+for each predictor. Reimann *et al*. (2008) recommend that the number of
+observations should be at least 5 times the number of predictors. So, we use a
+systematic stepwise procedure to test variations of the model, which omits
+unnecessary predictors.
+
+```{r stepwise refinement of multiple regression model}
+lm_stepwise <- step(lm_multi2, direction="both", trace=0)
+summary(lm_stepwise)
+require(car)
+{cat("==== Variance Inflation Factors ====\n")
+vif(lm_stepwise)}
+```
+In the optimised model, we find that the stepwise procedure has generated a new
+model with fewer predictor variables. You should notice that the p-values
+(`Pr(>|t|)`) for intercept and predictors are all now &le;&nbsp;0.05, so we can
+reject the null hypothesis for all predictors (*i.e*. none of them have 'no
+effect' on Cu). Our VIFs are now all close to 1, meaning negligible collinearity
+between predictors.
+
+It's always a good idea to run diagnostic plots (see Figure 
+\@ref(fig:diagnostic-plots) below) on a regression model (simple or multiple), 
+to check for (i) any systematic trends in residuals, (ii) normally distributed 
+residuals (or not), and (iii) any unusually influential observations.
+
+## Regression diagnostic plots
+
+```{r diagnostic-plots, fig.height=6, fig.width=6, fig.cap="Diagnostic plots for the optimal multiple regression model following backward-forward stepwise refinement."}
+par(mfrow=c(2,2), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.6,0.5,0), font.lab=2, font.main=3, 
+    cex.main=0.8, tcl=-0.2)
+plot(lm_stepwise, col=4)
+par(mfrow=c(1,1))
+```
+
+The optimal model is `Cu.pow ~ Al.pow + Ca.pow + Fe.pow + S.pow`, where suffixes 
+`.pow` and `.log` represent power- and log~10~-transformed variables 
+respectively. The point labelled `86` does look problematic... 
+
+```{r testing regression assumptions, paged.print=FALSE, results="hold"}
+require(lmtest)
+require(car)
+cat("------- Residual autocorrelation (independence assumption):")
+bgtest(lm_stepwise) # Breusch-Godfrey test for autocorrelation (independence)
+cat("\n------- Test of homoscedasticity assumption:")
+bptest(lm_stepwise) # Breusch-Pagan test for homoscedasticity
+cat("\n------- Test of linearity assumption:")
+raintest(lm_stepwise) # Rainbow test for linearity
+cat("\n------- Bonferroni Outlier test for influential observations:\n\n")
+outlierTest(lm_stepwise) # Bonferroni outlier test for influential observations
+```
+
+## Multiple regression effect plots
+```{r effect-plots, fig.height=6, fig.width=6, fig.cap="Effect plots for individual predictors in the optimal multiple regression model following backward-forward stepwise refinement. Light blue shaded areas on plots represent 95% confidence limits."}
+require(effects)
+plot(allEffects(lm_stepwise, confidence.level=0.95))
+```
+
+## Scatterplot of observed *vs*. fitted values
+
+An 'observed *vs*. fitted' plot (Figure \@ref(fig:obs-vs-fitted)) is a way 
+around trying to plot a function with multiple predictors (*i.e*. multiple 
+dimensions)! We can get the fitted values since these are stored in the `lm` 
+object, in our case `lm_stepwise` in an item called `lm_stepwise$fitted.values`.
+We also make use of other information stored in the `lm` object, by calling 
+`summary(lm_stepwise)$adj.r.squared`.
+
+```{r obs-vs-fitted, fig.height=6, fig.width=6, fig.cap="Measured (observed) vs. predicted values in the optimal multiple regression model."}
+par(mar=c(4,4,1,1), mgp=c(2,0.5,0), font.lab=2, cex.lab=1.2, 
+    lend="square", ljoin="mitre")
+plot(sv2017_multreg$Cu.pow ~ lm_stepwise$fitted.values,
+     xlab="Cu.pow predicted from regression model",
+     ylab="Cu.pow measured values", pch=3, lwd=2, 
+     cex=0.8, col="blue3")
+abline(0,1, col="gold4", lty=2, lwd=2)
+legend("topleft", legend=c("Observations","1:1 line"), col=c("blue3","gold4"), 
+       text.col=c("blue3","gold4"), pch=c(3,NA), lty=c(NA,2), pt.lwd=2, lwd=2, 
+       box.col="grey", box.lwd=2, inset=0.02, seg.len=2.7, y.intersp=1.2)
+mtext(side=3, line=-5.5, adj=0.05, col="blue3",
+      text=paste("Adjusted Rsq =",signif(summary(lm_stepwise)$adj.r.squared,3)))
+```
+
+## Some brief interpretation
+
+- The adjusted R-squared value of the final model is 0.506, meaning that 50.6% of the variance in Cu is explained by variance in the model's predictors. (The remaining 49.4% of variance must therefore be due to random variations, or 'unknown' variables not included in our model.)
+- From the model coefficients and the effect plots we can see that Cu  increases as Ca, Fe, and S increase, but Cu decreases as Al increases. This doesn't necessarily correspond with the individual relationships; Cu **IS** positively correlated with Ca, Fe, and S, **but** actually has no significant relationship with Al (you can check this!).
+- Although we can't attribute a causal relationship to correlation or regression relationships, the observed effects in our model **are** consistent with real phenomena. For example, copper is positively related to iron (Fe) in soils at the continental scale; see Hamon *et al*. (2004) and Caritat and Rate (2017).
+
+# References
+
+Caritat, P. and Rate, A. W. (2017). Detecting anomalous metal concentrations in the regolith using cross-compositional detrending. *Paper presented at the Goldschmidt Conference 2017*, Paris, France. [https://goldschmidtabstracts.info/2017/864.pdf](https://goldschmidtabstracts.info/2017/864.pdf){target="_blank"}.
+
+Cohen, J. 1988. *Statistical Power Analysis for the Behavioral Sciences*, Second Edition. Erlbaum Associates, Hillsdale, NJ, USA.
+
+Hamon, R. E., McLaughlin, M. J., Gilkes, R. J., Rate, A. W., Zarcinas, B., Robertson, A., Cozens, G., Radford, N. and Bettenay, L. (2004). Geochemical indices allow estimation of heavy metal background concentrations in soils. *Global Biogeochemical Cycles*, **18**(GB1014), [http://dx.doi.org/10.1029/2003GB002063](http://dx.doi.org/10.1029/2003GB002063){target="_blank"}. 
+
+Hebbali, A. (2018). Collinearity Diagnostics, Model Fit and Variable Contribution. Vignette for R Package 'olsrr'. Retrieved 2018.04.05, from [https://cran.r-project.org/web/packages/olsrr/vignettes/regression_diagnostics.html](https://cran.r-project.org/web/packages/olsrr/vignettes/regression_diagnostics.html){target="_blank"}.
+
+Reimann, C., Filzmoser, P., Garrett, R.G., Dutter, R., (2008). *Statistical Data Analysis Explained: Applied Environmental Statistics with R*. John Wiley & Sons, Chichester, England (see Chapter 16).
