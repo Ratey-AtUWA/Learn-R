@@ -81,4 +81,21 @@ uniform colour gradient is discussed below.
 
 ## 1. Existing palettes available in **R** packages
 
-There are several existing **R** packages and functions which allow generation of uniform-gradient, colourblind-friendly palettes.
+There are several existing **R** packages and functions which allow generation
+of uniform-gradient, colourblind-friendly palettes.
+
+### 1.1 `RColorBrewer::`
+
+The `RColorBrewer::` package contains 35 in-built palettes, 27 of which are
+colourblind-friendly (Figure \@ref(fig:rcolorbrewer-cbf)).
+
+```{r rcolorbrewer-cbf, fig.height=8, fig.width=8, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Colourblind-friendly palettes from the `RColorBrewer` R package, showing the maximum number of colours in each palette.", results='hold', echo=2:3}
+par(mar=c(0,4,0,0))
+library(RColorBrewer)
+display.brewer.all(colorblindFriendly = T)
+text(c(2,2,2),c(29.3,10.3,6.3),pos=2,font=2,
+     labels=c("Gradational","Qualitative","Diverging"))
+par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25, 
+    lend="square", ljoin="mitre")
+```
+
