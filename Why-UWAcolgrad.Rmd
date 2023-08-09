@@ -1,0 +1,80 @@
+---
+title: ''
+output:
+  bookdown::html_document2:
+    fig_width: 6
+    fig_height: 4
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+  word_document:
+    toc_depth: 2
+    fig_caption: yes
+---
+
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+```{r addimg function, include=FALSE}
+library(png)
+addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
+  if(is.null(x) | is.null(y) | is.null(width)){stop("Must provide args 'x', 'y', and 'width'")}
+  USR <- par()$usr ; PIN <- par()$pin ; DIM <- dim(obj) ; ARp <- DIM[1]/DIM[2]
+  WIDi <- width/(USR[2]-USR[1])*PIN[1] ;   HEIi <- WIDi * ARp 
+  HEIu <- HEIi/PIN[2]*(USR[4]-USR[3]) 
+  rasterImage(image = obj, xleft = x-(width/2), xright = x+(width/2),
+            ybottom = y-(HEIu/2), ytop = y+(HEIu/2), interpolate = interpolate)
+}
+logo <- readPNG("2015-UWA-Full-Hor-CMYK-png.png") # add our own image
+```
+
+```{r save-default-par, include=FALSE}
+defpar <- par(no.readonly = TRUE)
+```
+
+```{r header-image, echo=FALSE, fig.height=3, fig.width=20, message=FALSE, warning=FALSE}
+par(mar=c(0,0,0,0))
+windowsFonts(uwa = windowsFont("UWA"))
+plot(c(0,1),type="n",axes=F,bty="n",xlab="",ylab="",xaxs="i",yaxs="i")
+rect(1.25, 0.9, 2, 1, col="#003087", border="#003087")
+rect(1.8, 0.9, 2, 1, col="#DAAA00", border="#DAAA00")
+addImg(logo, x = 1.11, y = 0.6, width = 0.2)
+text(1.95,0.75,pos=2,labels="School of Agriculture and Environment", cex=3,
+     family="uwa", col="#003087")
+text(1.95,0.6,pos=2,labels="\u2514 Environmental Science", cex=3,
+     family="uwa", col="#003087")
+par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25, 
+    lend="square", ljoin="mitre")
+```
+
+# Why a UWA colour palette generator for **R**?
+
+Colour palettes with relatively few distinctive colours are often used in the
+corporate world. Apparently they confer a consistent "look and feel" to
+company-branded materials, making publications, presentations, and advertising
+more memorable and the brand more recognisable.
+
+When presenting material clearly from a scientific perspective, however,
+corporate colour palettes can be problematic if they include colour combinations
+that are difficult to distinguish for people having colour vision impairments
+such as red-green colour-blindness. Where colour comparisons are important to
+interpreting data presented graphically, the contrast between the items being
+compared should be visible to as many people as possible, regardless of
+colour-blindness. In addition, the print copies of some scientific journals
+still reproduce figures as greyscale images, so a colour palette that maintains
+as much contrast as possible when converted to greyscale is preferable.
+
+Fortunately for staff and students working at UWA, the standard colours in the
+UWA brand lend themselves well to generation of themed colour palettes which are
+colourblind-friendly. The development of a possible UWA colour palette with
+uniform colour gradient is discussed below.
+
+## 1. Existing palettes available in **R** packages
+
+There are several existing **R** packages and functions which allow generation of uniform-gradient, colourblind-friendly palettes.
