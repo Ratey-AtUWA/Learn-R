@@ -68,7 +68,11 @@ interpreting data presented graphically, the contrast between the items being
 compared should be visible to as many people as possible, regardless of
 colour-blindness. In addition, the print copies of some scientific journals
 still reproduce figures as greyscale images, so a colour palette that maintains
-as much contrast as possible when converted to greyscale is preferable.
+as much contrast as possible when converted to greyscale is preferable. This is
+achieved with 
+
+1. a *uniform gradient*, an approximately linear relationship between greyscale value and colour palette index;
+2. a wide range of initial contrast (dark to light, or *vice versa*).
 
 Fortunately for staff and students working at UWA, the standard colours in the
 UWA brand lend themselves well to generation of themed colour palettes which are
