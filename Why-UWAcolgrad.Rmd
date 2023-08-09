@@ -9,9 +9,6 @@ output:
     df_print: default
     fig_caption: yes
     smart: no
-  html_document:
-    toc_depth: '2'
-    df_print: paged
   word_document:
     toc_depth: 2
     fig_caption: yes
@@ -92,8 +89,10 @@ par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25,
     lend="square", ljoin="mitre")
 ```
 
-Fortunately for staff and students working at UWA, the standard colours in the
-UWA brand lend themselves well to generation of themed colour palettes which are
+<p>&nbsp;</p>
+
+Fortunately for staff and students working at UWA, the standard blue and gold colours in the
+[UWA brand](https://www.uniprint.uwa.edu.au/answers/visual-identity/what-colours-do-I-need-to-use-to-comply-with-the-uwa-brand){target="_blank"} lend themselves well to generation of themed colour palettes which are
 colourblind-friendly. The development of a possible UWA colour palette with
 uniform colour gradient is discussed below.
 
@@ -102,20 +101,22 @@ uniform colour gradient is discussed below.
 There are several existing **R** packages and functions which allow generation
 of uniform-gradient, colourblind-friendly palettes.
 
-### 1.1 `RColorBrewer::`
+### 1.1 RColorBrewer
 
-The `RColorBrewer::` package contains 35 in-built palettes, 27 of which are
-colourblind-friendly (Figure \@ref(fig:rcolorbrewer-cbf)).
+The `RColorBrewer` package (Neuwirth, 2022) contains 35 in-built palettes, 27 of
+which are colourblind-friendly (Figure \@ref(fig:rcolorbrewer-cbf)).
 
-```{r rcolorbrewer-cbf, fig.height=8, fig.width=8, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Colourblind-friendly palettes from the `RColorBrewer` R package, showing the maximum number of colours in each palette.", results='hold', echo=2:3}
+```{r rcolorbrewer-cbf, fig.height=8, fig.width=8, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Colourblind-friendly palettes from the `RColorBrewer` R package. Each palette is shown with the maximum allowable number of colours.", results='hold', echo=2:3}
 par(mar=c(0,4,0,0))
 library(RColorBrewer)
-display.brewer.all(colorblindFriendly = T)
+display.brewer.all(colorblindFriendly = TRUE)
 text(c(2,2,2),c(29.3,10.3,6.3),pos=2,font=2,
      labels=c("Gradational","Qualitative","Diverging"))
 par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25, 
     lend="square", ljoin="mitre")
 ```
+
+<p>&nbsp;</p>
 
 For comparison, the `RColorBrewer` colourblind-friendly palettes viewed in 
 greyscale are shown below (Figure \@ref(fig:rcolorbrewer-gray):
@@ -128,6 +129,8 @@ addImg(logo, x = 1.5, y = 0.5, width = 1)
 par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25, 
     lend="square", ljoin="mitre")
 ```
+
+<p>&nbsp;</p>
 
 ## References
 
