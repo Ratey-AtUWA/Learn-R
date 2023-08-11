@@ -53,8 +53,8 @@ par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25,
     lend="square", ljoin="mitre")
 ```
 
-The up-to-date code to generate this document is always available at 
-[https://github.com/Ratey-AtUWA/Learn-R/raw/main/Why-UWAcolgrad.Rmd](https://github.com/Ratey-AtUWA/Learn-R/raw/main/Why-UWAcolgrad.Rmd){target="_blank"}.
+The up-to-date code to generate this document is always available 
+[**here**](https://github.com/Ratey-AtUWA/Learn-R/blob/main/Why-UWAcolgrad.Rmd){target="_blank"}.
 
 # Why a UWA colour palette generator for **R**?
 
@@ -77,11 +77,12 @@ achieved with:
 1. a *uniform gradient*, an approximately linear relationship between greyscale value and colour palette index;
 2. a wide range of initial contrast (dark to light, or *vice versa*).
 
-The importance of contrast when converting to greyscale is illustrated by the 
-four versions of the same map shown in Figure \@ref(fig:recoloured-map) below.
+The importance of a wide range in contrast when converting to greyscale is
+illustrated by the four versions of the same map shown in Figure
+\@ref(fig:recoloured-map) below.
 
-```{r recoloured-map, echo=FALSE, fig.height=6.25, fig.width=10, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Four versions of the same map: (a) original colours from Thebo *et al*. (2014); (b) original map converted to grayscale; (c) recoloured map used in Rate (2022); (d) recoloured map converted to grayscale.", echo=FALSE}
-logo <- readPNG("recoloured-map.png") # add our own image
+```{r recoloured-map, echo=FALSE, fig.height=6.25, fig.width=10, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Four versions of the same map: (a) original colours from Thebo *et al*. (2014); (b) original map converted to grayscale; (c) recoloured map used in Rate (2022); (d) recoloured map converted to grayscale. Greyscale conversions were performed in `paint.net` (Brewster, 2023).", echo=FALSE}
+logo <- readPNG("./images/recoloured-map.png") # add our own image
 par(mar=c(0,0,0,0))
 plot(c(0,1),type="n",axes=F,bty="n",xlab="",ylab="",xaxs="i",yaxs="i")
 addImg(logo, x = 1.5, y = 0.5, width = 1)
@@ -92,7 +93,8 @@ par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25,
 <p>&nbsp;</p>
 
 Fortunately for staff and students working at UWA, the standard blue and gold colours in the
-[UWA brand](https://www.uniprint.uwa.edu.au/answers/visual-identity/what-colours-do-I-need-to-use-to-comply-with-the-uwa-brand){target="_blank"} lend themselves well to generation of themed colour palettes which are
+[UWA brand](https://www.uniprint.uwa.edu.au/answers/visual-identity/what-colours-do-I-need-to-use-to-comply-with-the-uwa-brand){target="_blank"} 
+lend themselves well to generation of themed colour palettes which are
 colourblind-friendly. The development of a possible UWA colour palette with
 uniform colour gradient is discussed below.
 
@@ -104,7 +106,9 @@ of uniform-gradient, colourblind-friendly palettes.
 ### 1.1 RColorBrewer
 
 The `RColorBrewer` package (Neuwirth, 2022) contains 35 in-built palettes, 27 of
-which are colourblind-friendly (Figure \@ref(fig:rcolorbrewer-cbf)).
+which are colourblind-friendly (Figure \@ref(fig:rcolorbrewer-cbf)). One of 
+these (`YlGnBu`) has end-member colors which are near the UWA colours in the 
+colour wheel, but not at the exact hues.
 
 ```{r rcolorbrewer-cbf, fig.height=8, fig.width=8, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Colourblind-friendly palettes from the `RColorBrewer` R package. Each palette is shown with the maximum allowable number of colours.", results='hold', echo=2:3}
 par(mar=c(0,4,0,0))
@@ -121,18 +125,136 @@ par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25,
 For comparison, the `RColorBrewer` colourblind-friendly palettes viewed in 
 greyscale are shown below (Figure \@ref(fig:rcolorbrewer-gray):
 
-```{r rcolorbrewer-gray, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Colourblind-friendly palettes from the `RColorBrewer` R package, shown as a greyscale image.", echo=FALSE}
-logo <- readPNG("rcolorbrewer-gray.png") # add our own image
-par(mar=c(0,0,0,0))
-plot(c(0,1),type="n",axes=F,bty="n",xlab="",ylab="",xaxs="i",yaxs="i")
-addImg(logo, x = 1.5, y = 0.5, width = 1)
+```{r convert-to-greyscale, message=FALSE, warning=FALSE, include=FALSE}
+library(imager)
+png(file="./images/rcb-col.png", width = 600, height = 600)
+par(mar=c(0,4,0,0))
+display.brewer.all(colorblindFriendly = TRUE)
+text(c(2,2,2),c(29.3,10.3,6.3),pos=2,font=2,
+     labels=c("Gradational","Qualitative","Diverging"))
 par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25, 
     lend="square", ljoin="mitre")
+dev.off()
+rcb_col <- imager::load.image("./images/rcb-col.png")
+rcb_gry <- grayscale(rcb_col)
+save.image(rcb_gry, "./images/rcb-gry.png")
+```
+
+```{r rcolorbrewer-gray, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Colourblind-friendly palettes from the `RColorBrewer` R package, shown as a greyscale image created using the `imager` **R** package.", echo=FALSE}
+logo <- readPNG("./images/rcb-gry.png") # add our own image
+par(mar=c(0,0,0,0))
+plot(c(0,1),c(0,1),type="n",axes=F,bty="n",xlab="",ylab="",xaxs="i",yaxs="i")
+addImg(logo, x = 0.5, y = 0.5, width = 1)
+par(mar = c(3.5,3.5,0.5,0.5), font.lab=2, mgp=c(1.6,0.3,0), tcl=0.25, 
+    lend="square", ljoin="mitre")
+```
+
+```{r remove-temp-files, message=FALSE, warning=FALSE, include=FALSE}
+file.remove("./images/rcb-col.png")
+file.remove("./images/rcb-gry.png")
+```
+
+<p>&nbsp;</p>
+
+### 1.2 Viridis
+
+The `viridis` and companion `viridisLite` **R** packages (Garnier *et al*. 2021)
+are specifically designed to address and minimise loss of information caused by
+colourblindness. The vignette supplied with the `viridis` package provides an
+excellent explanation of the need for, and functions of, the package (in
+RStudio, run `help(package="viridis")`, then select <u>User guides, package
+vignettes and other documentation</u>, then select
+<u>viridis::intro-to-viridis</u>). The `viridis` package has eight colour 
+palettes which are shown as gradients in Figure \@ref(fig:show-viridis) below 
+(each palette can be used to generate fewer discrete colours as well). The
+`cividis` palette, a corrected version of the original `viridis`, appears to 
+contain hues most closely resembling the UWA brand colours.
+
+```{r show-viridis, fig.height=6, fig.width=8, message=FALSE, warning=FALSE, echo=FALSE, fig.align='center',out.width='60%',fig.cap="The colour palettes available in the `viridis` and `viridisLite` R packages (Garnier et al. 2021)."}
+par(mar=c(0,0,0,0))
+plot(c(0,1),c(0,1),type="n",axes=F,bty="n",xlab="",ylab="",xaxs="i",yaxs="i")
+library(viridis)
+points(seq(0,1,l=101), rep(0.92,101),col=viridis(101),pch=15,cex=4)
+text(0.5,0.92,pos=3,labels="viridis",cex=1.5,offset=1)
+points(seq(0,1,l=101), rep(0.8,101),col=cividis(101),pch=15,cex=4)
+text(0.5,0.8,pos=3,labels="cividis",cex=1.5,offset=1)
+points(seq(0,1,l=101), rep(0.68,101),col=magma(101),pch=15,cex=4)
+text(0.5,0.68,pos=3,labels="magma",cex=1.5,offset=1)
+points(seq(0,1,l=101), rep(0.56,101),col=plasma(101),pch=15,cex=4)
+text(0.5,0.56,pos=3,labels="plasma",cex=1.5,offset=1)
+points(seq(0,1,l=101), rep(0.44,101),col=inferno(101),pch=15,cex=4)
+text(0.5,0.44,pos=3,labels="inferno",cex=1.5,offset=1)
+points(seq(0,1,l=101), rep(0.32,101),col=mako(101),pch=15,cex=4)
+text(0.5,0.32,pos=3,labels="mako",cex=1.5,offset=1)
+points(seq(0,1,l=101), rep(0.2,101),col=rocket(101),pch=15,cex=4)
+text(0.5,0.2,pos=3,labels="rocket",cex=1.5,offset=1)
+points(seq(0,1,l=101), rep(0.08,101),col=turbo(101),pch=15,cex=4)
+text(0.5,0.08,pos=3,labels="turbo",cex=1.5,offset=1)
+```
+
+<p>&nbsp;</p>
+
+### 1.3 Scico
+
+The final **R** palette package worth investigating is `scico` (pronounced
+'psycho'; Pedersen and Crameri, 2023). The `psico` package can generate 35
+different palettes, some of which can be categorical; my favourites are shown in
+Figure \@ref(fig:show-scico-pals) below. None of the built-in colour palettes in
+the `scico` package are good analogues for the UWA brand colours.
+
+```{r show-scico-pals, echo=FALSE, fig.height=4, fig.width=10, message=FALSE, warning=FALSE, out.width="70%", fig.align='center',fig.cap="Examples of gradational palettes available in the `scico` package."}
+library(scico)
+scico_palette_show(palettes = c("batlow","hawaii","imola","lajolla"))
+mtext("batlow",3,-1, adj=0.01,col="white",cex=1.5, family="mono", font =2)
+mtext("hawaii",3,-1, adj=0.99,col="black",cex=1.5, family="mono", font =2)
+mtext("imola",1,-0.1, adj=0.01,col="white",cex=1.5, family="mono", font =2)
+mtext("lajolla",1,-0.1, adj=0.99,col="white",cex=1.5, family="mono", font =2)
+```
+
+<p>&nbsp;</p>
+
+## 2. Development of a draft UWA colour palette for **R**
+
+The simplest and most obvious option was to try a colour gradient with the two core colours of the UWA brand: <span style="color:white; background-color:#003087;">&nbsp;UWA blue&nbsp;</span> and <span style="background-color:#DAAA00;">&nbsp;UWA gold&nbsp;</span>, plus black and white. A gradient of the desired number of colours was generated using the `colorRampPalette` function in **R**. As can be seen in Figure \@ref(fig:UWA-palette-initial) below, this produced an attractive, full-contrast, gradient which was nearly uniform.
+
+```{r UWA-palette-initial, echo=FALSE, fig.height=9, fig.width=12, message=FALSE, warning=FALSE, out.width="80%", fig.align='center', fig.cap=}
+np <- 24
+pal0 <- c("#000000","#003087","#DAAA00","#FFFFFF")
+UWAgrad <- colorRampPalette(pal0)(np)
+rgbTable <- col2rgb(UWAgrad)
+palette(UWAgrad)
+greyWt <- ((rgbTable["red",]*0.299) + (rgbTable["green",]*0.587) + (rgbTable["blue",]*0.114))/255
+greyAv <- ((rgbTable["red",]/3) + (rgbTable["green",]/3) + (rgbTable["blue",]/3))/255
+
+par(mar=rep(0.5,4),mfrow=c(2,1),mar=c(3,3,.5,.5),mgp=c(1.5,0.2,0), tcl=0.2, font.lab=2)
+plot(0:1, 0:1, ann=F, axes = F, type="n")
+points(seq(0,1,l=np), rep(0.95,np), pch=22, bg=UWAgrad, cex=6) #, col=UWAgrad
+text(0.5, 0.9, labels=paste("Full colour ramp, n =",np), pos=1, cex=2)
+points(seq(0,1,l=np), rep(0.7,np), pch = 22,
+       bg=rgb(greyWt, greyWt, greyWt), cex = 6)
+text(0.5, 0.65, labels=paste("Weighted grey ramp, n =",np), pos=1, cex=2)
+points(seq(0,1,l=np), rep(0.45,np), pch = 22,
+       bg=rgb(greyAv, greyAv, greyAv), cex = 6)
+text(0.5, 0.4, labels=paste("Average grey ramp, n =",np), pos=1, cex=2)
+points(c(0.3,0.5,0.7,0.9), rep(0.15,4), pch=22, cex=4, bg=pal0)
+text(0.25,0.15,pos=2,labels="Starting colours:",cex=2,offset=1)
+text(c(0.1,0.3,0.5,0.7,0.9), rep(0.15,4), pos=1, cex=1.5, offset=1,
+     labels=c("hex codes:",pal0))
+plot(1:np, round(greyWt,2), ylim=c(0,1), xlab="Gradient sequence number", 
+     ylab="Weighted greyscale value", pch=21, cex=4, bg=UWAgrad, cex.lab=1.4, cex.axis=1.4)
+mtext("Dark-light gradient",3,-1.5,cex=1.5)
+abline(lm(greyWt ~ c(1:np)), col=as.integer(np*0.6),lty=2)
+```
+
+```{r}
+
 ```
 
 <p>&nbsp;</p>
 
 ## References
+
+Brewster, R. (2023). `paint.net 5.0.6` (Stable 5.6.8544.33530); dotPDN LLC,  [https://www.getpaint.net/index.html](https://www.getpaint.net/index.html){target="_blank"}
 
 Garnier S, Ross N, Rudis R, Camargo AP, Sciaini M, Scherer C (2021). *Rvision - Colorblind-Friendly Color Maps for R*. R package version 0.6.2. (package **viridis**) [https://sjmgarnier.github.io/viridis/](https://sjmgarnier.github.io/viridis/){target="_blank"}
 
