@@ -58,3 +58,4 @@ abline(lm(greyWt ~ c(1:np)), col=as.integer(np*0.6),lty=2)
 
 lmGrad <- lm(greyWt~c(1:np))
 summary(lmGrad)
+

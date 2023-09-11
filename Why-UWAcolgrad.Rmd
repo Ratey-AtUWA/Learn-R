@@ -143,7 +143,7 @@ rcb_gry <- grayscale(rcb_col)
 save.image(rcb_gry, "./images/rcb-gry.png")
 ```
 
-```{r rcolorbrewer-gray, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Colourblind-friendly palettes from the `RColorBrewer` R package, shown as a greyscale image created using the `imager` **R** package.", echo=FALSE}
+```{r rcolorbrewer-gray, echo=FALSE, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, fig.align='center', fig.cap="Colourblind-friendly palettes from the `RColorBrewer` R package, shown as a greyscale image created using the `imager` **R** package (Barthelme, 2023).", echo=FALSE}
 logo <- readPNG("./images/rcb-gry.png") # add our own image
 par(mar=c(0,0,0,0))
 plot(c(0,1),c(0,1),type="n",axes=F,bty="n",xlab="",ylab="",xaxs="i",yaxs="i")
@@ -279,7 +279,7 @@ development process continued. (I also thought that this initial palette did not
 have enough blue saturation at the 'dark end'.) By iteratively substituting some
 of the core colours used to generate the palette with secondary colours from the
 previous palette(s), including not starting from pure black, it proved possible
-to generate more uniform palettes (Figure \@ref(figUWA-palette-iterations)):
+to generate more uniform palettes (Figure \@ref(fig:UWA-palette-iterations)):
 
 ```{r UWA-palette-iterations, echo=FALSE, fig.height=9, fig.width=12, message=FALSE, warning=FALSE, out.width="80%", fig.align='center', fig.cap="Display and analysis of subsequent attempts at uniform-gradient UWA colour palettes."}
 np <- 24

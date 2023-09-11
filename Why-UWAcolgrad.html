@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Why-UWAcolgrad.knit</title>
+
+<script src="Why-UWAcolgrad_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="Why-UWAcolgrad_files/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="Why-UWAcolgrad_files/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="Why-UWAcolgrad_files/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="Why-UWAcolgrad_files/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="Why-UWAcolgrad_files/navigation-1.1/tabsets.js"></script>
+<link href="Why-UWAcolgrad_files/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="Why-UWAcolgrad_files/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div id="header">
+
+
+
+
+</div>
+
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+<p><img src="Why-UWAcolgrad_files/figure-html/header-image-1.png" width="1920" /></p>
+<p>The up-to-date code to generate this document is always available
+<a href="https://github.com/Ratey-AtUWA/Learn-R/blob/main/Why-UWAcolgrad.Rmd" target="_blank"><strong>here</strong></a>.</p>
+<div id="why-a-uwa-colour-palette-generator-for-r" class="section level1">
+<h1>Why a UWA colour palette generator for <strong>R</strong>?</h1>
+<p>Colour palettes with relatively few distinctive colours are often used in the
+corporate world. Apparently they confer a consistent “look and feel” to
+company-branded materials, making publications, presentations, and advertising
+more memorable and the brand more recognisable.</p>
+<p>When presenting material clearly from a scientific perspective, however,
+corporate colour palettes can be problematic if they include colour combinations
+that are difficult to distinguish for people having colour vision impairments
+such as red-green colour-blindness. Where colour comparisons are important to
+interpreting data presented graphically, the contrast between the items being
+compared should be visible to as many people as possible, regardless of
+colour-blindness. In addition, the print copies of some scientific journals
+still reproduce figures as greyscale images, so a colour palette that maintains
+as much contrast as possible when converted to greyscale is preferable. This is
+achieved with:</p>
+<ol style="list-style-type: decimal">
+<li>a <em>uniform gradient</em>, an approximately linear relationship between greyscale value and colour palette index;</li>
+<li>a wide range of initial contrast (dark to light, or <em>vice versa</em>).</li>
+</ol>
+<p>The importance of a wide range in contrast when converting to greyscale is
+illustrated by the four versions of the same map shown in Figure
+<a href="#fig:recoloured-map">1</a> below.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:recoloured-map"></span>
+<img src="Why-UWAcolgrad_files/figure-html/recoloured-map-1.png" alt="Four versions of the same map: (a) original colours from Thebo *et al*. (2014); (b) original map converted to grayscale; (c) recoloured map used in Rate (2022); (d) recoloured map converted to grayscale. Greyscale conversions were performed in `paint.net` (Brewster, 2023)." width="960" />
+<p class="caption">
+Figure 1: Four versions of the same map: (a) original colours from Thebo <em>et al</em>. (2014); (b) original map converted to grayscale; (c) recoloured map used in Rate (2022); (d) recoloured map converted to grayscale. Greyscale conversions were performed in <code>paint.net</code> (Brewster, 2023).
+</p>
+</div>
+<p>
+ 
+</p>
+<p>Fortunately for staff and students working at UWA, the standard blue and gold colours in the
+<a href="https://www.uniprint.uwa.edu.au/answers/visual-identity/what-colours-do-I-need-to-use-to-comply-with-the-uwa-brand" target="_blank">UWA brand</a>
+lend themselves well to generation of themed colour palettes which are
+colourblind-friendly. The development of a possible UWA colour palette with
+uniform colour gradient is discussed below. I have focused on the creation of
+this palette in the <strong>R</strong> statistical computing environment (R Core Team, 2022);
+many people at UWA use <strong>R</strong>, but many don’t, so there is some comment on use of
+the UWA palette in Microsoft Office<sup>®</sup> software near the end.</p>
+<div id="existing-palettes-available-in-r-packages" class="section level2">
+<h2>1. Existing palettes available in <strong>R</strong> packages</h2>
+<p>There are several existing <strong>R</strong> packages and functions which allow generation
+of uniform-gradient, colourblind-friendly palettes.</p>
+<div id="rcolorbrewer" class="section level3">
+<h3>1.1 RColorBrewer</h3>
+<p>The <code>RColorBrewer</code> package (Neuwirth, 2022) contains 35 in-built palettes, 27 of
+which are colourblind-friendly (Figure <a href="#fig:rcolorbrewer-cbf">2</a>). One of
+these (<code>YlGnBu</code>) has end-member colors which are near the UWA colours in the
+colour wheel, but not at the exact hues.</p>
+<pre class="r"><code>library(RColorBrewer)
+display.brewer.all(colorblindFriendly = TRUE)</code></pre>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:rcolorbrewer-cbf"></span>
+<img src="Why-UWAcolgrad_files/figure-html/rcolorbrewer-cbf-1.png" alt="Colourblind-friendly palettes from the `RColorBrewer` R package. Each palette is shown with the maximum allowable number of colours." width="768" />
+<p class="caption">
+Figure 2: Colourblind-friendly palettes from the <code>RColorBrewer</code> R package. Each palette is shown with the maximum allowable number of colours.
+</p>
+</div>
+<p>
+ 
+</p>
+<p>For comparison, the <code>RColorBrewer</code> colourblind-friendly palettes viewed in
+greyscale are shown below (Figure <a href="#fig:rcolorbrewer-gray">3</a>:</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:rcolorbrewer-gray"></span>
+<img src="Why-UWAcolgrad_files/figure-html/rcolorbrewer-gray-1.png" alt="Colourblind-friendly palettes from the `RColorBrewer` R package, shown as a greyscale image created using the `imager` **R** package." width="576" />
+<p class="caption">
+Figure 3: Colourblind-friendly palettes from the <code>RColorBrewer</code> R package, shown as a greyscale image created using the <code>imager</code> <strong>R</strong> package.
+</p>
+</div>
+<p>
+ 
+</p>
+</div>
+<div id="viridis" class="section level3">
+<h3>1.2 Viridis</h3>
+<p>The <code>viridis</code> and companion <code>viridisLite</code> <strong>R</strong> packages (Garnier <em>et al</em>. 2021)
+are specifically designed to address and minimise loss of information caused by
+colourblindness. The vignette supplied with the <code>viridis</code> package provides an
+excellent explanation of the need for, and functions of, the package (in
+RStudio, run <code>help(package="viridis")</code>, then select <u>User guides, package
+vignettes and other documentation</u>, then select
+<u>viridis::intro-to-viridis</u>). The <code>viridis</code> package has eight colour
+palettes which are shown as gradients in Figure <a href="#fig:show-viridis">4</a> below
+(each palette can be used to generate fewer discrete colours as well). The
+<code>cividis</code> palette, a corrected version of the original <code>viridis</code>, appears to
+contain hues most closely resembling the <a href="https://www.uniprint.uwa.edu.au/answers/visual-identity/what-colours-do-I-need-to-use-to-comply-with-the-uwa-brand" target="_blank">UWA brand</a> colours.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:show-viridis"></span>
+<img src="Why-UWAcolgrad_files/figure-html/show-viridis-1.png" alt="The colour palettes available in the `viridis` and `viridisLite` R packages (Garnier et al. 2021)." width="60%" />
+<p class="caption">
+Figure 4: The colour palettes available in the <code>viridis</code> and <code>viridisLite</code> R packages (Garnier et al. 2021).
+</p>
+</div>
+<p>
+ 
+</p>
+</div>
+<div id="scico" class="section level3">
+<h3>1.3 Scico</h3>
+<p>The final <strong>R</strong> palette package worth investigating is <code>scico</code> (pronounced
+‘psycho’; Pedersen and Crameri, 2023). The <code>psico</code> package can generate 35
+different palettes, some of which can be categorical; my favourites are shown in
+Figure <a href="#fig:show-scico-pals">5</a> below. None of the built-in colour palettes in
+the <code>scico</code> package are good analogues for the <a href="https://www.uniprint.uwa.edu.au/answers/visual-identity/what-colours-do-I-need-to-use-to-comply-with-the-uwa-brand" target="_blank">UWA brand</a> colours.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:show-scico-pals"></span>
+<img src="Why-UWAcolgrad_files/figure-html/show-scico-pals-1.png" alt="Examples of gradational palettes available in the `scico` package." width="70%" />
+<p class="caption">
+Figure 5: Examples of gradational palettes available in the <code>scico</code> package.
+</p>
+</div>
+<p>
+ 
+</p>
+</div>
+</div>
+<div id="development-of-a-draft-uwa-colour-palette-for-r" class="section level2">
+<h2>2. Development of a draft UWA colour palette for <strong>R</strong></h2>
+<p>From the previous section we saw that several packages in <strong>R</strong> could generate
+useful colour palettes with approximately uniform [brightness] gradients. <strong>I
+would definitely recommend</strong> trying and using uniform-gradient,
+colorblind-friendly palettes of colours from any of the packages described in
+Section 1. Using these palettes appropriately would add accessibility to
+presentations and written teaching materials without sacrificing aesthetic
+appeal. That none of these palettes perfectly captures the UWA brand should not
+be any impediment to their use!</p>
+<p>To maintain the “look and feel” of the <a href="https://www.uniprint.uwa.edu.au/answers/visual-identity/what-colours-do-I-need-to-use-to-comply-with-the-uwa-brand" target="_blank">UWA brand</a>,
+however, we need a colour palette which explicitly includes the brand colours,
+so the remainder of this document describes the steps in development of one such
+palette. The simplest and most obvious option was to try a colour gradient with
+the two core colours of the UWA brand: <span style="color:white;
+background-color:#003087;"> UWA blue </span> and <span style="background-color:#DAAA00;"> UWA gold </span>, bracketed by
+black and white. A gradient of the desired number of colours was generated using
+the <code>colorRampPalette()</code> function in
+<strong>R</strong>. As can be seen in Figure <a href="#fig:UWA-palette-initial">6</a> below, this
+produced an attractive, full-contrast, gradient which was nearly uniform.</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:UWA-palette-initial"></span>
+<img src="Why-UWAcolgrad_files/figure-html/UWA-palette-initial-1.png" alt="Analysis of initial attempt at a UWA uniform-gradient colour palette." width="80%" />
+<p class="caption">
+Figure 6: Analysis of initial attempt at a UWA uniform-gradient colour palette.
+</p>
+</div>
+<p>
+ 
+</p>
+<p>The palette in Figure <a href="#fig:UWA-palette-initial">6</a> does not have a perfectly
+uniform gradient, however, so in the interests of personal perfectionism the
+development process continued. (I also thought that this initial palette did not
+have enough blue saturation at the ‘dark end’.) By iteratively substituting some
+of the core colours used to generate the palette with secondary colours from the
+previous palette(s), including not starting from pure black, it proved possible
+to generate more uniform palettes (Figure <a href="#figUWA-palette-iterations"><strong>??</strong></a>):</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:UWA-palette-iterations"></span>
+<img src="Why-UWAcolgrad_files/figure-html/UWA-palette-iterations-1.png" alt="Display and analysis of subsequent attempts at uniform-gradient UWA colour palettes." width="80%" />
+<p class="caption">
+Figure 7: Display and analysis of subsequent attempts at uniform-gradient UWA colour palettes.
+</p>
+</div>
+<p>
+ 
+</p>
+<p>For the palettes shown in Figure <a href="#fig:UWA-palette-iterations">7</a>, the full range of contrast (zero to 100%) is not quite achieved, and the saturated version has a slightly non-uniform gradient. Both are probably suitable for most application required of them (the unsaturated version is similar to <code>cividis</code> from the <code>viridis</code> <strong>R</strong> package.</p>
+<p>If you want to use these palettes in <strong>R</strong>, you can download code for a function to generate them <a href="https://github.com/Ratey-AtUWA/Learn-R/blob/main/UWAcolgrad.R" target="_blank">at this link</a>. Alternatively, you can run the line of R code below:</p>
+<pre class="r"><code>source(&quot;https://github.com/Ratey-AtUWA/Learn-R/raw/main/UWAcolgrad.R&quot;)</code></pre>
+<p>Explanations of the arguments of this function are given in standard format in
+<a href="https://github.com/Ratey-AtUWA/Learn-R/blob/main/UWAcolgrad.R" target="_blank">the code file itself</a>.</p>
+</div>
+<div id="using-the-uwa-colour-palette-in-ms-office" class="section level2">
+<h2>3. Using the UWA colour palette in MS Office</h2>
+<p>We all use MS Office apps, even though we might not want to admit it. MS Office
+allows users to change the palette of a document (<em>e.g</em>. Word, PowerPoint,
+Excel) by selecting <span style="font-family:mono;">Design | Colors |
+<u>C</u>ustomize colors</span>. This opens a dialog where we can edit and save a
+colour palette, entering the RGB or hex colour values available via the <a href="https://www.uniprint.uwa.edu.au/answers/visual-identity/what-colours-do-I-need-to-use-to-comply-with-the-uwa-brand" target="_blank">UWA
+brand</a>
+(Figure <a href="#fig:custom-mso">8</a>).</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:custom-mso"></span>
+<img src="Why-UWAcolgrad_files/figure-html/custom-mso-1.png" alt="Editing colours in a custom palette (theme colours) in a Microsoft Office app." width="1152" />
+<p class="caption">
+Figure 8: Editing colours in a custom palette (theme colours) in a Microsoft Office app.
+</p>
+</div>
+<p>
+ 
+</p>
+<div class="figure" style="text-align: center"><span style="display:block;" id="fig:use-custom-mso"></span>
+<img src="Why-UWAcolgrad_files/figure-html/use-custom-mso-1.png" alt="Selecting a custom palette in MS Office software." width="1152" />
+<p class="caption">
+Figure 9: Selecting a custom palette in MS Office software.
+</p>
+</div>
+<p>
+ 
+</p>
+<p>The custom palette shown also includes some of the secondary colours in the <a href="https://www.uniprint.uwa.edu.au/answers/visual-identity/what-colours-do-I-need-to-use-to-comply-with-the-uwa-brand" target="_blank">UWA brand</a>
+specification.</p>
+<p>
+ 
+</p>
+</div>
+<div id="references" class="section level2">
+<h2>References</h2>
+<p>Brewster, R. (2023). <code>paint.net 5.0.6</code> (Stable 5.6.8544.33530); dotPDN LLC, <a href="https://www.getpaint.net/index.html" target="_blank">https://www.getpaint.net/index.html</a></p>
+<p>Garnier S, Ross N, Rudis R, Camargo AP, Sciaini M, Scherer C (2021). <em>Rvision - Colorblind-Friendly Color Maps for R</em>. R package version 0.6.2. (package <strong>viridis</strong>) <a href="https://sjmgarnier.github.io/viridis/" target="_blank">https://sjmgarnier.github.io/viridis/</a></p>
+<p>Neuwirth E (2022). <em>RColorBrewer: ColorBrewer Palettes</em>. R package version 1.1-3, <a href="https://CRAN.R-project.org/package=RColorBrewer" target="_blank">https://CRAN.R-project.org/package=RColorBrewer</a>.</p>
+<p>Pedersen T, Crameri F (2023). <em>scico: Colour Palettes Based on the Scientific Colour-Maps</em>. R package version 1.4.0, <a href="https://CRAN.R-project.org/package=scico" target="_blank">https://CRAN.R-project.org/package=scico</a></p>
+<p>R Core Team (2022). <em>R: A language and environment for statistical computing</em>.
+R Foundation for Statistical Computing, Vienna, Austria.
+<a href="https://www.R-project.org/" target="_blank">https://www.R-project.org/</a>.</p>
+<p>Rate, A.W. (2022). Urban Ecosystems: Soils and the Rise and Fall of Cities. <strong>In</strong> Rate, A.W. (Ed.), <em>Urban Soils: Principles and Practice</em>. Springer-Nature; Cham, Switzerland. <a href="https://doi.org/10.1007/978-3-030-87316-5" target="_blank">https://doi.org/10.1007/978-3-030-87316-5</a>.</p>
+<p>Thebo, A. L., Drechsel, P., &amp; Lambin, E. F. (2014). Global assessment of urban and peri-urban agriculture: irrigated and rainfed croplands. <em>Environmental Research Letters</em>, <strong>9</strong>, 9pp. <a href="https://doi.org/10.1088/1748-9326/9/11/114002" target="_blank">https://doi.org/10.1088/1748-9326/9/11/114002</a></p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
