@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+PP-git-read-sampling-plans.R
 *.zip
 ~$*.*
