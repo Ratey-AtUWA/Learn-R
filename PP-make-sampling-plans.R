@@ -19,7 +19,7 @@ plot_tiles(ppmap)
 axis(1);mtext("Easting (m)",1,1.6,font=2) 
 axis(2);mtext("Northing (m)",2,1.6,font=2);box() 
 
-polygon(sa1, col="#e0e08080", border="#d0d070")
+polygon(sa1, col="#e0e08080", border="#c0c060")
 polygon(sah1, col="#80c0ffa0", border="#70b0f0")
 polygon(sah2, col="#90b09080", border="#80a080")
 polygon(sah3, col="#c0c0c0", border="#b0b0b0")
@@ -34,11 +34,13 @@ mtext("EPSG: 32750 \u2022 Datum: WGS84 \u2022 (UTM Zone 50S)"
       , side=1, line=-1.5, adj=0.98, cex=0.85)
 legend("bottomleft", bty="n", inset=0.03, y.intersp=1.2, cex=1.4,
        legend=c("Study area","Proposed soil sample locations"), pt.cex=c(4,1.2),
-       pch=c(22,10), pt.bg=c("#e0e08080","#00000000"), col=c("#507070","blue3"))
-shadowtext(c(388900,389000,389000,388600), c(6460320,6460390,6460690,6460580), 
-     labels=c("Swan River","Pelican Point\nReserve","Matilda\nBay","UWA"),
+       pch=c(22,10), pt.bg=c("#e0e08080","#00000000"), col=c("#c0c060","blue3"))
+shadowtext(c(388900,389000,389000,388610), c(6460320,6460390,6460690,6460580), 
+     labels=c("Swan River","Pelican Point\nReserve","Matilda\nBay",
+              "The University of\nWestern Australia"),
      col=c("cadetblue","olivedrab","cadetblue","navy"), font=c(3,3,3,4), 
      cex=1.5,bg="white")
-text(x=c(388745,388960,388978), y=c(6460427,6460472,6460440), 
-     labels=c("Inaccessible","Inaccessible","DBCA\nDepot"),
-     font=3, col=c("#ffffd0","white","grey15"), cex=0.8)
+shadowtext(x=c(388850,388745,388960,388978), y=c(6460505, 6460427,6460472,6460440), 
+     labels=c("Car Park","Inaccessible","Inaccessible","DBCA\nDepot"),
+     font=3, cex=0.8, col=c("grey50","#ffffd0","white","grey15"),
+     bg=c("white","#70b0f0","#80a080","white"))
