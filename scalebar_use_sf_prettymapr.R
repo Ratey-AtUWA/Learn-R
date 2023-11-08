@@ -1,3 +1,7 @@
+# small edit of code at 
+# https://github.com/paleolimbot/prettymapr/blob/master/R/scalebar.R
+# (or https://github.com/paleolimbot/prettymapr/raw/master/R/scalebar.R)
+# so that sf:: is now used for CRS conversions instead of sp::
 
 # Calculates the geodesic distance between two points specified by radian
 # latitude/longitude using the Haversine formula (hf)
