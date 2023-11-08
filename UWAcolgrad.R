@@ -4,14 +4,14 @@
 #' a uniform gradient version (default) and an original more saturated version 
 #' which is closer to the UWA standard colours.
 #'
-#' @param np An integer specifying the number of colours to be generated (no 
-#' default).
+#' @param np An integer specifying the number of colours to be generated  
+#'   (default = 10).
 #' @param alpha A value between 0 and 1 specifying the transparency applied to 
-#' the colours (0 = fully transparent, 1, = fully opaque, default = 1).
+#'   the colours (0 = fully transparent, 1, = fully opaque, default = 1).
 #' @param saturated A logical value (default is FALSE) which specifies whether 
-#' the UWA standard saturated palette will be generated.
+#'   the UWA standard saturated palette will be generated.
 #' @param verbose A logical value (default is FALSE) which specifies whether 
-#' to output a message about the colour character string vector created.
+#'   to output a message about the colour character string vector created.
 #'
 #' @return A vector of np colors (as hexadecimal strings).
 #' @export
