@@ -556,7 +556,7 @@ results. You might be able to use the contents of a `lm` object to:
   3. find out if any regression residuals are unusual<br>
      ...and so on.
      
-<center>![](cats-lightning-correlation.jpg)</center>
+<center>![](images/cats-lightning-correlation.jpg)</center>
 
 <p>&nbsp;</p>
 
