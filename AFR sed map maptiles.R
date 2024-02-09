@@ -3,13 +3,11 @@ library(sp)
 library(sf)
 library(maptiles)
 library(prettymapr)
-pal4lite <- c("black", "purple2", "blue2", "cyan4", "forestgreen", 
-              "darkorange", "gold3", "red3", "grayB0", "white")
-pal4liteTransp <- c("#000000","#912CEEb0","#0000EEb0","#008B8Bb0","#228B22b0",
-                    "#CDAD00b0", "#FF8C00b0", "#CD0000b0", "#CCCCCC", "#FFFFFF")
-pal4dark <- c("white", "pink1", "orange", "khaki1", "lightgreen", "cadetblue1", 
-              "deepskyblue", "plum", "gray80", "black")
-
+pal4lite <- c("black", viridis::plasma(8), "white")
+pal4liteTransp <- 
+  c("black", scico::scico(8, alpha=0.7, palette="hawaii", beg=0.1), "white")
+pal4dark <- c("white", viridis::turbo(8, beg=0.2, end=0.9,dir=1), "black")
+                           
 LongLat <- CRS("+proj=longlat +ellps=WGS84 
            +datum=WGS84 +no_defs") # uses Earth ellipsis specs from WGS84 datum
 UTM50 <- CRS("+proj=utm +zone=50 +south") # just for Zone 50, S hemisphere!

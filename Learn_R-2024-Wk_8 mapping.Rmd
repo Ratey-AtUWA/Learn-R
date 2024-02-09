@@ -164,50 +164,41 @@ library(sf)
 afs21ll <- read.csv("afs21ll.csv", stringsAsFactors = T)
 afs21ll <- st_as_sf(afs21ll, coords=c("Longitude", "Latitude"), 
                     crs=st_crs(4326))
+secret <- read.csv("tfapi.csv")
 ```
 
 ```{r load packages and data show code but DO NOT RUN, eval=FALSE, results='hide'}
-library(sp)            # older package for spatial data in R
+# library(sp)          # older package for spatial data in R, retiring soon
 library(sf)            # Simple Features spatial data in R
 library(maptiles)      # get open-source map tiles for background maps
 library(prettymapr)    # add scale bar and north arrows to maps
 library(viridis)       # colourblind-friendly colour palettes
 library(scico)         # more colourblind-friendly colour palettes
-library(rosm)          # alternative open-source map tiles for background maps
 library(ggmap)         # plotting spatial data with ggplot syntax
 library(ggsn)          # add scale and north to ggmap maps (doesn't always work)
-# only run next line if you can run it from the console without crashing R!
-library(OpenStreetMap) # alternative open-source map tiles for background maps
 ```
 
 ```{r load packages and data invisibly, error=FALSE, warning=FALSE, include=FALSE, results='hide'}
-library(sp)
 library(sf)
 library(maptiles)
 library(prettymapr)
 library(viridis)
-library(rosm)
+library(scico)
 library(ggmap)
 library(ggsn)
-# un-comment next line if you can run it from the console without crashing R!
-# library(OpenStreetMap) 
 ```
 
 ```{r load maps data and do setups, error=FALSE, message=FALSE, warning=FALSE, results='hold'}
 git <- "https://raw.githubusercontent.com/Ratey-AtUWA/"
 afr_map <- read.csv(file=paste0(git,"spatial/main/afr_map_v2.csv"), 
                       stringsAsFactors = TRUE)
-places <- read.csv(file=paste0(git,"learningR/main/places.csv"),
+places <- read.csv(file=paste0(git,"Learn-R/main/places.csv"),
                    stringsAsFactors = TRUE)
-taita <- data.frame(lon = c(174.967,174.9549,174.9489,174.9521), 
-                    lat = c(-41.1761,-41.1812,-41.1831,-41.1838), 
-                    name = c("Tait\u0101 College", "Tait\u0101 School",
-                          "Fraser Park","Home")) # we need this later...
-taita$name <- as.factor(taita$name) # ...and this
 pal4lite <- c("black", viridis::plasma(8), "white")
-pal4liteTransp <- c("black", scico::scico(8, alpha = 0.8, palette = "hawaii"),"white")
-pal4dark <- c("white", scico::scico(8, begin=0.3, palette="hawaii"), "black")
-windowsFonts(nar=windowsFont("Arial Narrow"), monosans=windowsFont("Consolas"))
+pal4liteTransp <- c("black", 
+                    scico::scico(8, alpha = 0.7, palette = "hawaii", beg=0.1),
+                    "white")
+pal4dark <- c("white", viridis::turbo(8, beg=0.2, end=0.9,dir=1), "black")
 ```
 
 ## Preparing to make maps
@@ -218,9 +209,9 @@ data frame:
 ```{r read AFR data, warning=FALSE, error=FALSE, results='hold',eval=-1}
 # afs19 <- read.table('clipboard', header=T, sep="\t", stringsAsFactors = TRUE)
 # alternative code reading data from a file:
-afs19 <- read.csv(file=paste0(git,"learningR/main/afs19.csv"), 
+afs19 <- read.csv(file=paste0(git,"Learn-R/main/afs19.csv"), 
                   stringsAsFactors = TRUE) # use this one
-afs22 <- read.csv(file=paste0(git,"learningR/main/afs22S1.csv"), 
+afs22 <- read.csv(file=paste0(git,"Learn-R/main/afs22S1.csv"), 
                   stringsAsFactors = TRUE)
 ```
 
@@ -298,9 +289,8 @@ would need to convert our *Simple Features* object (see the **Appendix**).
 If our input coordinates are Longitude--Latitude, note that south latitudes (and
 west longitudes) are negative, and we want decimal degrees rather than
 degrees-minutes-seconds. Also note that coordinates from Google Maps and Google
-Earth (except in saved [.kml]{style="font-family: monospace;"} files) are in the
-order (Latitude, Longitude); *i.e*. $(y,x)$, whereas $(x,y)$ (Longitude,
-Latitude) seems to make more sense.
+Earth (except in saved `.kml` files) are in the order (Latitude, Longitude);
+*i.e*. $(y,x)$, whereas $(x,y)$ (Longitude, Latitude) seems to make more sense.
 
 For coordinates in the `sf` and `maptiles` packages, $x$ coordinates are
 commonly Eastings or Longitudes, and $y$ coordinates are commonly Northings or
@@ -340,7 +330,7 @@ of axes *etc* -- see Figure \@ref(fig:plot-map1-axes).
 
 ```{r plot-map1-axes, fig.align='center', fig.cap="Map of Ashfield Flats in the UTM projection, generated using the maptiles R package, with OpenStreetMap tiles.", fig.height=4.35, fig.width=6.8, message=FALSE, warning=FALSE, out.width='70%', results='hold'}
 par(oma=c(3,3,1,1), lend="square")
-plot(aftiles)
+plot_tiles(aftiles)
 
 box(lwd=6,col="white") # tidies up skewness of UTM tiles a bit
 axis(1, tcl=-0.2, mgp = c(1.6,0.3,0))
@@ -355,6 +345,13 @@ code, `plotepsg = 32750` refers to the EPSG code for the UTM projection in Zone
 50 (EPSG 32750), which we need to include so that the scale bar shows the
 correct distances. (Long-Lat is EPSG 4326 in WGS84)
 
+**NOTE**: If the `addscalebar` function does not work, run this line of code:
+```{r load-modified-addscalebar-function, eval=FALSE}
+source("https://github.com/Ratey-AtUWA/Learn-R/raw/main/scalebar_use_sf_prettymapr.R")
+```
+(This will replace the function in the `prettymapr` package with a modified 
+version that uses the `sf` package for coordinate conversions instead of `sp` and `rgdal`.)
+
 ```{r map-north-scale-pretend, eval=FALSE, message=FALSE, warning=FALSE}
 # . . . continuing previous code . . .
 addnortharrow(text.col=1, border=1)
@@ -363,7 +360,7 @@ addscalebar(plotepsg = 32750, label.col = 1, linecol = 1,
 ```
 
 ```{r map-north-scale, fig.align='center', fig.cap="Map of Ashfield Flats (UTM), with added North arrow and scale bar from prettymapr, over OpenStreetMap tiles acquired using maptiles.", fig.height=4.35, fig.width=6.8, message=FALSE, warning=FALSE, out.width='70%', results='hold',echo=FALSE}
-par(oma=c(3,3,1,1), lend="square");plot(aftiles);box(lwd=6,col="white");axis(1, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2);axis(2, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.5, font=2);box()
+par(oma=c(3,3,1,1), lend="square");plot_tiles(aftiles);box(lwd=6,col="white");axis(1, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2);axis(2, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.5, font=2);box()
 
 addnortharrow(text.col=1, border=1)
 addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, 
@@ -394,7 +391,7 @@ legend("bottomright", legend=levels(as.factor(afs19$Group)),
 ```
 
 ```{r add-data, eval=TRUE, message=FALSE, warning=FALSE, out.width='70%',echo=FALSE, fig.height=4.35, fig.width=6.8, fig.cap = "Map of Ashfield Flats (UTM), with added North arrow, scale bar, and user data, over OpenStreetMap tiles acquired using maptiles.", fig.align='center', results='hold'}
-par(oma=c(3,3,1,1), lend="square");plot(aftiles);box(lwd=6,col="white");axis(1, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2);axis(2, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.5, font=2);box();addnortharrow(text.col=1, border=1);addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, label.cex = 1.2, htin=0.15, widthhint = 0.15)
+par(oma=c(3,3,1,1), lend="square");plot_tiles(aftiles);box(lwd=6,col="white");axis(1, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2);axis(2, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.5, font=2);box();addnortharrow(text.col=1, border=1);addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, label.cex = 1.2, htin=0.15, widthhint = 0.15)
 clrz <- plasma(15)[6:15]
 with(afs19utm, plot(geometry, add=TRUE,  
                     pch = rep(21:25,2)[Group], 
@@ -417,7 +414,7 @@ with(afr_map, lines(wetland_E, wetland_N, col = "cadetblue", lwd = 1, lty = 2))
 
 ```{r map-annot, error=FALSE, warning=FALSE, echo=FALSE, fig.height=4.35, fig.width=6.8, fig.align='center', fig.cap="Map of Ashfield Flats (UTM), with added North arrow, scale bar, user data, and additional map items, over OpenStreetMap tiles acquired using maptiles.", results='hold'}
 # everything we did above in the first line
-par(oma=c(3,3,1,1), lend="square");plot(aftiles);box(lwd=6,col="white");axis(1, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2);axis(2, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.5, font=2);box();addnortharrow(text.col=1, border=1);addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, label.cex = 1.2, htin=0.15, widthhint = 0.15); with(afs19utm, plot(geometry, add=TRUE, pch = rep(21:25,2)[Group], bg = clrz[Group]))
+par(oma=c(3,3,1,1), lend="square");plot_tiles(aftiles);box(lwd=6,col="white");axis(1, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2);axis(2, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.5, font=2);box();addnortharrow(text.col=1, border=1);addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, label.cex = 1.2, htin=0.15, widthhint = 0.15); with(afs19utm, plot(geometry, add=TRUE, pch = rep(21:25,2)[Group], bg = clrz[Group]))
 legend("bottomright", legend=levels(as.factor(afs19$Group)), pch = rep(21:25,2), pt.bg = clrz, title = "Group", inset = 0.02, ncol = 2)
 with(afr_map, lines(drain_E, drain_N, col = "cadetblue", lwd = 2))
 with(afr_map, lines(wetland_E, wetland_N, col = "cadetblue", 
@@ -437,7 +434,7 @@ text(c(400263, 399962, 400047), c(6468174, 6468083, 6468237),
 
 ```{r map-text-labels, error=FALSE, warning=FALSE, echo=FALSE, fig.height=4.35, fig.width=6.8, fig.align='center', fig.cap="Map of Ashfield Flats (UTM), with added North arrow, scale bar, user data, and additional map items plus text labels, over OpenStreetMap tiles acquired using maptiles.", results='hold'}
 # everything we did above in the first line
-par(oma=c(3,3,1,1), lend="square");plot(aftiles);box(lwd=6,col="white");axis(1, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2);axis(2, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.5, font=2);box();addnortharrow(text.col=1, border=1);addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, label.cex = 1.2, htin=0.15, widthhint = 0.15); with(afs19utm, plot(geometry, add=TRUE, pch = rep(21:25,2)[Group], bg = clrz[Group]))
+par(oma=c(3,3,1,1), lend="square");plot_tiles(aftiles);box(lwd=6,col="white");axis(1, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2);axis(2, tcl=-0.2, mgp = c(1.6,0.3,0));mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.5, font=2);box();addnortharrow(text.col=1, border=1);addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, label.cex = 1.2, htin=0.15, widthhint = 0.15); with(afs19utm, plot(geometry, add=TRUE, pch = rep(21:25,2)[Group], bg = clrz[Group]))
 legend("bottomright", legend=levels(as.factor(afs19$Group)), pch = rep(21:25,2), pt.bg = clrz, title = "Group", inset = 0.02, ncol = 2); with(afr_map, lines(drain_E, drain_N, col = "cadetblue", lwd = 2)); with(afr_map, lines(wetland_E, wetland_N, col = "cadetblue", lwd = 1, lty = 2))
 text(c(400263, 399962, 400047), c(6468174, 6468083, 6468237),
      labels = c("Chapman Drain","Kitchener Drain", "Woolcock Drain"),
@@ -459,7 +456,7 @@ where high concentrations are located.
 
 ```{r map-bubbles, fig.align='center', fig.cap="\\label{bubbles}Bubble map of zinc concentrations in sediment and soil at Ashfield Flats in 2019, over OpenStreetMap tiles acquired using maptiles.", fig.height=4.35, fig.width=6.8, message=FALSE, warning=FALSE, out.width='70%', results='hold'}
 par(oma=c(3,3,1,1), lend="square")
-plot(aftiles)
+plot_tiles(aftiles)
 box(lwd=6,col="white") # tidies up skewness of UTM tiles a bit
 axis(1, tcl=-0.2, mgp = c(1.6,0.3,0))
 mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2)
@@ -500,7 +497,7 @@ sample location. We add a line break to text labels using $\backslash$`n`.
 
 ```{r PctBubb, fig.align='center', fig.cap="Map showing percentile ranges of zinc concentrations in sediment and soil at Ashfield Flats in 2019, over OpenStreetMap tiles acquired using maptiles.", out.width='70%', fig.height=6.4, fig.width=10, message=FALSE, warning=FALSE, results='hold'}
 par(oma=c(3,3,1,1), lend="square")
-plot(aftiles)
+plot_tiles(aftiles)
 box(lwd=6,col="white") # tidies up skewness of UTM tiles a bit
 axis(1, tcl=-0.2, mgp = c(1.6,0.3,0))
 mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.5, font=2)
@@ -528,12 +525,12 @@ with(afs19,
             pch = c(22,22,22,3,4,21,21,21)[QZn], 
             col = c(1,1,1,4,5,1,1,1)[QZn], bg = c(9:2)[QZn],
             lwd = c(1,1,1,2,2,1,1)[QZn], 
-            cex = c(0.5,0.65,0.8,1,1,1.5,2.2,3)[QZn])
+            cex = c(0.7,0.9,1.1,1.3,1.3,2,3,4)[QZn])
      )
 legend("bottomright", legend = levels(afs19$QZn), title="Zn",
        pch = c(22,22,22,3,4,21,21,21), col = c(1,1,1,4,5,1,1,1),
        pt.lwd = c(1,1,1,2,2,1,1), pt.bg = c(9:2 ), 
-       pt.cex = c(0.5,0.65,0.8,1,1,1.5,2.2,3),
+       pt.cex = c(0.7,0.9,1.1,1.3,1.3,2,3,4),
        bty = "n", inset = 0.02, cex = 0.85, y.intersp = 1.2)
 palette(pal4lite) # change back to non-transparent palette (optional)
 afs19$QZn <- NULL # to delete quantile column (optional; you can leave it in)
@@ -558,24 +555,26 @@ colours, save as `.png` or `.tiff`, or copy as a bitmap.</span>
 
 ## Alternative 2 -- Maps in R using the ggmap package
 
-The [ggmap]{style="font-family: monospace; background-color: #e8e8e8;"} package 
-(Kahle and Wickham 2013) is an extension of
-[ggplot]{style="font-family: monospace; background-color: #e8e8e8;"}, 
-so it's easier to use if you are familiar with 
-[ggplot]{style="font-family: monospace; background-color: #e8e8e8;"}
-and the associated family of packages. [*The Google maps key is owned by*
+The `ggmap` package (Kahle and Wickham 2013) is an extension of `ggplot`, so
+it's easier to use if you are familiar with `ggplot` and the associated family
+of packages. [*The Google maps key is owned by*
 *the Unit Coordinator, so please use it responsibly!*]{style="color: #A00000;"}
 
-First we make a [ggmap]{style="font-family: monospace; background-color: #e8e8e8;"} 
-object, locating the map by its central coordinate with the extent controlled by
-the [zoom]{style="font-family: monospace; background-color: #e8e8e8;"} option:
+First we make a `ggmap` object, locating the map by its central coordinate with
+the extent controlled by the `zoom` option:
 
 ```{r make ggmap object, message=FALSE, warning=FALSE, eval=-1, results='hold'}
 library(ggmap)
 register_google(key = "AIzaSyDU7QiTWE4RGFFQNmhWy51n7e4RBeHKjc0")
 udubua.gg <- get_googlemap(center=c(115.8213,-31.98165), 
-                           zoom = 16, maptype = "terrain", color = "bw")
+                           zoom = 16, maptype = "roadmap", color = "bw")
 ```
+
+This always gives a **square** map (Figure \@ref(fig:ggmap1)) &ndash; which we
+might not always want. In theory, the map aspect ratio can be changed using the
+`size` argument in the `get_googlemap` function, but this does not work
+reliably. We recommend leaving the map dimensions and aspect ratio at their
+default values.
 
 Next we plot the ggmap object using ggplot grammar. It's possible to just plot
 the object (*i.e*. run `ggmap(udubua.gg)`), but it's good to have more control
@@ -603,48 +602,16 @@ ggmap(udubua.gg) +
 There are numerous possibilities with `ggmap` and the features made possible by
 `ggplot2` that are not illustrated by Figure \@ref(fig:ggmap1). For example, we
 could use `size` as an aesthetic (*i.e*. include within `aes(...)` with `size =
-variableName`), to generate something like a bubble map. Although there is an
-option to set the map size (and therefore aspect ratio) in the `get_googlemap()`
-function, we have found that this doesn't work consistently, so we recommend
-leaving the map dimensions and aspect ratio at their default values.
+variableName`), to generate something like a bubble map. 
 
 ### Other map types using ggmap
 
-Another option currently implemented in `ggmap` are some of the *Stamen* map
-tiles, accessible with the `get_stamenmap()` function.
+Another option apparently available in `ggmap` are some of the *Stamen* map
+tiles, accessible with the `get_stamenmap()` function. **However**, the Stamen 
+URLs have been updated, and this function is no longer able to download Stamen 
+map tiles.
 
-- The Stamen "terrain" tiles seem to be available up to `zoom = 13`, and are good for showing maps at the scale of 1-2 suburbs or a small town (Figure \@ref(fig:ggStamenNZ)), with 'hill shading' to show terrain.
-- The Stamen toner variants are minimalist maps which are good at de-emphasizing 
-the base map background to emphasise added data (see the example in Figure
-\@ref(fig:ggStamenAF)).
-- The Stamen "watercolor" tiles are also available.
-
-```{r ggStamenNZ, fig.height=6.8, fig.width=10, fig.align='center', fig.cap="Map of the central Hutt Valley, New Zealand, plotted with Stamen terrain map tiles acquired using the R package ggmap.", out.width='80%', message=FALSE, warning=FALSE, results='hold'}
-tai_Stamen <- get_stamenmap(bbox=c(left=174.9, bottom = -41.2,
-                                   right = 175.0, top = -41.15),
-                            zoom=13, # seems to be max zoom
-                            maptype = "terrain", color = "color")
-ggmap(tai_Stamen) + 
-  labs(y="Latitude (\u00B0S)", x = "Longitude (\u00B0E)") + 
-  geom_rect(aes(xmin=174.94, xmax=174.96, ymin=-41.178,ymax=-41.188),
-               colour="red3", fill=NA, size=1.2) +
-  geom_text(aes(x = 174.961, y = -41.183, label = "live\nplay\nschool",
-                fontface = "bold", family="mono"), 
-            size = 5, vjust = 0.5, hjust = 0, color="red3", lineheight=0.8) +
-  geom_text(aes(x = 174.91, y = -41.16, 
-                label = paste("(author's childhood neighbourhood,\n",
-                              "Tait\u0101,","Aotearoa New Zealand)"),
-                fontface = "italic", family="serif"),
-            size = 4.5, lineheight=0.8, vjust = 0, hjust = 0, color="#004000") +
-  geom_point(aes(x = lon, y = lat, color=name), data=taita, size = 4) +
-  scale_color_manual(values = c("navy","goldenrod","darkorchid","seagreen")) +
-  theme_bw() +
-  theme(axis.text=element_text(size=10, color="black"),
-        axis.title=element_text(size=12,face="bold"),
-        legend.text = element_text(size=12))
-```
-
-[**The next example**]{style="size: 14pt"} (Figure \@ref(fig:ggStamenAF)) uses
+[**The next example**]{style="size: 14pt"} (Figure \@ref(fig:ggAF)) uses
 the simple features information in one of the data frames we made at the
 beginning. The `sf` package introduces a new 'geom', `geom_sf()` for plotting in
 `ggmap.` We need to use the option `inherit.aes = FALSE` in `geom_sf()`, to
@@ -652,10 +619,9 @@ override the default aesthetics from the `ggmap` object. We also add `coord_sf`
 to ensure that all layers use a common CRS (<u>C</u>oordinate <u>R</u>eference
 <u>S</u>ystem). <br> Run `help(geom_sf)` for more information.
 
-```{r ggStamenAF, fig.height=4.5, fig.width=7.5, fig.align='center', fig.cap="Zinc concentration (mg/kg) in sediment sampled in Semester 1, 2021 at Ashfield Flats, Western Australia, plotted over Stamen toner-lite map tiles acquired using the R package ggmap, with data in a simple features data frame, and with manually added wetland pond locations.", out.width='70%', message=FALSE, warning=FALSE, results='hold'}
-afr.gg <- get_stamenmap(bbox=c(left=115.941, bottom = -31.92,
-                                   right = 115.948, top = -31.916), 
-                        zoom=17, col = "bw",maptype = "toner-lite")
+```{r ggAF, fig.height=4.5, fig.width=7.5, fig.align='center', fig.cap="Zinc concentration (mg/kg) in sediment sampled in Semester 1, 2021 at Ashfield Flats, Western Australia, plotted over Stamen toner-lite map tiles acquired using the R package ggmap, with data in a simple features data frame, and with manually added wetland pond locations.", out.width='70%', message=FALSE, warning=FALSE, results='hold'}
+afr.gg <- get_googlemap(center=c(lon=115.9445, lat = -31.918), 
+                        zoom=17, col = "bw", maptype = "terrain")
 ggmap(afr.gg) + 
   labs(y="Latitude (\u00B0S)", x = "Longitude (\u00B0E)") + 
   geom_text(aes(x = 115.944, y = -31.918, label = "Ashfield\nFlats",
@@ -680,14 +646,15 @@ ggmap(afr.gg) +
 ## Other tile-based mapping packages in R
 
 The `rosm` package (Dunnington 2022) allows users to produce background maps
-from several map tile providers. We don't currently recommend `rosm`, since it's
-difficult when using this package to produce axes in commonly-used coordinate
-reference systems.
+from several map tile providers. **We don't currently recommend** `rosm`, since
+it's difficult when using this package to produce axes in commonly-used
+coordinate reference systems.
 
 The `OpenStreetMap` R package (Fellows, 2019) can make very good tile-based
 maps. Unfortunately, however, it can be difficult to use on Apple Mac computers,
-and there can also be problems with Windows-based systems due to the use of 
-`Java` code in the package. So, out of respect for MacOS users, we are not recommending the `OpenStreetMap` package either.
+and there can also be problems with Windows-based systems due to the use of
+`Java` code in the package. So, out of respect for MacOS users, we are 
+**not recommending the** `OpenStreetMap` package either.
 
 ## Final Words
 
@@ -795,20 +762,20 @@ in R. *R News* **5** (2), <https://cran.r-project.org/doc/Rnews/>.
 
 <hr style="height: 2px; background-color: #5560A4;" />
 
-```{r stamen watercolor, echo=FALSE, fig.align='center', fig.height=2.4, fig.width=6, message=FALSE, warning=FALSE, out.width='80%', results='hold'}
-artStamen2 <- get_stamenmap(bbox=c(left=115.8175, bottom = -31.9736,
-                                   right = 115.8851, top = -31.9501),
-                            zoom=15, 
-                            maptype = "watercolor", 
-                            color = "color") 
-ggmap(artStamen2) + 
-  labs(x="Stamen 'watercolor' map of Kings Park and Perth", y = "") +
-  geom_text(aes(x = 115.86, y = -31.966, label = "Swan River",
-                fontface = "italic", family="sans"), angle=350,
-            size = 4, vjust = 0, hjust = 0.5, color="steelblue4") +
-  geom_text(aes(x = 115.832, y = -31.966, label = "Kings\nPark",
-       fontface = "italic", family="sans"), size = 4, color="#004000") +
-  theme(axis.text=element_text(size=9, color="transparent"),
-        axis.title=element_text(size=14, color="dodgerblue"),
-        axis.ticks = element_line(colour = "transparent")) 
+```{r stamen-watercolor, echo=FALSE, fig.align='center', fig.height=2.63, fig.width=7, message=FALSE, warning=FALSE, out.width='80%', results='hold'}
+artextent <- st_as_sf(data.frame(x = c(115.814, 115.8925), 
+                                 y = c(-31.9736, -31.9501)),
+                      coords=c("x","y"), crs=st_crs(4326))
+artStamen2 <- get_tiles(artextent, provider = "Thunderforest.SpinalMap",
+                      apikey=secret[1,1], zoom=13,crop=TRUE)
+plot_tiles(artStamen2)
+mtext("Thunderforest 'SpinalMap' of Kings Park and Perth", 3, -1.25, 
+      col="white", family='mono', cex=1.2)
+mtext("made with sf and maptiles", 1, -1.25, col="yellow", adj=0.98, cex=0.6, 
+      family='mono')
+text(115.86, -31.966, labels = "Swan River",
+                fonte = 3, srt=350,
+            cex = 1.4, hjust = 0.5, col="skyblue2")
+text(115.832, -31.966, labels = "Kings\nPark",
+       font=3, cex=1.4, col="#a0c090",srt=10) 
 ```

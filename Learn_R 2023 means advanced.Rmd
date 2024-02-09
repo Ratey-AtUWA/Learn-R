@@ -134,7 +134,7 @@ As usual, we first need to read the data and load the necessary packages:
 
 ```{r load workspace and packages invisibly, echo=FALSE, include=FALSE}
 # load("//uniwa.uwa.edu.au/userhome/staff8/00028958/My Documents/_R Projects/Learning R/.RData")
-setwd("C:/Users/00028958/LocalData/R Projects/Learning R")
+setwd("C:/Users/00028958/OneDrive - The University of Western Australia/R Projects/Learning R")
 sv2017 <- read.csv("sv2017_original.csv", stringsAsFactors = TRUE)
 sv2017$Reserve <- cut(sv2017$Northing,
                       breaks = c(0,6466530,9999999),
@@ -144,10 +144,9 @@ library(png)
 library(car)
 library(RcmdrMisc)
 library(effsize)
-library(multcomp)
 library(rcompanion)
 library(multcompView)
-library(PMCMRplus)
+knitr::opts_chunk$set(comment="")
 ```
 
 ```{r load workspace and packages visible notrun, eval=FALSE}
@@ -158,12 +157,10 @@ sv2017$Reserve <- cut(sv2017$Northing,
 sv17_soil <- subset(sv2017, subset=sv2017$Type=="Soil")
 
 library(car)
-library(RcmdrMisc)
 library(effsize)
-library(multcomp)
 library(rcompanion)
 library(multcompView)
-library(PMCMRplus) # needed for non-parametric pairwise comparisons
+library(RcmdrMisc)
 ```
 
 ## Non-Parametric Comparisons
@@ -224,27 +221,27 @@ print(signif(meansFe),4)
 rm(meansFe)
 ```
 
+<p>&nbsp;</p>
+
 With a p-value of &asymp; 0.016, H~0~ can be rejected. We still have the
 problem of not knowing which means are significantly different from each other.
-The `PMCMRplus` **R** package allows multiple comparisons of means following
-statistically significant Kruskal-Wallis comparisons (there are several options;
-we will use the Conover's non-parametric all-pairs comparison test for
-Kruskal-type ranked data).
+There are several options for pairwise comparisons of means following
+statistically significant Kruskal-Wallis results; we will use the pairwise
+Wilcoxon test (`pairwise.wilcox.test()`), for consistency with the 2-level
+comparisons in the previous section. Also, we should still be using a
+non-parametric test to match the original Kruskal-Wallis test. (More rigorous
+tests, such as Conover's non-parametric all-pairs comparison test, are available
+in the R package `PMCMRplus`).
 
 ### Pairwise comparisons following a Kruskal-Wallis test
 
-```{r Kruskal-Wallis test - Conover pairwise dummy, eval=FALSE}
-require(PMCMRplus)
-kwAllPairsConoverTest(Fe~Type, data=sv2017)
-```
-
-```{r Kruskal-Wallis test - Conover pairwise comps, echo=FALSE, warning=FALSE, results='hold'}
-kwAllPairsConoverTest(Fe~Type, data=sv2017)
+```{r Kruskal-Wallis-test-wilcox-pairwise-comps, echo=FALSE, warning=FALSE, results='hold'}
+with(sv2017, pairwise.wilcox.test(Fe, Type))
 ```
 
 The pairwise comparisons show that only Soil and Street dust have significantly 
-different Fe concentration. *Note* the p-value adjustment -- not Holm's this
-time.
+different Fe concentration. *Note* the p-value adjustment -- we still use Holm's 
+for multiple non-parametric comparisons.
 
 We can also get a pairwise compact letter display based on the results of
 non-parametric tests. As before, we need the **R** packages `rcompanion` and 
@@ -253,34 +250,20 @@ non-parametric tests. As before, we need the **R** packages `rcompanion` and
 ```{r}
 require(rcompanion)
 require(multcompView)
-pwFe_Type <- with(sv2017, kwAllPairsConoverTest(Fe ~ Type)) # from PMCMRplus
+pwFe_Type <- with(sv2017, pairwise.wilcox.test(Fe, Type)) 
 pwFe_Type_pv <- fullPTable(pwFe_Type$p.value)               # from rcompanion
 multcompLetters(pwFe_Type_pv)                               # from multcompView
 ```
 
 The output from `kwAllPairsConoverTest()` shows that p &le; 0.05 only for the
 Soil-Street dust comparison (`"ab"` matches `"a"` OR `"b"`). We can't reject 
-H~0~ for any other pairwise comparisons. [We would get slightly different
-results using the functions `kwAllPairsDunnTest()` or `kwAllPairsNemenyiTest()`
-- see below. In this example, the conclusions are the same for each type of
-pairwise test, but this isn't always the case.]
+H~0~ for any other pairwise comparisons. 
 
-```{r alt nonparam pairwise dummy, eval=FALSE, echo=TRUE}
-kwAllPairsDunnTest(Fe~Type, data=sv2017)
-kwAllPairsNemenyiTest(Fe~Type, data=sv2017)
-```
-
-```{r Dunn nonparam pairwise tests, echo=FALSE, results='hold'}
-kwAllPairsDunnTest(Fe~Type, data=sv2017)
-```
-
-```{r Nemenyi nonparam pairwise tests, echo=FALSE, results='hold'}
-kwAllPairsNemenyiTest(Fe~Type, data=sv2017)
-```
+<p>&nbsp;</p>
 
 ## References and R Packages
 
-Cohen, J. (1988). *Statistical power analysis for the behavioral sciences (2nd ed.)*. 
+Cohen, J. (1988). *Statistical power analysis for the behavioral sciences (2^nd^ ed.)*. 
 New York:Academic Press.
 
 Sawilowsky, S.S. (2009). New Effect Size Rules of Thumb. *Journal of Modern Applied Statistical Methods* **8**:597-599.

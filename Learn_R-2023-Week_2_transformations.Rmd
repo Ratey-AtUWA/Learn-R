@@ -67,7 +67,7 @@ standardisation gives each variable equal weight in the analysis
 (*e.g*., Principal Components Analysis – PCA)
 
 <center>
-![](paranormal.jpg){width=300 height=300}
+![](images/paranormal.jpg){width=300 height=300 alt="funny cartoon showing a normal distribution curve above a distribution shaped like a stereotypical ghost"}
 </center>
 
 In case you need to read in the data again...
@@ -114,7 +114,7 @@ multi-modal distributions may be easier to see. From the histograms we can see
 if (1) the variable is skewed (and therefore probably not normally distributed),
 or (2) if the distribution appears to be bimodal or multi-modal.
 
-### Q-Q- plots
+### Q-Q-plots
 
 A **Q-Q-plot** or normal quantile plot is a plot of all the values in a variable
 in ascending order, with the axes transformed in such a way that a perfectly
@@ -202,7 +202,7 @@ with(hubbard, qqPlot(-1*(Al^-0.1061), id=FALSE))
 <p>&nbsp;</p>
 
 **NOTE** that we use a different form of the power transformation equation,
-depending on whether the estimated power term is positive or negative If the
+depending on whether the estimated power term is positive or negative. If the
 power term is negative, we multiply the answer by -1, otherwise the order of
 observations is reversed! (lowest becomes highest and vice-versa)
 
@@ -210,7 +210,7 @@ observations is reversed! (lowest becomes highest and vice-versa)
 
 > "*But what's normal now anyhow?*"
 >
-> --- [Porcupine Tree](http://www.darklyrics.com/lyrics/porcupinetree/nilrecurring.html){target="_blank"}, from the song *Normal* (2007)
+> &mdash; [Porcupine Tree](http://www.darklyrics.com/lyrics/porcupinetree/nilrecurring.html){target="_blank"}, from the song *Normal* (2007)
 
 <hr style="height: 2px; background-color: #660F00;" />
 
@@ -220,7 +220,8 @@ observations is reversed! (lowest becomes highest and vice-versa)
 run formal statistical tests for normality such as the Shapiro-Wilk test, 
 available using the function `shapiro.test()`.
 
-We first **load a new dataset** (we think that the variables in these data illustrate transformations and normality testing a bit better).
+We first **load a new dataset** (we think that the variables in these data
+illustrate transformations and normality testing a bit better).
 
 ```{r read-sv2017, message=FALSE, warning=FALSE}
 sv2017 <- read.csv(file="sv2017_original.csv", stringsAsFactors = TRUE)
@@ -233,20 +234,21 @@ data analysis with statistics and graphics in **R**.
 
 ```{r SLCVR-map, echo=FALSE, fig.width=10.6, fig.height=5.2, fig.cap="(a) map showing locations of Charles Veryard and Smiths Lake Reserves, North Perth, Western Australia; (b) photograph of areas targeted for soil sampling.", results='hold', warning=FALSE, message=FALSE}
 library(sf);library(maptiles);library(TeachingDemos)
-extent <- st_as_sf(data.frame(x=c(390910,391550),y=c(6466220,6466800)),
-                   coords = c("x","y"), crs = st_crs(32750))
+extent <- st_as_sf(data.frame(x=c(115.846,115.8526),y=c(-31.9348,-31.9295)),
+                   coords = c("x","y"), crs = st_crs(4326))
 SLtiles <- get_tiles(extent, provider = "OpenTopoMap", 
                      zoom=16, crop = TRUE)
-par(mfrow=c(1,2), oma=c(3,3,1,1), mgp=c(1.6,0.3,0), tcl=-0.25, lend="square")
-plot_tiles(SLtiles)
-axis(1);axis(2, at=seq(6466300,6466800,100), labels=seq(6466300,6466800,100))
-box()
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.4, font=2, cex=1.1)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.4, font=2, cex=1.1)
-shadowtext(c(391355,391260), c(6466430,6466660),
+par(mfrow=c(1,2), oma=c(3,3,1,1), mgp=c(1.6,0.3,0), tcl=-0.25, lend="square", 
+    font.lab=2)
+plot_tiles(SLtiles, axes=T, cex.axis=1.4)
+# axis(1);axis(2, at=seq(6466300,6466800,100), labels=seq(6466300,6466800,100))
+# box()
+mtext("Latitude (WGS84)", side = 1, line = 6.5, font=2, cex=1.1)
+mtext("Longitude (WGS84)", side = 2, line = 5, font=2, cex=1.1)
+shadowtext(c(115.8505,115.8495), c(-31.933,-31.9307),
      labels=c("Smith's\nLake\nReserve","Charles Veryard\nReserve"),
      col="darkgreen", bg="white", font=4, cex = 1.2)
-mtext("(a)",3,-1.4, adj = 0.01, cex=1.4)
+mtext("(a)",3,2, adj = 0.14, cex=1.4)
 pic1 <- jpeg::readJPEG("SmithsLakeReserve.jpg")
 plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
 addImg(pic1, x = 0.5, y = 0.5, width = 0.95)
@@ -364,6 +366,6 @@ without generating new columns in your data frame, delete the lines of code from
 
 <hr style="height: 2px; background-color: #660F00;" />
 
-![](skewed.png)
+![](images/skewed.png){alt="funny cartoon of a grumpy-faced negatively skewed distribution above a happy-faced positively skewed distribution"}
 
 <p>&nbsp;</p>

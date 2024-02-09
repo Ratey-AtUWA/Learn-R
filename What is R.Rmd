@@ -69,7 +69,7 @@ By using **R** code to do this, we can easily *reproduce* our analyses, that is,
 
 > "...R has developed into a powerful and much used open source tool ... for advanced statistical data analysis..."
 >
-> --- [Reimann *et al*. (2008) &ndash; *Statistical Data Analysis Explained: Applied Environmental Statistics with R*](https://onesearch.library.uwa.edu.au/permalink/61UWA_INST/1vk1d8f/alma99584168302101){target="_blank"}, p.3.
+> &mdash; [Reimann *et al*. (2008) &ndash; *Statistical Data Analysis Explained: Applied Environmental Statistics with R*](https://onesearch.library.uwa.edu.au/permalink/61UWA_INST/1vk1d8f/alma99584168302101){target="_blank"}, p.3.
 
 <hr style="height: 2px; background-color: #660F00;" />
 
@@ -88,23 +88,23 @@ addImg(fig1, x = 0.5, y = 0.5, width = 1)
 
 1.  **How data are stored**. **R** can handle many different types of data, such as numbers, text, categories, spatial coordinates, images, and so on. **R** uses various types of *objects* to store different types of data in different ways.
 
-2.  **Code-based instructions**. If we want **R** to do something for us, we need to give it instructions. We do this in other software too, commonly by using a mouse or other pointing device to click and select options from a menu. For example, in Excel we can sort a table of data by:
-
-    (a) using the mouse to select the cells we want to sort;
-    (b) clicking on the Data menu;
-    (c) clicking on the Sort button;
-    (d) choosing the column we want to sort by in the dialog box that appears;
-    (e) clicking 'OK'.
-
-    In **R**, we can do the same thing, but we would write the instructions in **R** code, such as that shown below:
-
-    You don't have to remember this (yet). The code here is also to illustrate that, in this document, **R** code will be shown in blocks like the one below having a `shaded background and fixed-space font`.
+2.  **Code-based instructions**. If we want **R** to do something for us, we need to give it instructions. We do this in other software too, commonly by using a mouse or other pointing device to click and select options from a menu. For example, in **R** we can sort a table of data by writing the instructions in **R** code:
 
 ```{r compare Excel sorting, eval=FALSE, include=TRUE}
 data_sorted <- data[order(data$column1, data$column2),] 
 ```
 
-3.  (We did say three things.) **R** is **very** literal, and needs precise instructions to do everything. A small error in our code will mean we get wrong, or no, results. For example, all **R** code is case-sensitive. Also, if we don't tell R where to look for things, it won't try anywhere else just in case we might have intended another location!
+You don't have to remember this (yet). The code here is also to illustrate that, in this document, **R** code will be shown in blocks like the one above having a `shaded background and fixed-space font`.
+
+In Excel, we can do the same thing, but we would use a sequence of point-and-click operations, such as that shown below:
+
+(a) using the mouse to select the cells we want to sort;
+(b) clicking on the Data menu;
+(c) clicking on the Sort button;
+(d) choosing the column we want to sort by in the dialog box that appears;
+(e) clicking 'OK'.
+
+3.  (We did say three things.) **R** is **very** literal, and needs precise instructions to do everything. A small error in our code will mean we get wrong, or no, results. For example, all **R** code is case-sensitive. Also, if we don't tell R where to look for things, it won't try anywhere else just in case we might have intended another location!<br />[Go here for a great page on common errors in **R** and how to fix them](https://statsandr.com/blog/top-10-errors-in-r/){target="_blank"}
 
 ## Types of data we commonly use in **R**
 
@@ -140,17 +140,18 @@ This is also the place to introduce Functions in **R**. We just used a function 
 
 An R function is identified by a **name** such as `sqrt`, `t.test` or `plot`, followed by **arguments** in parentheses `( )` (the parentheses can be empty, for example `help.start()` -- try it!). We used the argument `731` in the `sqrt()` function -- some functions require several arguments, as you will see. Some arguments have default 'built-in' values.
 
-There are huge numbers of built-in functions in **R** which we can use after first installing **R**, "straight out of the box" (we call this "**base R**"). For instance, see the 
-<a href="https://cran.r-project.org/doc/contrib/Baggott-refcard-v2.pdf" target="_blank">R reference card v2 by Matt Baggott</a>.
+There are huge numbers of built-in functions in **R** which we can use after first installing **R**, "straight out of the box" (we call this "**base R**"). For instance, see the [R reference card v2 by Matt Baggott](https://cran.r-project.org/doc/contrib/Baggott-refcard-v2.pdf){target="_blank"}.
 
 If we can't find the functions we need, they may be available in **R packages** which are additional libraries of functions that we can install from within the **R** environment. A commonly used package is `car`, the <u>c</u>ompanion to <u>a</u>pplied <u>r</u>egression. We would install this into **R** using a function `install.packages("car")`, which stores the library on our device. To use the functions in the `car` package we would load the library into our **R** session by running `library(car)`.
 
 We can also write our own functions in **R** and we may show you examples of these as you progress through this course.</td></tr>
 <table>
 
+<p>&nbsp;</p>
+
 ### Vectors
 
-A vector is a one-dimensional set of numbers, similar to a column or row of values in a spreadsheet. We use the simple function `c()` to **c**ombine, or put together, a set of values. The code below shows how we can make a vector **object** using the assign code `\<-` to give our vector a name of our choice. Just by entering the vector object's name, we can then see its contents:
+A vector is a one-dimensional set of numbers, similar to a column or row of values in a spreadsheet. We use the simple function `c()` to **c**ombine, or put together, a set of values. The code below shows how we can make a vector **object** using the assign code `<-` to give our vector a name of our choice. Just by entering the vector object's name, we can then see its contents:
 
 ```{r make and view a vector}
 a <- c(1,3,5,7,9,2,4,6,8,10)
@@ -281,6 +282,24 @@ Before we read any files, though, we need to tell **R** where to find the files 
 1.  In the top level menu, click Session » Set Working Directory » Choose Directory. This will open a window showing just folders (= *directories*). Click on the folder where your files are, and click the [&nbsp;Open&nbsp;]{style="background-color:#808080; color:white;"} button.
 
 2.  With the RStudio [&nbsp;Files&nbsp;]{style="background-color:#808080; color:white"} pane already showing the files you are working with, click [&nbsp;More&nbsp;]{style="background-color:#808080; color:white;"}, then [&nbsp;Set As Working Directory&nbsp;]{style="background-color:#808080; color:white;"}.
+
+### Opening (and saving) a code file
+
+If we write some code that works, it's good to save it so we can use it again or
+adapt it for a similar task. In classes, we will provide you with code files 
+(having the extension `.R`) to help you learn what **R** code does.
+
+To open a code file we have a few options:
+
+1. just type `ctrl-O`, and choose the file from the 'Open file' window that appears
+2. click on the open file ![](images/openfile32.png){width=24 height=24} icon, and choose the file from the 'Open file' window that appears
+3. click on the file shown in the `Files` pane (lower right, see Figure 1) in the RStudio screen.
+
+You can type code into a new file made by the keystroke combination 
+`ctrl-shift-N` (for other new file types, use the RStudio menu `File/New file`).
+
+Files can be saved by typing `ctrl-S` (you will be prompted for a new file name 
+the first time you save a new file), or clicking the file-save ![](images/save-file-disk-32.png){width=24 height=24} icon.
 
 ### Opening a data file
 
