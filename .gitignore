@@ -4,6 +4,7 @@
 .Ruserdata
 PP-git-read-sampling-plans.R
 tfapi.csv
+gmapskey.csv
 *.zip
 *.html
 ~$*.*

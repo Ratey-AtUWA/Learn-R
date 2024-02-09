@@ -557,17 +557,21 @@ colours, save as `.png` or `.tiff`, or copy as a bitmap.</span>
 
 The `ggmap` package (Kahle and Wickham 2013) is an extension of `ggplot`, so
 it's easier to use if you are familiar with `ggplot` and the associated family
-of packages. [*The Google maps key is owned by*
-*the Unit Coordinator, so please use it responsibly!*]{style="color: #A00000;"}
+of packages. [*You will need a Google maps API key which you can get by registering at [https://developers.google.com/maps](https://developers.google.com/maps){target="_blank"}*]{style="color: #A00000;"}
+
+```{r get-api-key, include=FALSE}
+secret <- read.csv("gmapskey.csv")
+```
 
 First we make a `ggmap` object, locating the map by its central coordinate with
 the extent controlled by the `zoom` option:
 
-```{r make ggmap object, message=FALSE, warning=FALSE, eval=-1, results='hold'}
+```{r make ggmap object, message=FALSE, warning=FALSE, eval=-1, results='hold', echo=-4}
 library(ggmap)
-register_google(key = "AIzaSyDU7QiTWE4RGFFQNmhWy51n7e4RBeHKjc0")
+register_google(key = secret[1,1]) # you would replace secret[1,1] with your API key
 udubua.gg <- get_googlemap(center=c(115.8213,-31.98165), 
                            zoom = 16, maptype = "roadmap", color = "bw")
+rm(secret)
 ```
 
 This always gives a **square** map (Figure \@ref(fig:ggmap1)) &ndash; which we
