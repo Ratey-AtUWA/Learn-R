@@ -3,5 +3,9 @@
 .RData
 .Ruserdata
 PP-git-read-sampling-plans.R
+tfapi.csv
 *.zip
+*.html
 ~$*.*
+/Learn_R*
+/Wh*
