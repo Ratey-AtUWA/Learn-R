@@ -32,7 +32,7 @@ addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
 ```
 
 ```{r page 1 header hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
-logo <- readPNG("UWA logo_text_V_wsL.png")
+logo <- readPNG("./images/UWA logo_text_V_wsL.png")
 par(mar = c(0,0,0,0))
 layout(matrix(c(1,1,1,1,2),nrow = 1))
 
@@ -77,8 +77,8 @@ By using **R** code to do this, we can easily *reproduce* our analyses, that is,
 
 To make our job of using **R** easier, we'll be using the **RStudio** program. RStudio is an IDE or 'integrated development environment' which puts everything we need for R coding in one place, and has some helpful tools (such as predictive text for code, and some menu-driven functions) to make coding easier. In this document, when we say '**R**', we really mean 'R in the RStudio environment'.
 
-```{r fig-RStudio, fig.height=5.4, fig.width=7.2, fig.align='center', fig.cap="The RStudio window with a very brief explanation of some different sub-panes.", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
-fig1 <- readPNG("RStudio.png")
+```{r fig-RStudio, fig.height=5.4, fig.width=7.2, fig.align='center', fig.cap="Figure 1: The RStudio window with a very brief explanation of some different sub-panes.", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+fig1 <- readPNG("images/RStudio.png")
 par(mar = c(0,0,0,0))
 plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
 addImg(fig1, x = 0.5, y = 0.5, width = 1)
@@ -124,8 +124,8 @@ below the code we just entered.
 sqrt(731)
 ```
 
-```{r fig-1, fig.height=2.41, fig.width=6.16, fig.align='center', fig.cap="Understanding simple R functions and output.", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
-fig1 <- readPNG("function_results.png")
+```{r fig-1, fig.height=2.41, fig.width=6.16, fig.align='center', fig.cap="Figure 2: Understanding simple R functions and output.", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+fig1 <- readPNG("images/function_results.png")
 par(mar = c(0,0,0,0))
 plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
 addImg(fig1, x = 0.5, y = 0.5, width = 1)
@@ -166,7 +166,7 @@ is.vector(a)
 is.character(a)
 ```
 
-We can also make use of the square brackets: remember from Figure 1 that the values in square brackets `[ ]` are the index for a set of values. For a vector, which is one dimensional, we just need one value in `[ ]` at the end of our object name to select particular values:
+We can also make use of the square brackets: remember from Figure 2 that the values in square brackets `[ ]` are the index for a set of values. For a vector, which is one dimensional, we just need one value in `[ ]` at the end of our object name to select particular values:
 
 ```{r}
 a[3]
@@ -293,7 +293,7 @@ To open a code file we have a few options:
 
 1. just type `ctrl-O`, and choose the file from the 'Open file' window that appears
 2. click on the open file ![](images/openfile32.png){width=24 height=24} icon, and choose the file from the 'Open file' window that appears
-3. click on the file shown in the `Files` pane (lower right, see Figure 1) in the RStudio screen.
+3. click on the file shown in the `Files` pane (lower right, see Figures 1 and 3) in the RStudio screen.
 
 You can type code into a new file made by the keystroke combination 
 `ctrl-shift-N` (for other new file types, use the RStudio menu `File/New file`).
@@ -332,8 +332,8 @@ have the extension `.R`. We can:
 - **Open** files by clicking File/Open File... (or typing `ctrl-O` on the keyboard), then choosing from our computer or network file system
 - **Create** new `.R` code files by clicking File/New File/R Script (or typing `ctrl-shift-N` on the keyboard), then typing in code. *Don't forget to save the file!*
 
-```{r fig-RStudio-file, fig.height=4, fig.width=7.2, fig.align='center', fig.cap="The RStudio window showing the `Source` sub-pane (and the other panes).", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
-fig1 <- readPNG("RStudio2.png")
+```{r fig-RStudio-file, fig.height=4, fig.width=7.2, fig.align='center', fig.cap="Figure 3: The RStudio window showing the `Source` sub-pane (and the other panes).", warning=FALSE, error=FALSE, results='hold', echo=FALSE}
+fig1 <- readPNG("images/RStudio2.png")
 par(mar = c(0,0,0,0))
 plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
 addImg(fig1, x = 0.5, y = 0.5, width = 1.0)

@@ -34,7 +34,7 @@ defpar <- par(no.readonly = TRUE)
 ```
 
 ```{r page 1 header hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
-logo <- readPNG("UWA logo_text_V_wsL.png")
+logo <- readPNG("images/UWA logo_text_V_wsL.png")
 par(mar = c(0,0,0,0))
 layout(matrix(c(1,1,1,1,2),nrow = 1))
 
@@ -58,10 +58,10 @@ layout(matrix(c(1),nrow = 1))
 <tbody>
 <tr>
 <td valign="top" style="vertical-align: top;">
-<h5><a href="https://echo360.net.au/media/19219e47-b5fb-44d9-b4f5-8572f9cfc021/public" target="_blank" rel="noopener">&nbsp; <img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45036816_1/xid-45036816_1" align="left" alt="Video link icon" style="border: 0px solid #000000;" height="38" width="48" />&nbsp;<strong style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; margin: 0px; padding: 0px; border: 0px; outline: 0px; font-weight: bold; font-style: normal; font-size: 13px; color: #000080; font-variant-ligatures: normal; font-variant-caps: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial;"><span style="font-size: medium;">Video 1 - basic R/RStudio graphics functions</span></strong></a><br />&nbsp;&nbsp;Duration: 18m48s</h5>
+<h5><a href="https://echo360.net.au/media/19219e47-b5fb-44d9-b4f5-8572f9cfc021/public" target="_blank" rel="noopener">&nbsp; ![](images/video.png){align="left" alt="Video link icon" style="border: 0px solid #000000;" height="38" width="48"}&nbsp;<strong style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; margin: 0px; padding: 0px; border: 0px; outline: 0px; font-weight: bold; font-style: normal; font-size: 13px; color: #000080; font-variant-ligatures: normal; font-variant-caps: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial;"><span style="font-size: medium;">Video 1 - basic R/RStudio graphics functions</span></strong></a><br />&nbsp;&nbsp;Duration: 18m48s</h5>
 </td>
 <td valign="top" style="vertical-align: top;">
-<p><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45036816_1/xid-45036816_1" align="left" alt="Video link icon" style="border: 0px solid #000000;" height="38" width="48" />&nbsp;<span style="color: #000080;"><strong><span style="font-size: medium;">&nbsp;<a href="https://echo360.net.au/media/84f872ea-6859-4a3c-a689-4bca0b94a247/public" target="_blank" rel="noopener">Video 2 - additional R/RStudio graphics functions</a></span></strong></span></p>
+<p>![](images/video.png){align="left" alt="Video link icon" style="border: 0px solid #000000;" height="38" width="48"}&nbsp;<span style="color: #000080;"><strong><span style="font-size: medium;">&nbsp;<a href="https://echo360.net.au/media/84f872ea-6859-4a3c-a689-4bca0b94a247/public" target="_blank" rel="noopener">Video 2 - additional R/RStudio graphics functions</a></span></strong></span></p>
 <p>&bull;&nbsp;0.00s - 8m47s PowerPoint Presentation<br />&bull;&nbsp;8m59s Setting R graphics parameters using <span style="font-family: consolas, courier new, courier;">par()</span><br />&bull;&nbsp;19m30s Cumulative Distribution Function plots <span style="font-family: consolas, courier new, courier;">plot.ecdf()</span><br />&bull;&nbsp;21m48s Normal quantile (Q-Q) plots using <span style="font-family: consolas, courier new, courier;">qqPlot()</span> from <b><i>car</i></b> package<br />&bull;&nbsp;23m19s Histograms - additional customisations<br />&bull;&nbsp;25m35s Boxplots - additional customisations<br />&bull;&nbsp;27m27s Scatter Plots - more customisation...<br />&bull;&nbsp;31m27s Scatter plot matrices<br />&bull;&nbsp;35m20s Maps (a preliminary look, including use of the <span style="font-family: consolas, courier new, courier;">text()</span> function in graphs</p>
 </td>
 </tr>
@@ -72,20 +72,20 @@ layout(matrix(c(1),nrow = 1))
 <table>
 <tbody>
 <tr>
-<td style="width: 50%;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-24052449_1/xid-24052449_1" target="_blank" rel="noreferrer noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035823_1/xid-45035823_1" width="48" height="48" alt="html file icon" style="float: left;" /></a><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035919_1/xid-45035919_1" target="_blank" rel="noopener"><span class="mce-nbsp-wrap" contenteditable="false">&nbsp;</span><span style="background-color: #ffff40;">NEW</span><span class="mce-nbsp-wrap" contenteditable="false">&nbsp;</span>Annotated code for basic R and RStudio Graphics</a></span></td>
-<td style="width: 50%;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-24053058_1/xid-24053058_1"><span style="font-size: medium;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693705_1/xid-23693705_1" width="48" height="48" alt="R code file icon" style="float: left;" />R code (script) file for R Graphics video 1</span></a></td>
+<td style="width: 50%;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-24052449_1/xid-24052449_1" target="_blank" rel="noreferrer noopener">![](images/html.png){align="left" alt="html file icon" style="border: 0px solid #000000;" height="48" width="48"}</a><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035919_1/xid-45035919_1" target="_blank" rel="noopener"><span class="mce-nbsp-wrap" contenteditable="false">&nbsp;</span><span style="background-color: #ffff40;">NEW</span><span class="mce-nbsp-wrap" contenteditable="false">&nbsp;</span>Annotated code for basic R and RStudio Graphics</a></span></td>
+<td style="width: 50%;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-24053058_1/xid-24053058_1"><span style="font-size: medium;">![](images/rcode.png){align="left" alt="R code icon" style="border: 0px solid #000000;" height="48" width="48"}&nbsp;R code (script) file for R Graphics video 1</span></a></td>
 </tr>
 <tr>
-<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693508_1/xid-23693508_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693691_1/xid-23693691_1" width="48" height="48" alt="csv file icon" style="float: left;" />Hubbard Book soil dataset (required in code for video 1 and&nbsp; pdf)</span></a></td>
-<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693660_1/xid-23693660_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693691_1/xid-23693691_1" width="48" height="48" alt="csv file icon" style="float: left;" />sv18 dataset (required in code for video 2)</span></a></td>
+<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693508_1/xid-23693508_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;">![](images/csv.png){align="left" alt="CSV icon" style="border: 0px solid #000000;" height="48" width="48"}&nbsp;Hubbard Book soil dataset (required in code for video 1 and&nbsp; pdf)</span></a></td>
+<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693660_1/xid-23693660_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;">![](images/csv.png){align="left" alt="CSV icon" style="border: 0px solid #000000;" height="48" width="48"}&nbsp;sv18 dataset (required in code for video 2)</span></a></td>
 </tr>
 <tr>
-<td><span style="font-size: medium;"><a alt="" href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035953_1/xid-45035953_1" target="_blank" rel="noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693691_1/xid-23693691_1" width="48" height="48" alt="csv file icon" style="float: left;" />&nbsp;SL18.csv</a><br />used in Annotated code</span></td>
-<td><span style="font-size: 12pt;"><a alt="" href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035961_1/xid-45035961_1" target="_blank" rel="noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693691_1/xid-23693691_1" width="48" height="48" alt="csv file icon" style="float: left;" />&nbsp;sv2017_original.csv</a><br />(just in case!)</span></td>
+<td><span style="font-size: medium;"><a alt="" href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035953_1/xid-45035953_1" target="_blank" rel="noopener">![](images/csv.png){align="left" alt="CSV icon" style="border: 0px solid #000000;" height="48" width="48"}&nbsp;SL18.csv</a><br />used in Annotated code</span></td>
+<td><span style="font-size: 12pt;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035961_1/xid-45035961_1" target="_blank" rel="noopener">![](images/csv.png){align="left" alt="CSV icon" style="border: 0px solid #000000;" height="48" width="48"}&nbsp;sv2017_original.csv</a><br />(just in case!)</span></td>
 </tr>
 <tr>
-<td><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035966_1/xid-45035966_1" target="_blank" rel="noreferrer noopener"> <span style="font-size: medium;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-35328977_1/xid-35328977_1" alt="R file icon" width="48" height="64" style="font-family: inherit; text-shadow: none !important; letter-spacing: normal !important; border: 0px; cursor: default; margin: 0px; padding: 0px; outline: 0px; font-weight: inherit; font-style: inherit; font-size: 16px; vertical-align: middle; max-width: none; height: auto;" />Complete R code (script) used in video</span>&nbsp;2</a></span></td>
-<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035853_1/xid-45035853_1" target="_blank" style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; margin: 0px; padding: 0px; border: 0px; outline: 0px; font-weight: 400; font-style: normal; font-size: 13px; color: #1874a4; text-decoration: underline; font-variant-ligatures: normal; font-variant-caps: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;" rel="noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-35328977_1/xid-35328977_1" alt="R file icon" width="32" height="64" style="font-family: inherit; text-shadow: none !important; letter-spacing: normal !important; border: 0px; cursor: default; margin: 0px; padding: 0px; outline: 0px; font-weight: inherit; font-style: inherit; font-size: 13px; vertical-align: middle; max-width: none; height: auto;" /><span style="font-size: 12pt; font-family: arial, helvetica, sans-serif;">&nbsp;R code for adding mean symbols to boxplots</span></a><br style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; color: #000000; font-size: 13px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial;" /><span style="color: #ff0000;">(worth trying!)</span></td>
+<td><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035966_1/xid-45035966_1" target="_blank" rel="noreferrer noopener"> <span style="font-size: medium;">![](images/rcode.png){align="left" alt="R code icon" style="border: 0px solid #000000;" height="48" width="48"}&nbsp;Complete R code (script) used in video</span>&nbsp;2</a></span></td>
+<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035853_1/xid-45035853_1" target="_blank" style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; margin: 0px; padding: 0px; border: 0px; outline: 0px; font-weight: 400; font-style: normal; font-size: 13px; color: #1874a4; text-decoration: underline; font-variant-ligatures: normal; font-variant-caps: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;" rel="noopener">![](images/rcode.png){align="left" alt="R code icon" style="border: 0px solid #000000;" height="48" width="48"}&nbsp;<span style="font-size: 12pt; font-family: arial, helvetica, sans-serif;">R code for adding mean symbols to boxplots</span></a><br style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; color: #000000; font-size: 13px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial;" /><span style="color: #ff0000;">(worth trying!)</span></td>
 </tr>
 </tbody>
 </table>
@@ -145,20 +145,20 @@ This is a supplement to the other preliminary material on **R** graphics. We hav
 <table>
 <tbody>
 <tr>
-<td style="width: 50%;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-24052449_1/xid-24052449_1" target="_blank" rel="noreferrer noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-40243195_1/xid-40243195_1" width="48" height="48" alt="html file icon" style="float: left;" /></a><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-42740881_1/xid-42740881_1" target="_blank" rel="noopener"><span class="mce-nbsp-wrap" contenteditable="false">&nbsp;</span><span style="background-color: #ffff40;">NEW</span><span class="mce-nbsp-wrap" contenteditable="false">&nbsp;</span>Annotated code for basic R and RStudio Graphics</a></span></td>
-<td style="width: 50%;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-24053058_1/xid-24053058_1"><span style="font-size: medium;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-23693705_1/xid-23693705_1" width="48" height="48" alt="R code file icon" style="float: left;" />R code (script) file for R Graphics video 1</span></a></td>
+<td style="width: 50%;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-24052449_1/xid-24052449_1" target="_blank" rel="noreferrer noopener">![](images/html.png){width="32" height="32" alt="html file icon" style="float: left;"}</a><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-42740881_1/xid-42740881_1" target="_blank" rel="noopener"><span class="mce-nbsp-wrap" contenteditable="false">&nbsp;</span><span style="background-color: #ffff40;"><strong>NEW</strong></span><span class="mce-nbsp-wrap" contenteditable="false">&nbsp;</span>Annotated code for basic R and RStudio Graphics</a></span><br />This is the most up-to-date content on **R** graphics.</td>
+<td style="width: 50%;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-24053058_1/xid-24053058_1"><span style="font-size: medium;">![](images/rcode.png){width="32" height="32" alt="R code icon" style="float: left;"}&nbsp;R code (script) file for R Graphics video 1</span></a></td>
 </tr>
 <tr>
-<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-23693508_1/xid-23693508_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-23693691_1/xid-23693691_1" width="48" height="48" alt="csv file icon" style="float: left;" />Hubbard Book soil dataset (required in code for video 1 and&nbsp; pdf)</span></a></td>
-<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-23693660_1/xid-23693660_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-23693691_1/xid-23693691_1" width="48" height="48" alt="csv file icon" style="float: left;" />sv18 dataset (required in code for video 2)</span></a></td>
+<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-23693508_1/xid-23693508_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;">![](images/csv.png){width="32" height="32" alt="csv icon" style="float: left;"}&nbsp;Hubbard Book soil dataset (required in code for video 1 and&nbsp; pdf)</span></a></td>
+<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-23693660_1/xid-23693660_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;">![](images/csv.png){width="32" height="32" alt="csv icon" style="float: left;"}&nbsp;sv18 dataset (required in code for video 2)</span></a></td>
 </tr>
 <tr>
-<td><span style="font-size: medium;"><a alt="" href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-42740852_1/xid-42740852_1" target="_blank" rel="noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-23693691_1/xid-23693691_1" width="48" height="48" alt="csv file icon" align="left" style="float: left;" />&nbsp;sv2017_original.csv</a><br />&nbsp;</span></td>
+<td><span style="font-size: medium;"><a alt="" href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-42740852_1/xid-42740852_1" target="_blank" rel="noopener">![](images/csv.png){width="32" height="32" alt="csv icon" style="float: left;"}&nbsp;sv2017_original.csv</a><br />&nbsp;</span></td>
 <td><span style="font-size: medium;">&nbsp;</span></td>
 </tr>
 <tr>
-<td><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-40243108_1/xid-40243108_1" target="_blank" rel="noreferrer noopener"> <span style="font-size: medium;"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-35328977_1/xid-35328977_1" alt="R file icon" width="48" height="64" style="font-family: inherit; text-shadow: none !important; letter-spacing: normal !important; border: 0px; cursor: default; margin: 0px; padding: 0px; outline: 0px; font-weight: inherit; font-style: inherit; font-size: 16px; vertical-align: middle; max-width: none; height: auto;" />Complete R code (script) used in video</span>&nbsp;2</a></span></td>
-<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-40243015_1/xid-40243015_1" target="_blank" style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; margin: 0px; padding: 0px; border: 0px; outline: 0px; font-weight: 400; font-style: normal; font-size: 13px; color: #1874a4; text-decoration: underline; font-variant-ligatures: normal; font-variant-caps: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;" rel="noopener"><img src="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-35328977_1/xid-35328977_1" alt="R file icon" width="32" height="64" style="font-family: inherit; text-shadow: none !important; letter-spacing: normal !important; border: 0px; cursor: default; margin: 0px; padding: 0px; outline: 0px; font-weight: inherit; font-style: inherit; font-size: 13px; vertical-align: middle; max-width: none; height: auto;" /><span style="font-size: 12pt; font-family: arial, helvetica, sans-serif;">&nbsp;R code for adding mean symbols to boxplots</span></a><br style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; color: #000000; font-size: 13px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial;" /><span style="color: #ff0000;">(worth trying!)</span></td>
+<td><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-40243108_1/xid-40243108_1" target="_blank" rel="noreferrer noopener"> <span style="font-size: medium;">![](images/rcode.png){width="32" height="32" alt="R code icon" style="float: left;"}&nbsp;Complete R code (script) used in video</span>&nbsp;2</a></span></td>
+<td><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-40243015_1/xid-40243015_1" target="_blank" style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; margin: 0px; padding: 0px; border: 0px; outline: 0px; font-weight: 400; font-style: normal; font-size: 13px; color: #1874a4; text-decoration: underline; font-variant-ligatures: normal; font-variant-caps: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;" rel="noopener">![](images/rcode.png){width="32" height="32" alt="R code icon" style="float: left;"}&nbsp;<span style="font-size: 12pt; font-family: arial, helvetica, sans-serif;">&nbsp;R code for adding mean symbols to boxplots</span></a><br style="font-family: 'Source Sans Pro'; text-shadow: none !important; letter-spacing: normal; color: #000000; font-size: 13px; font-style: normal; font-variant-ligatures: normal; font-variant-caps: normal; font-weight: 400; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px; text-decoration-style: initial; text-decoration-color: initial;" /><span style="color: #ff0000;">(worth trying!)</span></td>
 </tr>
 </tbody>
 </table>
@@ -838,7 +838,7 @@ scatterplotMatrix(~log10(Al) + log10(Ca) + log10(Fe) + log10(Na) | Type,
 Maps are [mostly] just scatterplots with a map background &ndash; we will spend 
 a separate session on maps in R later.
 
-![](./Learn_R-2023-Week_1a_graphs_files/figure-html/rottnest.png)
+<center>![](images/rottnest.png)</center>
 ```{r, eval=FALSE, include=FALSE}
 #```{r map-code-hidden, echo=FALSE, fig.align='center', fig.height=4.2, fig.width=9, message=FALSE, warning=FALSE, out.width='80%', results='hold'}
 # library(ggmap)
@@ -860,30 +860,7 @@ a separate session on maps in R later.
 
 (See the code at the end)
 
-```{r fave-palettes, echo=FALSE, fig.height=4.8, fig.width=10}
-# first load and run code to make UWAcolgrad() function
-# for help download the file itself and look inside!
-source("https://github.com/Ratey-AtUWA/Learn-R/raw/main/UWAcolgrad.R")
-np <- 32
-par(mar=rep(0.5,4), xpd=TRUE)
-plot(0:1, 0:1, ann=F, axes = F, type="n", ylim=c(-0.1,1))
-points(seq(0,1,l=np),rep(1,np),pch=22,bg=viridis(np),cex=4)
-text(0.5,0.98,labels=paste0("viridis::viridis(",np,")"),pos=1, cex=1.4, family="mono")
-points(seq(0,1,l=np),rep(0.85,np),pch=22,bg=plasma(np),cex=4)
-text(0.5,0.83,labels=paste0("viridis::plasma(",np,")"),pos=1, cex=1.4, family="mono")
-points(seq(0,1,l=np),rep(0.7,np),pch=22,bg=cividis(np),cex=4)
-text(0.5,0.68,labels=paste0("viridis::cividis(",np,")"),pos=1, cex=1.4, family="mono")
-points(seq(0,1,l=np),rep(0.55,np),pch=22,bg=scico(np, palette = "hawaii"),cex=4)
-text(0.5,0.53,labels=paste0("scico(",np,", palette='hawaii')"),pos=1, cex=1.4, family="mono")
-points(seq(0,1,l=np),rep(0.4,np),pch=22,bg=scico(np, palette = "lajolla"),cex=4)
-text(0.5,0.38,labels=paste0("scico(",np,", palette='lajolla')"),pos=1, cex=1.4, family="mono")
-points(seq(0,1,l=np),rep(0.25,np),pch=22,bg=scico(np, palette = "batlow"),cex=4)
-text(0.5,0.23,labels=paste0("scico(",np,", palette='batlow')"),pos=1, cex=1.4, family="mono")
-points(seq(0,1,l=np),rep(0.1,np),pch=22,bg=UWAcolgrad(np),cex=4)
-text(0.5,0.08,labels=paste0("UWAcolgrad(",np,")"),pos=1, cex=1.4, family="mono")
-points(seq(0,1,l=np),rep(-0.05,np),pch=22,bg=UWAcolgrad(np, saturated = TRUE),cex=4)
-text(0.5,-0.07,labels=paste0("UWAcolgrad(",np,", saturated=TRUE)"),pos=1, cex=1.4, family="mono")
-```
+![](images/pretty-palettes.png){align="center"}
 
 <h2> References and R Packages</h2>
 
@@ -900,7 +877,7 @@ Pedersen T, Crameri F (2023). *scico: Colour Palettes Based on the Scientific Co
 ```{r fave-palettes-notrun, eval=FALSE}
 # first load and run code to make UWAcolgrad() function
 # for help download the file itself and look inside!
-source("https://github.com/Ratey-AtUWA/learningR/raw/main/UWAcolgrad.R")
+source("https://github.com/Ratey-AtUWA/Learn-R/raw/main/UWAcolgrad.R")
 np <- 32
 par(mar=rep(0.5,4), xpd=TRUE)
 plot(0:1, 0:1, ann=F, axes = F, type="n", ylim=c(-0.1,1))

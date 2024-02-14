@@ -33,7 +33,7 @@ addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
 ```
 
 ```{r page 1 header hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
-logo <- readPNG("UWA logo_text_V_wsL.png")
+logo <- readPNG("images/UWA logo_text_V_wsL.png")
 par(mar = c(0,0,0,0))
 layout(matrix(c(1,1,1,1,2),nrow = 1))
 
@@ -249,7 +249,7 @@ shadowtext(c(115.8505,115.8495), c(-31.933,-31.9307),
      labels=c("Smith's\nLake\nReserve","Charles Veryard\nReserve"),
      col="darkgreen", bg="white", font=4, cex = 1.2)
 mtext("(a)",3,2, adj = 0.14, cex=1.4)
-pic1 <- jpeg::readJPEG("SmithsLakeReserve.jpg")
+pic1 <- jpeg::readJPEG("images/SmithsLakeReserve.jpg")
 plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
 addImg(pic1, x = 0.5, y = 0.5, width = 0.95)
 mtext(paste("Smith's Lake Reserve, North Perth, Western Australia, with",
