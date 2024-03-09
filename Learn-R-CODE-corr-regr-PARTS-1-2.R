@@ -8,7 +8,6 @@ library(Hmisc)
 library(RcmdrMisc)
 library(lmtest)
 library(effects)
-library(tinytex)
 
 # Let's look at the relationship between Cd and Zn in the Smiths Lake and
 # Charles Veryard Reserves data from 2017. For Pearson's correlation we
