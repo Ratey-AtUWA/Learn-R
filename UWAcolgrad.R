@@ -25,14 +25,14 @@ UWAcolgrad <- function(np=10, alpha=1, saturated=FALSE, verbose=FALSE){
   unsat <- c("#00091A","#31517d","#ac8e4b","#E6BF68","#ffffff")
   sat <- c("#000b1f","#103f8f","#DAAA00","#E4BB5E","#ffffff")
   if(saturated==FALSE){
-    unsat <- paste0(paste0(unsat,intToHex(alpha*255)))
+    unsat <- paste0(unsat,intToHex(alpha*255))
     UWAgrad <- colorRampPalette(unsat, alpha=TRUE)(np)
     if(verbose==TRUE){
       cat("You have made a UWA R palette with",np,"uniform-gradient colours...\n")
     }
     return(UWAgrad)
   } else {
-    sat <- paste0(paste0(sat,intToHex(alpha*255)))
+    sat <- paste0(sat,intToHex(alpha*255))
     UWAgrad <- colorRampPalette(sat, alpha=TRUE)(np)
     if(verbose==TRUE){
       cat("You have made a UWA R palette with",np,"standard colours...\n")
