@@ -1,3 +1,5 @@
+# function inputs output object from Pedro Martinez Arbizu's pairwise.adonis2()
+# code at https://github.com/pmartinezarbizu/pairwiseAdonis
 plainPW2 <- function(PWobj){
   tablout <- data.frame(Pair=rep(NA, length(PWobj)-1),
                         P_value=rep(NA, length(PWobj)-1))
