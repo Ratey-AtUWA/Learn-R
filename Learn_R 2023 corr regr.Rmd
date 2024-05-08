@@ -16,10 +16,14 @@ output:
 }
 </style>
 
-```{r load table making pkgs, include=FALSE}
+```{r load-packages-etc, include=FALSE}
 library(flextable)
 library(magrittr)
 library(png)
+library(car)
+library(psych)
+library(lmtest)
+library(effects)
 
 set_flextable_defaults(theme_fun = "theme_zebra", 
                        font.size = 9, fonts_ignore = TRUE)
@@ -94,7 +98,7 @@ There’s more next week, including a short report on this topic!</p>
 # load packages we need
 library(car)        # for various plotting and regression-specific functions
 library(viridis)    # colour palettes for improved graph readability
-library(Hmisc)      # utility functions
+library(psych)      # utility functions
 library(RcmdrMisc)  # utility functions
 library(corrplot)   # plotting of correlation heatmaps
 library(lmtest)     # regression diagnostic tests
@@ -189,7 +193,7 @@ legend("topleft", legend=c(levels(sv2017$Type),"Best-fit line ignoring Type"),
 > "The invalid assumption that correlation implies cause is probably among the
   two or three most serious and common errors of human reasoning."
 >
-> --- [Stephen Jay Gould](https://en.wikipedia.org/wiki/Stephen_Jay_Gould){target="_blank"}
+> &mdash; [Stephen Jay Gould](https://en.wikipedia.org/wiki/Stephen_Jay_Gould){target="_blank"}
 
 <hr style="height: 2px; background-color: #660F00;" />
 
@@ -198,22 +202,39 @@ legend("topleft", legend=c(levels(sv2017$Type),"Best-fit line ignoring Type"),
 We'll generate Spearman correlation matrices in these examples, but it's easy to change the code to generate Pearson (or other) correlation matrices. <br>
 The p-values give the probability of the observed relationship if the null hypothesis (*i.e*. no relationship) is true.
 
-```{r correlation matrix using Hmisc, results='hold'}
-require(Hmisc) # needed for rcorr() function
-corr_table <- rcorr(as.matrix(sv2017[c("pH","Al","Ca","Fe","Cd","Pb","Zn")]), 
-                    type="spearman")
+```{r correlation-matrix-using-psych, results='hold'}
+require(psych) # needed for corTest() function
+corr_table <- corTest(sv2017[c("pH","Al","Ca","Fe","Cd","Pb","Zn")], 
+                    method="spearman")
 print(corr_table)
 ```
 
-The output has three sub-tables:
+The output from `psych::corTest()`has three sub-tables:
 
 1. the correlation coefficients for each pair of variables (note symmetry)
 2. the number of pairs of observations for each relationship (some observations 
 may be missing)
-3. the p values for each relationship (note symmetry)
+3. the p values for each relationship (raw p-values are reported *below* the diagonal and p-values adjusted for multiple comparisons *above* the diagonal (by default based on Holm's correction.)
 
-[Note that for Pearson correlations we instead use `type="pearson"` in the 
-`rcorr` function.]
+[Note that for Pearson correlations we instead use `method="pearson"` in the 
+`corTest` function.]
+
+It can be a little tricky to compare raw and adjusted p-values, so we can tidy it up with a bit of code:
+
+```{r just-corrmat-pvals, results='hold'}
+corr_pvals <- corr_table$p
+corr_pvals[which(corr_pvals==0)] <- NA
+cat("----- Adjusted (upper) and raw (lower) p-values for correlations -----\n")
+print(round(corr_pvals, 3), na.print = "")
+```
+
+As above,the p-values give the probability of the observed relationship if # the
+null hypothesis (*i.e*. no relationship) is true. Corrections are to reduce the
+risk of **Type 1 Errors (false positives)** which is greater when multiple
+comparisons are being made. We should **always use the adjusted p-values** to
+interpret a correlation matrix.
+
+<p>&nbsp;</p>
 
 Since a correlation coefficient is a standardised measure of association, we can 
 treat it as an 'effect size'. <br>
@@ -256,30 +277,6 @@ whether r is positive or negative)</span>
 
 <p>&nbsp;</p>
 
-## Correlation matrix with p-values corrected for multiple comparisons
-
-We can do this using the `rcorr.adjust()` function in the `RcmdrMisc` package
-which calculates **corrected** P-values. As above,the p-values give the
-probability of the observed relationship if # the null hypothesis (*i.e*. no
-relationship) is true. Corrections are to reduce the risk of **Type 1 Errors
-(false positives)** which is greater when multiple comparisons are being made.
-
-We include `use="pairwise.complete"` in the `rcorr.adjust()` function
-parameters, otherwise the correlations are calculated on the number of
-observations for the variable with the most missing values (try changing it
-after reading `help("rcorr.adjust")`).
-
-```{r correlation matrix using RcmdrMisc package, results='hold'}
-require(RcmdrMisc) # needed for rcorr.adjust() function
-cormat0 <- rcorr.adjust(sv2017[c("pH","Al","Ca","Fe","Cd","Pb","Zn")], 
-                        type="spearman", use="pairwise.complete")
-cormat0
-```
-
-The output from `rcorr.adjust()` has a fourth sub-table:
-
-4. the adjusted p-values for each pair of variables, which depend on the number of variables being compared
-
 ## Correlation heatmaps
 
 These are a handy visual way of displaying a correlation matrix. We use the 
@@ -288,16 +285,21 @@ different data to show a plot with both positive and negative correlations, and
 display the text correlation matrix after the heatmap 
 (Figure \@ref(fig:correl-heat)) for reference.
 
-```{r correl-heat, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Correlation heatmap for selected variables in the 2023 Ashfield Flats sediment data. The numeric correlation matrix is below.", results='hold'}
+```{r correl-heat, fig.height=6, fig.width=6, message=FALSE, warning=FALSE, paged.print=FALSE, fig.cap="Correlation heatmap (Spearman) for selected variables in the 2023 Ashfield Flats sediment data. The numeric correlation matrix is below.", results='hold'}
 afs23 <- read.csv(paste0(git,"afs23.csv"), stringsAsFactors = TRUE)
 library(corrplot)
-cormat1 <- rcorr.adjust(afs23[,c("pH","EC","Al","Ca","Fe","Cu","Gd","Pb","Zn")], 
-                        type="spearman", use="pairwise.complete")
-print(cormat1$R$r, digits=2)
-corrplot(cormat1$R$r, 
-         method="ellipse", diag=F, addCoef.col = "black", 
+cormat1 <- corTest(afs23[,c("pH","EC","Al","Ca","Fe","Cu","Gd","Pb","Zn")], 
+                        method="spearman")
+print(cormat1$r, digits=2)
+corrplot(cormat1$r, 
+         method="ellipse", diag=FALSE, addCoef.col = "black", 
          tl.col = 1, tl.cex = 1.2, number.font = 1, cl.cex=1)
 ```
+
+<p>&nbsp;</p>
+
+[There is also a simpler correlation heatmap function in the `psych` package, 
+`cor.plot()`.]
 
 <p>&nbsp;</p>
 
@@ -375,7 +377,7 @@ summary(lmCrFesimple)
 The output from a linear model summary in R is quite extensive:
 
 1. `Call`: gives the model we specified (for checking)
-2. `Residuals`: some summary statistics for the difference of the model from the measured values -- these differences are called the **residuals**
+2. `Residuals`: some summary statistics for the difference of the model from the measured values &ndash; these differences are called the **residuals**
 3. `Coefficients`: a table showing the parameters of the line of best fit, shown by the estimates. The *intercept* of the line is in the first row, and the *slope* labelled by the predictor variable. The other columns in the sub-table give the uncertainty in the parameters (Std.Error), and the null hypothesis p-value (`Pr(>|t|)`) based on a t-statistic for each parameter (against H~0~ that there is no effect of a predictor, *i.e*. the slope = 0)
 4. `Signif. codes`: just explains the asterisks *** or ** or *
 5. The last block of text contains information on how well the model fits the data. We will focus on the R^2^ (R-squared) value, which is equivalent to the proportion of variance in the dependent variable (`Cr.log` in this example) which is explained by the predictor (`Fe.log` in this example). We should also note the overall **p-value**, based on the variance ratio F-statistic, which tests H~0~ = no effect of any predictor.
@@ -438,7 +440,7 @@ would better describe the Cr-Fe relationship, as the deviations from the model
 > "Begin challenging your own assumptions. Your assumptions are your windows on
   the world. Scrub them off every once in awhile, or the light won't come in."
 >
-> --- [Alan Alda](https://www.imdb.com/name/nm0000257/){target="_blank"}
+> &mdash; [Alan Alda](https://www.imdb.com/name/nm0000257/){target="_blank"}
 
 <hr style="height: 2px; background-color: #660F00;" />
 
@@ -450,12 +452,14 @@ model. The residuals are the differences between the model and reality (*e.g*.
 for simple linear regression, the residuals are the the vertical distances
 between the line of best fit and the actual points).
 
+<table border=1 width="100%" style="background-color: #fff0c0;"><tr><td>
 The assumptions of linear regression are:
 
 1. **Linear relationship**: There is a linear relationship between the independent variable, x, and the dependent variable, y.
 2. **Independence**: The residuals are independent. In particular, there is no correlation between consecutive residuals in time series data (*i.e*. no *autocorrelation*).
 3. **Homoscedasticity**: The residuals have constant variance at every level of x.
 4. **Normality**: The residuals of the model are normally distributed.
+</td></tr></table>
 
 We can check these assumptions graphically using *diagnostic plots* (see below), 
 or using formal statistical tests, which we do further down.
@@ -566,6 +570,11 @@ results. You might be able to use the contents of a `lm` object to:
 
 > **NOTE: This section on multiple regression is optional** &ndash; it is more advanced material which we will not cover in class, but which may be useful for analysing data from the class project.
 
+Sometimes the unexplained variation in our dependent variable (*i.e*. the 
+residuals) may be able to be explained by one or more additional predictors in
+our data. If we suspect this to be true, we can add predictors in a *multiple*
+linear regression model.
+
 **Multiple regression models** predict the value of one variable 
 (the *dependent variable*) from two or more *predictor variables* 
 (or just 'predictors'). They can be very useful in environmental 
@@ -576,8 +585,8 @@ In this example we're going to develop a regression model to
 **predict copper (Cu) concentrations** from several predictors. 
 It makes sense to choose predictors that represent bulk soil properties 
 that could *plausibly* control trace element concentrations. So, 
-we choose variables like **pH, EC, organic carbon, cation exchange **
-**capacity, and the major elements** as predictors 
+we choose variables like **pH, EC, organic carbon, cation exchange 
+capacity, and some major elements** as predictors 
 (<span style="color: #B04030;">**but NOT other trace elements**</span>, 
 as their concentrations are probably too low to control the concentration of
 anything else!)
@@ -606,9 +615,9 @@ dependent variable as well, just to see which predictors are
 most closely correlated.
 
 (We try to generate a 'tidier' table by restricting numbers to 3 significant 
-digits, based on the smallest r value in each column. We don't need to use
-`rcorr()` or `rcorr.adjust()`, since we're not so interested in P-values for
-this purpose.)
+digits, and making the values = 1 on the diagonal `NA`. We don't need to use
+`corTest()` from the  `psych` package, since we're not so interested in P-values
+for this purpose.)
 
 Note that all variables are **appropriately transformed**!<br>
 *You will need to do this yourself...*
@@ -628,16 +637,18 @@ sv2017$Cu.pow <- -1*(sv2017$Cu^powerTransform(sv2017$Cu)$lambda)
 cor0 <- 
   cor(sv2017[,c("Al.pow","Ca.pow","Fe.pow","K.log","Mg.log","Na.pow","pH","S.pow","Cu.pow")],
    use="pairwise.complete")
-print(cor0,digits=3)
-rm(cor0)
+cor0[which(cor0==1)] <- NA         # change diagonal to NA
+print(round(cor0,3), na.print="")  # round to 3 decimal places and print nothing for NAs
+rm(cor0)                           # tidy up
 ```
 
-The rule of thumb we use is that **if predictor variables are correlated with
-Pearson's r &ge; 0.8 or r &le; &minus;0.8, then the collinearity is too large
-and one of the correlated predictors should be omitted**. In the correlation
-table above this applies to the correlation between [transformed] Ca and Mg,
-with **r=0.85**. In this example we will run two versions of the model, one
-keeping both Ca and Mg, and one omitting Mg.
+The rule of thumb we use is that:
+
+>if predictor variables are correlated with Pearson's r &ge; 0.8 or r &le; -0.8, then the collinearity is too large and one of the correlated predictors should be omitted
+
+In the correlation table above this applies to the correlation between
+[transformed] Ca and Mg, with **r=0.85**. In this example we will run two
+versions of the model, one keeping both Ca and Mg, and one omitting Mg.
 
 <table border=1 width="100%" style="background-color: #fff0c0;"><tr><td>
 We have just added a fifth assumption for regression models specifically for 
@@ -656,8 +667,8 @@ problem.
 ## Generate multiple regression model for Cu (co-linear predictors NOT omitted)
 
 We first delete any observations (rows) with missing (`NA`) values, otherwise
-when we reduce the number of predictors we may not have the same number of
-observations for all models, in which case we can't compare them.
+when we change the number of predictors later,  we may not have the same number
+of observations for all models, in which case we can't compare them.
 
 ```{r lm all variables, results='hold'}
 # make new data object containing relevant variables with no missing values
@@ -684,12 +695,15 @@ require(car)
 vif(lm_multi)}
 ```
 
-A general rule of thumb is that if **VIF > 4** we need to do some further
-investigation, while serious multi-collinearity exists
-**requiring correction if VIF > 10** (Hebbali, 2018). As we probably expected 
-from the correlation coefficient (above), VIFs for both Ca and Mg are >4 in this 
-model, which may be OK, but we will try a model which omits Ca or Mg (we'll 
-choose Mg)...
+The VIF could be considered the "penalty" from having 2 or more predictors which
+(since they contain the same information) don't decrease the unexplained variance
+of the model, but add unnecessary complexity. A general rule of thumb is that if
+**VIF > 4** we need to do some further investigation, while serious
+multi-collinearity exists **requiring correction if VIF > 10** (Hebbali, 2018).
+As we probably expected from the correlation coefficient (above), VIFs for both
+Ca and Mg are >4 in this model, which may be OK, but we will try a model which
+omits Ca or Mg (we'll choose Mg), since r&nbsp;&ge;&nbsp;0.8 suggests we remove 
+one . . .
 
 ## Generate multiple regression model for Cu, omitting co-linear predictors
 
@@ -697,6 +711,7 @@ choose Mg)...
 # make new data object containing relevant variables with no missing values
 sv2017_multreg <- na.omit(sv2017[c("Cu.pow","pH","Al.pow","Ca.pow","Fe.pow",
                                    "K.log","Mg.log","Na.pow","S.pow")])
+row.names(sv2017_multreg) <- NULL  # reset row indices
 # run model using correctly transformed variables (omitting co-linear predictors)
 lm_multi2 <- lm(Cu.pow ~ pH + Al.pow + Ca.pow + Fe.pow + 
                   K.log + Na.pow + S.pow, data=sv2017_multreg)
@@ -704,7 +719,7 @@ summary(lm_multi2)
 ```
 
 Note that again the null hypothesis probability `Pr(>|t|)` for some predictors 
-is >0.05, so we can't reject the null hypothesis -- that this predictor has no 
+is >&nbsp;0.05, so we can't reject the null hypothesis &ndash; that this predictor has no 
 effect on the dependent variable.
 
 ## Calculate variance inflation factors (VIF) for the model omitting co-linear predictors
@@ -721,14 +736,14 @@ omitting Mg and moved on to the next step below.]
 
 ## Stepwise refinement of maximal multiple regression model (omitting co-linear predictors)
 
-We don't want to have too many predictors in our model -- just the predictors
-which explain significant proportions of the variance in our dependent variable.
-In addition, our data may be insufficient to generate a very complex model; one
-rule-of-thumb suggests 10-20 observations are needed to calculate coefficients
-for each predictor. Reimann *et al*. (2008) recommend that the number of
-observations should be at least 5 times the number of predictors. So, we use a
-systematic stepwise procedure to test variations of the model, which omits
-unnecessary predictors.
+We don't want to have too many predictors in our model &ndash; just the
+predictors which explain significant proportions of the variance in our
+dependent variable. The simplest possible model is best! In addition, our data
+may be insufficient to generate a very complex model; one rule-of-thumb suggests
+10-20 observations are needed to calculate coefficients for each predictor.
+Reimann *et al*. (2008) recommend that the number of observations should be at
+least 5 times the number of predictors. So, we use a systematic stepwise
+procedure to test variations of the model, which omits unnecessary predictors.
 
 ```{r stepwise refinement of multiple regression model}
 lm_stepwise <- step(lm_multi2, direction="both", trace=0)
@@ -760,7 +775,7 @@ par(mfrow=c(1,1))
 
 The optimal model is `Cu.pow ~ Al.pow + Ca.pow + Fe.pow + S.pow`, where suffixes 
 `.pow` and `.log` represent power- and log~10~-transformed variables 
-respectively. The point labelled `86` does look problematic... 
+respectively. The point labelled `78` does look problematic... 
 
 ```{r testing regression assumptions, paged.print=FALSE, results="hold"}
 require(lmtest)
@@ -773,6 +788,8 @@ cat("\n------- Test of linearity assumption:")
 raintest(lm_stepwise) # Rainbow test for linearity
 cat("\n------- Bonferroni Outlier test for influential observations:\n\n")
 outlierTest(lm_stepwise) # Bonferroni outlier test for influential observations
+cat("\n------- Test distribution of residuals:\n")
+shapiro.test(lm_stepwise$residuals) # Shapiro-Wilk test for normality
 ```
 
 ## Multiple regression effect plots
@@ -805,11 +822,95 @@ mtext(side=3, line=-5.5, adj=0.05, col="blue3",
       text=paste("Adjusted Rsq =",signif(summary(lm_stepwise)$adj.r.squared,3)))
 ```
 
+### *What if we remove that outlier?*
+
+```{r multi-lm-omitting-outlier, results='hold'}
+# make new data object containing relevant variables with no missing values
+sv2017_multreg <- na.omit(sv2017[c("Cu.pow","pH","Al.pow","Ca.pow","Fe.pow",
+                                   "K.log","Mg.log","Na.pow","S.pow")])
+row.names(sv2017_multreg) <- NULL  # reset row indices
+sv2017_multreg <- sv2017_multreg[-78,]
+row.names(sv2017_multreg) <- NULL  # reset row indices again
+# run model using correctly transformed variables (omitting co-linear predictors)
+lm_multi2 <- lm(Cu.pow ~ pH + Al.pow + Ca.pow + Fe.pow + 
+                  K.log + Na.pow + S.pow, data=sv2017_multreg)
+summary(lm_multi2)
+```
+
+Note that again the null hypothesis probability `Pr(>|t|)` for some predictors 
+is >&nbsp;0.05, so we can't reject the null hypothesis &ndash; that this predictor has no 
+effect on the dependent variable.
+
+#### *Calculate variance inflation factors (VIF) for the model omitting an outlier*
+
+```{r VIFs for maximal model omitting co-linear predictors and outlier, results='hold'}
+require(car)
+{cat("Variance Inflation Factors\n")
+vif(lm_multi2)}
+```
+
+**With the co-linear variable(s) omitted (on the basis of |Pearson's r| > 0.8), we now have no VIFs > 4**. So we can move on to stepwise refinement of our [new] 'maximal' model...<br>
+[**BUT** note that in this case, with no VIF > 10, we could have simply skipped 
+omitting Mg and moved on to the next step below.]
+
+#### *Stepwise refinement of maximal multiple regression model (omitting outlier)*
+
+As before, but without the outlier identified with the Bonferroni `outlierTest()`.
+
+```{r stepwise refinement of multiple regression model no outlier}
+lm_stepwise <- step(lm_multi2, direction="both", trace=0)
+summary(lm_stepwise)
+require(car)
+{cat("==== Variance Inflation Factors ====\n")
+vif(lm_stepwise)}
+```
+In the optimised model with an outlier removed in the dataset, we find that the
+stepwise procedure has generated a model with fewer predictor variables than
+with the outlier present. The p-values (`Pr(>|t|)`) for intercept and predictors
+are *mostly* now &le;&nbsp;0.05 (except S.pow, p=0.061), so we can reject the
+null hypothesis for most predictors (*i.e*. that they have 'no effect' on Cu).
+Our VIFs are still all close to 1, meaning negligible collinearity between
+predictors.
+
+Check the diagnostic plots in Figure \@ref(fig:diagnostic-plots) below.
+
+#### *Regression diagnostic plots*
+
+```{r diagnostic-plots-no-outlier, fig.height=6, fig.width=6, fig.cap="Diagnostic plots for the optimal multiple regression model (outlier removed) following backward-forward stepwise refinement."}
+par(mfrow=c(2,2), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.6,0.5,0), font.lab=2, font.main=3, 
+    cex.main=0.8, tcl=-0.2)
+plot(lm_stepwise, col=4)
+par(mfrow=c(1,1))
+```
+
+The optimal model is `Cu.pow ~ Al.pow + Fe.pow + S.pow`, where suffixes 
+`.pow` and `.log` represent power- and log~10~-transformed variables 
+respectively. 
+
+```{r testing regression assumptions no outlier, paged.print=FALSE, results="hold"}
+require(lmtest)
+require(car)
+cat("------- Residual autocorrelation (independence assumption):")
+bgtest(lm_stepwise) # Breusch-Godfrey test for autocorrelation (independence)
+cat("\n------- Test of homoscedasticity assumption:")
+bptest(lm_stepwise) # Breusch-Pagan test for homoscedasticity
+cat("\n------- Test of linearity assumption:")
+raintest(lm_stepwise) # Rainbow test for linearity
+cat("\n------- Bonferroni Outlier test for influential observations:\n\n")
+outlierTest(lm_stepwise) # Bonferroni outlier test for influential observations
+cat("\n------- Test distribution of residuals:\n\n")
+shapiro.test(lm_stepwise$residuals) # Shapiro-Wilk test for normality
+```
+
+Note that with the outlier removed, the diagnostic tests now show no outlier (no
+surprises there, since we removed it!). There is negligible change in the other
+diagnostic test results.
+
 ## Some brief interpretation
 
-- The adjusted R-squared value of the final model is 0.506, meaning that 50.6% of the variance in Cu is explained by variance in the model's predictors. (The remaining 49.4% of variance must therefore be due to random variations, or 'unknown' variables not included in our model.)
+- The adjusted R-squared value of the final model is 0.506 (0.616 with no outlier!), meaning that 50.6% of the variance in Cu is explained by variance in the model's predictors. (The remaining 49.4% of variance must therefore be due to random variations, or 'unknown' variables not included in our model.)
 - From the model coefficients and the effect plots we can see that Cu  increases as Ca, Fe, and S increase, but Cu decreases as Al increases. This doesn't necessarily correspond with the individual relationships; Cu **IS** positively correlated with Ca, Fe, and S, **but** actually has no significant relationship with Al (you can check this!).
-- Although we can't attribute a causal relationship to correlation or regression relationships, the observed effects in our model **are** consistent with real phenomena. For example, copper is positively related to iron (Fe) in soils at the continental scale; see Hamon *et al*. (2004) and Caritat and Rate (2017).
+- Although we can't attribute a causal relationship to correlation or regression relationships, the observed effects in our model **are** consistent with real phenomena. For example, copper is positively related to iron (Fe) in soils at the continental scale; see Hamon *et al*. (2004) and Caritat and Rate (2017). We also know that trace elements are often associated with clays (measured by Al in our data, since clays are aluminosilicate minerals).
 
 # References
 

@@ -6,12 +6,12 @@
 #   |_|  |_|  \__,_| | .__/  |___/   |_| |_| |_|   |_|  \_\  
 #                    | |                                     
 #                    |_|
-#    ___     ___    __     _  _
-#   |__ \   / _ \  |__ \  | || |                             
-#      ) | | | | |    ) | | || |_                            
-#     / /  | | | |   / /  |__   _|                           
-#    / /_  | |_| |  / /_     | |                             
-#   |____|  \___/  |____|    |_|                             
+#             ___     ___    __     _  _
+#            |__ \   / _ \  |__ \  | || |                             
+#               ) | | | | |    ) | | || |_                            
+#              / /  | | | |   / /  |__   _|                           
+#             / /_  | |_| |  / /_     | |                             
+#            |____|  \___/  |____|    |_|                             
 
   # Introduction
   
@@ -27,7 +27,7 @@
 # chloropleth maps, and many other map plotting methods.
 
 
-### load packages needed to make maps
+### load packages needed to make maps ####
 
 # ...also read some *data* we need for map annotations, make some *colour*
 #   *palettes* to use later, and set any alternative Windows *fonts*:
@@ -38,7 +38,6 @@ library(prettymapr)    # add scale bar and north arrows to maps
 library(viridis)       # colourblind-friendly colour palettes
 library(scico)         # more colourblind-friendly colour palettes
 library(ggmap)         # plotting spatial data with ggplot syntax
-library(ggsn)          # add scale and north to ggmap maps (doesn't always work)
 
 # load maps data and do setups
 git <- "https://raw.githubusercontent.com/Ratey-AtUWA/"
@@ -52,7 +51,7 @@ pal4liteTransp <- c("black",
                     "white")
 pal4dark <- c("white", viridis::turbo(8, beg=0.2, end=0.9,dir=1), "black")
 
-## Preparing to make maps
+## Preparing to make maps ####
 
 # First we read the data we need: from `.csv` files on a website, into an **R**
 #   data frame:
@@ -119,7 +118,7 @@ afs22ll <- st_transform(afs22utm, crs = LongLat)
 
 ## Alternative 1 - Maps in R using the maptiles package ####
 
-### Defining the mapped area
+### Defining the mapped area ####
 
 # We define the area we need for our map and save it in a simple features object
 # called `extent`.
@@ -144,7 +143,7 @@ extent <- st_as_sf(data.frame(x=c(399800,400700),y=c(6467900,6468400)),
 
 # **NOTE**: The projection we specify here will be the one the map plots in!
 
-### Getting the map tile data
+### Getting the map tile data ####
 
 # We now need some functions from the `maptiles` package (Giraud 2021). We're
 # using one of the OpenStreetMap tile options, but the following tile providers
@@ -164,7 +163,7 @@ extent <- st_as_sf(data.frame(x=c(399800,400700),y=c(6467900,6468400)),
 # NOTE: projection of input object e.g. 'extent' sets map projection
 aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap.HOT", crop = TRUE)
 
-### Plotting the map
+### Plotting the map ####
 
 # The `aftiles` object we created is a `SpatRaster` object which needs the
 # `maptiles` (or `terra`) package loaded to be able to plot it - see 
@@ -175,19 +174,18 @@ plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,1,1)) # use axes = TRUE
 
 mtext("Easting (UTM Zone 50, m)", side = 1, line = 3.2, font=2)
 mtext("Northing (UTM Zone 50, m)", side = 2, line = 2.3, font=2)
-```
+# 
+# The next chunk of code adds the `prettymapr` features shown in Figure 2. In this
+# code, `plotepsg = 32750` refers to the EPSG code for the UTM projection in Zone
+# 50 (EPSG 32750), which we need to include so that the scale bar shows the
+# correct distances. (Long-Lat is EPSG 4326 in WGS84)
+# 
+# **NOTE**: If the `addscalebar` function does not work, run this line of code:
 
-The next chunk of code adds the `prettymapr` features shown in Figure 2. In this
-code, `plotepsg = 32750` refers to the EPSG code for the UTM projection in Zone
-50 (EPSG 32750), which we need to include so that the scale bar shows the
-correct distances. (Long-Lat is EPSG 4326 in WGS84)
-
-**NOTE**: If the `addscalebar` function does not work, run this line of code:
-  # load-modified-addscalebar-function, eval=FALSE}
 source("https://github.com/Ratey-AtUWA/Learn-R/raw/main/scalebar_use_sf_prettymapr.R")
-```
-(This will replace the function in the `prettymapr` package with a modified 
- version that uses the `sf` package for coordinate conversions instead of `sp` and `rgdal`.)
+
+# (This will replace the function in the `prettymapr` package with a modified 
+#  version that uses the `sf` package for coordinate conversions instead of `sp` and `rgdal`.)
 
 # . . . continuing previous code . . .
 addnortharrow(text.col=1, border=1)
@@ -223,11 +221,11 @@ addnortharrow(text.col=1, border=1)
 addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, 
             label.cex = 1.2, htin=0.15, widthhint = 0.15)
 
-### Adding our data and map annotations
+### Adding our data and map annotations ####
 
-Very often we would like to **add our own information to a map**, such
-as the location of samples, often with different sizes, shapes, or
-colours of symbols to represent numerical information.
+# Very often we would like to **add our own information to a map**, such
+# as the location of samples, often with different sizes, shapes, or
+# colours of symbols to represent numerical information.
 
 # Since we have a map in UTM coordinates, we can now add plots of our data based
 # on UTM locations (with a legend, of course - see code & output below. We can
@@ -250,7 +248,6 @@ with(afs19utm, plot(geometry, add=TRUE,
 legend("bottomright", legend=levels(as.factor(afs19$Group)),
        pch = rep(21:25,2), pt.bg = clrz,
        title = "Group", inset = 0.02, ncol = 2)
-```
 
 # We can also add digitized map features such as wetland ponds, drains, etc., if
 # these are not on the map tiles already. Ideally we would add these **before**
@@ -303,7 +300,6 @@ with(afr_map, lines(wetland_E, wetland_N, col = "cadetblue",
 text(c(400263, 399962, 400047), c(6468174, 6468083, 6468237),
      labels = c("Chapman Drain","Kitchener Drain", "Woolcock Drain"),
      pos = c(2,2,4), cex = 0.8, font = 3, col = "cadetblue")
-```
 
 ### Making a bubble map ####
 
@@ -343,7 +339,6 @@ symbols(c(400600,400600),c(6468040,6467980), circles=0.4*sqrt(c(bublo,bubhi)), a
         lwd=1, inches=F, fg = "purple", bg = "#8000FF40")
 text(c(400600,400620,400620),c(6468100,6468040,6467980), 
      labels=c("Zn (mg/kg)",bublo,bubhi), cex=0.85, pos = c(1,4,4))
-```
 
 ### Categorized (e.g. percentile) bubble map ####
 
@@ -459,7 +454,7 @@ ggmap(udubua.gg) +
 # `aes(...)` with `size = variableName`), to generate something like a bubble
 # map.
 
-### Other map types using ggmap
+### Other map types using ggmap ####
 
 # Another option *apparently* available in `ggmap` are some of the *Stamen* map
 # tiles, accessible with the `get_stamenmap()` function. **However**, the Stamen
@@ -509,22 +504,37 @@ ggmap(afr.gg) +
   
   ## Other tile-based mapping packages in R ####
   
-  The `rosm` package (Dunnington 2022) allows users to produce background maps
-from several map tile providers. **We don't currently recommend** `rosm`, since
-it's difficult when using this package to produce axes in commonly-used
-coordinate reference systems.
+# The `rosm` package (Dunnington 2022) allows users to produce background maps
+# from several map tile providers. **We don't currently recommend** `rosm`,
+# since it's difficult when using this package to produce axes in commonly-used
+# coordinate reference systems.
+# 
+# The `OpenStreetMap` R package (Fellows, 2019) can make very good tile-based
+# maps. Unfortunately, however, it can be difficult to use on Apple Mac
+# computers, and there can also be problems with Windows-based systems due to
+# the use of `Java` code in the package. So, out of respect for MacOS users, we
+# are not recommending the `OpenStreetMap` package either.
 
-The `OpenStreetMap` R package (Fellows, 2019) can make very good tile-based
-maps. Unfortunately, however, it can be difficult to use on Apple Mac computers,
-and there can also be problems with Windows-based systems due to the use of
-`Java` code in the package. So, out of respect for MacOS users, we are 
-**not recommending the** `OpenStreetMap` package either.
+#      _   _   ___  _____               
+#     | \ | | / _ \|_   _|   _ __  ___   ___  _ __ ___      ___   _ __
+#     |  \| || | | | | |    | '__|/ _ \ / __|| '_ ` _ \    / _ \ | '__|
+#     | |\  || |_| | | |    | |  | (_) |\__ \| | | | | |  | (_) || |
+#     |_| \_| \___/  |_|    |_|   \___/ |___/|_| |_| |_|   \___/ |_|
+#
+#  ___                     ____  _                     _   __  __               
+# / _ \  _ __  ___  _ __  / ___|| |_  _ __  ___   ___ | |_|  \/  |  __ _  _ __  
+#| | | || '_ \/ _ \| '_ \ \___ \| __|| '__|/ _ \ / _ \| __| |\/| | / _` || '_ \ 
+#| |_| || |_) | __/| | | | ___) | |_ | |  |  __/|  __/| |_| |  | || (_| || |_) |
+# \___/ | .__/\___||_| |_||____/ \__||_|   \___| \___| \__|_|  |_| \__,_|| .__/ 
+#       |_|                                                              |_|    
 
 ## Final Words ####
 
 # We recommend using either the `maptiles` or `ggmap` packages to draw maps with
-# tiled backgrounds, as they allow use of the state-of-the-art *simple features*
-# system *via* the `sf` package.
+# tiled backgrounds, as they allow use of the state-of-the-art simple features
+# system via the `sf` package.
+
+# -=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-
 
 ## Appendix - coordinate conversions ####
   
@@ -603,3 +613,5 @@ colnames(longlat.temp) <- c("Longitude","Latitude")
 # Pebesma, E.J., R.S. Bivand, 2005. Classes and methods for spatial data
 # in R. *R News* **5** (2), <https://cran.r-project.org/doc/Rnews/>.
 # (package **sp**)
+#
+# -=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-

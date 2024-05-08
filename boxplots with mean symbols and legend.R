@@ -1,14 +1,11 @@
-# code authored by andrew rate (c) the university of western australia 2016-2019
+# code authored by andrew rate (c) the university of western australia 2016-2024
 #
 # example for zinc - case-sensitive search & replace to make plots for other
 # variables, and the dataset used is called 'sv18', so you may need to
 # find/replace this too!
 #
-# specify a default data frame
-attach(sv18)
-#
-# make an object contaning a table of means
-Znstats<-tapply(log10(sv18$Zn), sv18$Type, mean, na.rm=T)
+# make an object containing a table of means
+Znstats <- with(sv18, tapply(log10(Zn), Type, mean, na.rm=T))
 #
 # plot the boxplot with nice axis titles etc.
 par(mar=c(4,4,1,1), mgp=c(2,0.6,0), ljoin="mitre", lend="square", font.lab=2)
@@ -32,7 +29,5 @@ text(.4,3,labels="Means on boxplot", pos=4, cex=1.5, font=3)
 #
 # delete the object contaning the table of means (to keep R tidy)...
 rm(Znstats)
-# ...and detach the data object
-detach(sv18)
 #
 # end code

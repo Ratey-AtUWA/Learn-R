@@ -1,6 +1,8 @@
-par(mar=c(4,4,1,1), mfrow=c(2,2), mgp=c(1.7,0.3,0), tcl=0.25, font.lab=2, cex=1.2)
+par(mar=c(4,4,1,1), oma=c(0,0,1,0), mfrow=c(2,2), mgp=c(1.7,0.3,0), tcl=0.25, 
+    font.lab=2, cex=1.2)
 with(datasets::anscombe, plot(x1,y1, pch=19, xlim=c(4,20), ylim = c(3,13),
                               col="#800000", col.axis="#800000", col.lab="#800000"))
+mtext("Anscombe's Quartet",3,1,adj=1,cex=1.6,font=2)
 lm1 <- with(datasets::anscombe, lm(y1~x1))
 text(4,12.5, pos=4, col="#800000",
      labels=paste0("y = ",signif(lm1$coef[2],2),"x + ",signif(lm1$coef[1],2)))

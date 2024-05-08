@@ -222,9 +222,11 @@ This means:</span>
 **Some practical tips**:
 
 - Increase the default text and symbol sizes 
-- Remove unnecessary lines (smooth, spread)
-- in RStudio, use the Export▾ button » Copy to clipboard » select &#9673;Metafile (best pasting into Word, *etc.*)
-- Graph plus caption should be self-contained
+- Remove unnecessary lines (*e.g*. `smooth`, `spread` in `car::scatterplot()`)
+- In RStudio, use the Export▾ button » Copy to clipboard » select &#9673;Metafile (best pasting into Word, *etc.*)
+- **Don't** use screen shots, and avoid `.jpg` files, as both can be blurry or grainy
+- Graph plus caption should be self-contained &ndash; we should only need to refer to these to fully understand the graph
+- **Don't** include a title above the plot (in many **R** plots, use the option `main=""`) &ndash; any information describing the plot should be in the caption
 - Transform axes if necessary (using arguments in **R** plotting functions)
 - Use appropriate proportions (width/height) for the plot you are creating
 - Change the default colour palette to a colourblind-friendly palette, *e.g*. from the **R** packages `viridis` or `scico` (see examples [for viridis here](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html#the-color-scales){target="_blank"} and [for scico here](https://repec.sowi.unibe.ch/stata/palettes/colors.html#scico){target="_blank"})
@@ -247,19 +249,17 @@ names or codes, which we can then refer to by numbers in subsequent functions.
 and <span style="font-family:monospace; background-color:#d8bfd8;">&quot;thistle&quot;</span> 
 &ndash; to see these, run the function `colors()` or run `demo("colors")`.
 
-Colour codes are a character string with 3 or 6 digits or letters after the `#`
+Colour codes are a character string with 6 or 8 digits or letters after the `#`
 symbol, like `"#A1B2C3"`. In the 6-digit version (the most common), the first 2 
 characters after `#` are a hexadecimal number specifying the intensity of the
 <span style="color:white; background-color:red;">&nbsp;red&nbsp;</span> 
 component of the colour, the next 2 specify 
 <span style="background-color:#00FF00;">&nbsp;green&nbsp;</span>, and the next 2
-<span style="color:white; background-color:blue;">&nbsp;blue&nbsp;</span>. **<span style="font-family:monospace; background-color:#E8E8E8;">#<span style="color:red;">rr</span><span style="color:#00C000;">gg</span><span style="color:blue;">bb</span></span>**<br /> 
-(With 3-digit codes, we just have one digit per colour channel: 
-**<span style="font-family:monospace; background-color:#E8E8E8;">#<span style="color:red;">r</span><span style="color:#00C000;">g</span><span style="color:blue;">b</span></span>**.)
+<span style="color:white; background-color:blue;">&nbsp;blue&nbsp;</span>. **<span style="font-family:monospace; background-color:#E8E8E8;">#<span style="color:red;">rr</span><span style="color:#00C000;">gg</span><span style="color:blue;">bb</span></span>**
 
 The greatest 2-digit hexadecimal number is `FF`, equal to the decimal number
 255. Since we can include zero, this means there will be 256^3^ = 16,777,216
-unique colours in **R**. (With 3-digit `#rgb` codes we can generate 4096 colours.)
+unique colours in **R**.
 
 Optionally we can use an 8-character colour code, such as `"#A1B2C399"`, where
 the last 2 characters define the **alpha** value, or colour transparency.
@@ -268,7 +268,7 @@ opaque. We can also use the colour name `"transparent"` in **R** which can
 sometimes be useful.
 
 <span style="font-size: 14pt;">**Warning**</span>: semi-transparent colours
-(*i.e*. alpha < 1; anything other than `#rgb`, `"#rrggbb"` or `"#rrggbbFF"`) are
+(*i.e*. alpha < 1; anything other than `"#rrggbb"` or `"#rrggbbFF"`) are
 not supported by metafiles in R. To use semi-transparent colours, save as `.png`
 or `.tiff`, or copy as a bitmap.
 </td></tr>
@@ -342,7 +342,7 @@ and the fill colour is set with `bg =`.
 
 ![](./Learn_R-2023-Week_1a_graphs_files/figure-html/pch_map.png)
 
-<center>For all symbols above, `col='navy'` and for pch 21-25 `bg='gold'`.</center>
+<center>For all symbols above, `col="navy"` and for pch 21-25 `bg="gold"`.</center>
 </td></tr></table>
 
 <p>&nbsp;</p>
@@ -839,6 +839,7 @@ Maps are [mostly] just scatterplots with a map background &ndash; we will spend
 a separate session on maps in R later.
 
 <center>![](images/rottnest.png)</center>
+
 ```{r, eval=FALSE, include=FALSE}
 #```{r map-code-hidden, echo=FALSE, fig.align='center', fig.height=4.2, fig.width=9, message=FALSE, warning=FALSE, out.width='80%', results='hold'}
 # library(ggmap)
@@ -876,7 +877,7 @@ Pedersen T, Crameri F (2023). *scico: Colour Palettes Based on the Scientific Co
 
 ```{r fave-palettes-notrun, eval=FALSE}
 # first load and run code to make UWAcolgrad() function
-# for help download the file itself and look inside!
+# for help download the UWAcolgrad.R file itself and look inside!
 source("https://github.com/Ratey-AtUWA/Learn-R/raw/main/UWAcolgrad.R")
 np <- 32
 par(mar=rep(0.5,4), xpd=TRUE)

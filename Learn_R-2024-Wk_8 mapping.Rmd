@@ -298,8 +298,8 @@ commonly Eastings or Longitudes, and $y$ coordinates are commonly Northings or
 Latitudes.
 
 ```{r make map extent object, warning=FALSE, error=FALSE, results='hold'}
-extent <- st_as_sf(data.frame(x=c(399800,400700),y=c(6467900,6468400)),
-                   coords = c("x","y"), crs = UTM50S)
+extent <- st_as_sf(data.frame(x=c(114.65,114.7),y=c(33.59,33.62)),
+                   coords = c("x","y"), crs = LongLat)
 ```
 
 **NOTE**: The projection we specify here will be the one the map plots in!
@@ -322,7 +322,7 @@ shape as it will use only square (uncropped) map tiles.
 
 ```{r get_tiles, warning=FALSE, error=FALSE, results='hold'}
 # NOTE: projection of input object e.g. 'extent' sets map projection
-aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap.HOT", crop = TRUE)
+aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap", crop = TRUE)
 ```
 
 ### Plotting the map
@@ -332,11 +332,14 @@ The `aftiles` object we created is a `SpatRaster` object which needs the
 Figure \@ref(fig:plot-map1-axes).
 
 ```{r plot-map1-axes, fig.align='center', fig.cap="Map of Ashfield Flats in the UTM projection, generated using the maptiles R package, with OpenStreetMap tiles.", fig.width=8, fig.height=5, message=FALSE, warning=FALSE, out.width='70%', results='hold'}
+aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap", crop = TRUE, 
+                               zoom=17)
 par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
-plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,1,1)) # use axes = TRUE
+plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,1,1))
+points(zk[,2:3], col="purple", pch=3, lwd=2)# use axes = TRUE
 
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 3.2, font=2)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 2.3, font=2)
+mtext("Longitude °E", side = 1, line = 3.2, font=2)
+mtext("Latitude °N", side = 2, line = 2.3, font=2)
 ```
 
 The next chunk of code adds the `prettymapr` features shown in Figure 2. In this

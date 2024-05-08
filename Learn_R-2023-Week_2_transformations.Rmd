@@ -72,8 +72,15 @@ standardisation gives each variable equal weight in the analysis
 
 In case you need to read in the data again...
 
-```{r}
+```{r read-data-local}
 hubbard <- read.csv("hubbard.csv", stringsAsFactors = TRUE)
+```
+
+(remember that you can also read the data directly from an online source)
+
+```{r read-data-github}
+hubbard <- read.csv("https://github.com/Ratey-AtUWA/Learn-R/raw/main/hubbard.csv", 
+                    stringsAsFactors = TRUE)
 ```
 
 ## Visualizing distributions
