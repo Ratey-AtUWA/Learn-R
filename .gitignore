@@ -5,9 +5,12 @@
 PP-git-read-sampling-plans.R
 tfapi.csv
 gmapskey.csv
+LMSicons.txt
 *.zip
 *.html
 ~$*.*
 /Learn_R*
+/afw24-plots/
 /Wh*
 /old-versions*
+/EDAmod*
