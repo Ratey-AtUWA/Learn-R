@@ -20,4 +20,5 @@ legend("topright", seg.len=4,
        lty = c(1,2,4), lwd=c(1,2,3),
        legend = levels(pcadata$species),
        inset=0.02, bty="n",
-       title="Sampling Zone")
+       title="Sampling Zone
+")

@@ -10,6 +10,7 @@ LMSicons.txt
 *.html
 ~$*.*
 /Learn_R*
+/eDNA*
 /afw24-plots/
 /Wh*
 /old-versions*

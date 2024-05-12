@@ -160,7 +160,7 @@ ggplot() + mapWorld +
 *palettes* to use later, and set any alternative Windows *fonts*:
 
 ```{r load OpenStreetMap invisibly, message=FALSE, warning=FALSE, include=FALSE}
-library(OpenStreetMap) 
+# library(OpenStreetMap) 
 library(sf)
 afs21ll <- read.csv("afs21ll.csv", stringsAsFactors = T)
 afs21ll <- st_as_sf(afs21ll, coords=c("Longitude", "Latitude"), 
@@ -298,8 +298,8 @@ commonly Eastings or Longitudes, and $y$ coordinates are commonly Northings or
 Latitudes.
 
 ```{r make map extent object, warning=FALSE, error=FALSE, results='hold'}
-extent <- st_as_sf(data.frame(x=c(114.65,114.7),y=c(33.59,33.62)),
-                   coords = c("x","y"), crs = LongLat)
+extent <- st_as_sf(data.frame(x=c(399900,400600),y=c(6467900,6468400)),
+                   coords = c("x","y"), crs = UTM50S)
 ```
 
 **NOTE**: The projection we specify here will be the one the map plots in!
@@ -320,9 +320,12 @@ The option `crop = TRUE` is included to crop the tiles to our
 defined area in the `extent` object. If we leave it out, the map may change
 shape as it will use only square (uncropped) map tiles.
 
+The map tile style we have selected is the `OpenStreetmap.HOT` style, where the
+suffix `HOT` reflects its development by the [Humanitarian OpenStreetMap Team](https://www.hotosm.org/updates/2013-09-29_a_new_window_on_openstreetmap_data){target="_blank"} in France.
+
 ```{r get_tiles, warning=FALSE, error=FALSE, results='hold'}
 # NOTE: projection of input object e.g. 'extent' sets map projection
-aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap", crop = TRUE)
+aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap.HOT", crop = TRUE)
 ```
 
 ### Plotting the map
@@ -331,15 +334,15 @@ The `aftiles` object we created is a `SpatRaster` object which needs the
 `maptiles` (or `terra`) package loaded to be able to plot it &ndash; see 
 Figure \@ref(fig:plot-map1-axes).
 
-```{r plot-map1-axes, fig.align='center', fig.cap="Map of Ashfield Flats in the UTM projection, generated using the maptiles R package, with OpenStreetMap tiles.", fig.width=8, fig.height=5, message=FALSE, warning=FALSE, out.width='70%', results='hold'}
-aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap", crop = TRUE, 
-                               zoom=17)
+```{r plot-map1-axes, fig.align='center', fig.cap="Map of Ashfield Flats in the UTM projection, generated using the maptiles R package, with OpenStreetMap tiles.", fig.width=8, fig.height=6, message=FALSE, warning=FALSE, out.width='70%', results='hold'}
+aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap.HOT", 
+                               crop = TRUE, zoom=16)
 par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
 plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,1,1))
-points(zk[,2:3], col="purple", pch=3, lwd=2)# use axes = TRUE
+# points(zk[,2:3], col="purple", pch=3, lwd=2)# use axes = TRUE
 
-mtext("Longitude °E", side = 1, line = 3.2, font=2)
-mtext("Latitude °N", side = 2, line = 2.3, font=2)
+mtext("Longitude \u00B0E", side = 1, line = 3.2, font=2)
+mtext("Latitude \u00B0N", side = 2, line = 2.3, font=2)
 ```
 
 The next chunk of code adds the `prettymapr` features shown in Figure 2. In this
@@ -555,7 +558,7 @@ is a factor which identifies which percentile of Zn concentration each sample is
 in. We then use this factor to define symbols, sizes, and colours for each
 sample location. We add a line break to text labels using $\backslash$`n`.
 
-```{r PctBubb, fig.align='center', fig.cap="Map showing percentile ranges of zinc concentrations in sediment and soil at Ashfield Flats in 2019, over OpenStreetMap tiles acquired using maptiles.", out.width='70%', fig.height=5, fig.width=8, message=FALSE, warning=FALSE, results='hold'}
+```{r PctBubb, fig.align='center', fig.cap="Map showing percentile ranges of zinc concentrations in sediment and soil at Ashfield Flats in 2019, over OpenStreetMap tiles acquired using maptiles.", out.width='70%', fig.height=6, fig.width=8, message=FALSE, warning=FALSE, results='hold'}
 par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
 plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,0.5,0.5)) # use axes = TRUE
 
