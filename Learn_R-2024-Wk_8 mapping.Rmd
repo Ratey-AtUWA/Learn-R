@@ -812,29 +812,31 @@ colnames(longlat.temp) <- c("Longitude","Latitude")
 
 ## References and R packages
 
-Dunnington, Dewey (2017). prettymapr: Scale Bar, North Arrow, and Pretty
-Margins in R. R package version 0.2.2.
-<https://CRAN.R-project.org/package=prettymapr>.
+Dunnington, Dewey (2017). *prettymapr: Scale Bar, North Arrow, and Pretty
+Margins in R*. R package version 0.2.2.
+[https://CRAN.R-project.org/package=prettymapr](https://CRAN.R-project.org/package=prettymapr){target="_blank"}.
 
 Dunnington D (2022). *rosm: Plot Raster Map Tiles from Open Street Map
 and* *Other Sources*. R package version 0.2.6,
-<https://CRAN.R-project.org/package=rosm>.
+[https://CRAN.R-project.org/package=rosm](https://CRAN.R-project.org/package=rosm){target="_blank"}.
 
 Fellows, Ian and using the JMapViewer library by Jan Peter Stotz (2019).
 *OpenStreetMap: Access to Open Street Map Raster Images*. R package
-version 0.3.4. <https://CRAN.R-project.org/package=OpenStreetMap>.
+version 0.3.4. [https://CRAN.R-project.org/package=OpenStreetMap](https://CRAN.R-project.org/package=OpenStreetMap){target="_blank"}.
 
 Giraud T (2021). *maptiles: Download and Display Map Tiles*. R package
-version 0.3.0, <https://CRAN.R-project.org/package=maptiles>.
+version 0.3.0, [https://CRAN.R-project.org/package=maptiles](https://CRAN.R-project.org/package=maptiles){target="_blank"}.
 
 Garnier S, Ross N, Rudis R, Camargo AP, Sciaini M, Scherer C (2021). *Rvision - Colorblind-Friendly Color Maps for R*. R package version 0.6.2. (**viridis**)
 
+D. Kahle and H. Wickham. `ggmap`: Spatial Visualization with `ggplot2`. *The R Journal*, **5**(1), 144-161. [http://journal.r-project.org/archive/2013-1/kahle-wickham.pdf](http://journal.r-project.org/archive/2013-1/kahle-wickham.pdf){target="_blank"}.
+
 Pebesma, E., 2018. Simple Features for R: Standardized Support for
 Spatial VectorData. *The R Journal* **10** (1), 439-446,
-<https://doi.org/10.32614/RJ-2018-009>. (package **sf**)
+[https://doi.org/10.32614/RJ-2018-009](https://doi.org/10.32614/RJ-2018-009){target="_blank"} . (package **sf**)
 
 Pebesma, E.J., R.S. Bivand, 2005. Classes and methods for spatial data
-in R. *R News* **5** (2), <https://cran.r-project.org/doc/Rnews/>.
+in R. *R News* **5** (2), [https://cran.r-project.org/doc/Rnews/](https://cran.r-project.org/doc/Rnews/){target="_blank"}.
 (package **sp**)
 
 <hr style="height: 2px; background-color: #5560A4;" />
