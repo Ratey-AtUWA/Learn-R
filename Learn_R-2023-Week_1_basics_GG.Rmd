@@ -667,6 +667,6 @@ Posit Software (2022) *RStudio 2022.12.0+353 "Elsbeth Geranium" Release*. [https
 
 R Core Team (2022). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL [https://www.R-project.org/](https://www.R-project.org/){target="_blank"}.
 
-H. Wickham. *ggplot2: Elegant Graphics for Data Analysis*. Springer-Verlag New York, 2016. [https://ggplot2.tidyverse.org](https://ggplot2.tidyverse.org){target="_blank"}.
+Wickham, H. *ggplot2: Elegant Graphics for Data Analysis*. Springer-Verlag New York, 2016. [https://ggplot2.tidyverse.org](https://ggplot2.tidyverse.org){target="_blank"}.
 
 <p>&nbsp;</p>
