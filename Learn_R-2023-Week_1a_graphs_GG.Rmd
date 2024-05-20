@@ -1,0 +1,684 @@
+---
+title: "Graphs in R"
+output:
+  bookdown::html_document2:
+    fig_width: 6
+    fig_height: 4
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+
+```{r addimg function, include=FALSE}
+library(png)
+addImg <- function(obj, x = NULL, y = NULL, width = NULL, interpolate = TRUE){
+  if(is.null(x) | is.null(y) | is.null(width)){stop("Must provide args 'x', 'y', and 'width'")}
+  USR <- par()$usr ; PIN <- par()$pin ; DIM <- dim(obj) ; ARp <- DIM[1]/DIM[2]
+  WIDi <- width/(USR[2]-USR[1])*PIN[1] ;   HEIi <- WIDi * ARp 
+  HEIu <- HEIi/PIN[2]*(USR[4]-USR[3]) 
+  rasterImage(image = obj, xleft = x-(width/2), xright = x+(width/2),
+            ybottom = y-(HEIu/2), ytop = y+(HEIu/2), interpolate = interpolate)
+}
+```
+
+```{r save-default-par, include=FALSE}
+defpar <- par(no.readonly = TRUE)
+```
+
+```{r page 1 header hide code, fig.height=1.5, fig.width=10, echo=FALSE, out.width="100%", fig.align='right', results='hold'}
+logo <- readPNG("images/UWA logo_text_V_wsL.png")
+par(mar = c(0,0,0,0))
+layout(matrix(c(1,1,1,1,2),nrow = 1))
+
+plot(c(0,1),c(0,1), axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+text(-0.025,0.9, pos = 4, cex = 2.6, font = 2, col = "#003087", 
+     labels="School of Agriculture and Environment")
+text(-0.025,0.6, pos = 4, cex = 2.2, col = "#997500", 
+     labels="R for data analysis and visualization in Environmental Science")
+# text(-0.025,0.4, pos = 4, font = 3, cex = 1.4, col = 12,
+#      labels="Geochemical data for international samples of whole rocks (USGS)")
+text(-0.025,0.1, pos = 4, font = 3, family = 'serif', cex = 1.5, col = "#636363",
+     labels="Andrew Rate, School of Agriculture and Environment, The University of Western Australia")
+plot(1,1, axes=F, type="n",xaxt="n", yaxt="n",ann=F)
+addImg(logo, x = 1.2, y = 1, width = 0.5)
+par(mar = c(3.5,3.5,0.5,0.5))
+layout(matrix(c(1),nrow = 1))
+```
+
+### Files to use or refer to during the Workshop class
+
+<div style="border: 2px solid #039; padding: 8px;">
+#### Files to download for R Graphics
+<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-24052449_1/xid-24052449_1" target="_blank" rel="noreferrer noopener">![](images/html.png){alt="html file icon" style="border: 0px solid #000000;" height="32" width="32"}</a><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035919_1/xid-45035919_1" target="_blank" rel="noopener">&nbsp;<span style="background-color: #ffff40;">NEW</span>&nbsp;Annotated code for basic R and RStudio Graphics</a></span> &nbsp; &nbsp; &nbsp; <a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-24053058_1/xid-24053058_1"><span style="font-size: medium;">![](images/rcode.png){alt="R code icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;R code (script) file for R Graphics video 1</span></a></p>
+
+<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693508_1/xid-23693508_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;">![](images/csv.png){alt="CSV icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;Hubbard Book soil dataset (required in code for video 1 and&nbsp; pdf)</span></a> &nbsp; &nbsp; &nbsp; <a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-23693660_1/xid-23693660_1" target="_blank" rel="noreferrer noopener"><span style="font-size: medium;">![](images/csv.png){alt="CSV icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;sv18 dataset (required in code for video 2)</span></a></p>
+
+<p><span style="font-size: medium;"><a alt="" href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035953_1/xid-45035953_1" target="_blank" rel="noopener">![](images/csv.png){alt="CSV icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;SL18.csv</a><br />used in Annotated code</span> &nbsp; &nbsp; &nbsp; <span style="font-size: 12pt;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035961_1/xid-45035961_1" target="_blank" rel="noopener">![](images/csv.png){alt="CSV icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;sv2017_original.csv</a><br />(just in case!)</span></p>
+
+<p><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035966_1/xid-45035966_1" target="_blank" rel="noreferrer noopener"> <span style="font-size: medium;">![](images/rcode.png){alt="R code icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;Complete R code (script) used in video</span>&nbsp;2</a></span> &nbsp; &nbsp; &nbsp; <a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035853_1/xid-45035853_1" target="_blank" style="font-family: sans-serif; text-shadow: none !important; letter-spacing: normal; margin: 0px; padding: 0px; border: 0px; outline: 0px; font-weight: 400; font-style: normal; font-size: 13px; color: #1874a4; text-decoration: underline; font-variant-ligatures: normal; font-variant-caps: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;" rel="noopener">![](images/rcode.png){alt="R code icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;<span style="font-size: 12pt; font-family: sans-serif;">R code for adding mean symbols to boxplots</span></a><br /><span style="color: #ff0000;">(worth trying!)</span></p>
+</div>
+
+<p>&nbsp;</p>
+
+<div style="border: 2px solid #039; background-color: #fec; padding: 8px;">
+#### Suggested Activities
+<p><span style="font-size: large;"><span style="color: #800000;"><strong>Using data previously provided (on LMS) and the `ggplot2` R package, produce presentation quality graphs of</strong></span>:</span></p>
+<ul>
+<li><span style="font-size: large;">Different probability distributions</span>
+<ul>
+<li><span style="font-size: large;">Cumulative distribution function, histogram, Q-Q plot</span></li>
+</ul>
+</li>
+<li><span style="font-size: large;">Scatterplots </span>
+<ul>
+<li><span style="font-size: large;">Grouped by one or more factors</span></li>
+</ul>
+</li>
+<li><span style="font-size: large;">Histogram, Q-Q plot, Boxplot</li>
+<li>A scatterplot matrix <br /><span style="font-family: courier new, courier;">require(car) &raquo;&raquo; scatterplotMatrix()</span></span></li>
+<ul>
+<li><span style="font-size: large;">(grouped by one or more factors)</span></li>
+</ul>
+</li>
+<li><span style="font-size: large;">Apply principles of graphical excellence</span></li>
+</ul>
+</div>
+
+<p>&nbsp;</p>
+
+# More basic information on plots in **R**
+
+This is a supplement to the other preliminary material on **R** graphics with a
+focus on using the `ggplot2` package. We have tried to avoid too much overlap
+with other sessions.
+
+For the **videos and other materials**, you can visit the 
+<a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-42740881_1/xid-42740881_1" target="_blank" rel="noopener">base-R graphics page</a>.
+
+<p>&nbsp;</p>
+
+<div style="border: 2px solid #600; padding: 8px;">
+## Colours in R
+
+The `palette()` function needs a vector of colour
+names or codes, which we can then refer to by numbers in subsequent functions.
+**R** has over 600 built-in colours, some with nifty names like 
+<span style="font-family:monospace; background-color:#deb887;">&quot;burlywood&quot;</span>, 
+<span style="font-family:monospace; background-color:#1e90ff; color:white;">&quot;dodgerblue&quot;</span>, 
+and <span style="font-family:monospace; background-color:#d8bfd8;">&quot;thistle&quot;</span> 
+&ndash; to see these, run the function `colors()` or run `demo("colors")`.
+
+Colour codes are a character string with 6 or 8 digits or letters after the `#`
+symbol, like `"#A1B2C3"`. In the 6-digit version (the most common), the first 2 
+characters after `#` are a hexadecimal number specifying the intensity of the
+<span style="color:white; background-color:red;">&nbsp;red&nbsp;</span> 
+component of the colour, the next 2 specify 
+<span style="background-color:#00FF00;">&nbsp;green&nbsp;</span>, and the next 2
+<span style="color:white; background-color:blue;">&nbsp;blue&nbsp;</span>. **<span style="font-family:monospace; background-color:#E8E8E8;">#<span style="color:red;">rr</span><span style="color:#00C000;">gg</span><span style="color:blue;">bb</span></span>**
+
+The greatest 2-digit hexadecimal number is `FF`, equal to the decimal number
+255. Since we can include zero, this means there will be 256^3^ = 16,777,216
+unique colours in **R**.
+
+Optionally we can use an 8-character colour code, such as `"#A1B2C399"`, where
+the last 2 characters define the **alpha** value, or colour transparency.
+`"#rrggbb00"` would be fully transparent, and `"#rrggbbFF"` would be fully
+opaque. We can also use the colour name `"transparent"` in **R** which can
+sometimes be useful.
+
+<span style="font-size: 14pt;">**Warning**</span>: semi-transparent colours
+(*i.e*. alpha < 1; anything other than `"#rrggbb"` or `"#rrggbbFF"`) are
+not supported by metafiles in R. To use semi-transparent colours, save as `.png`
+or `.tiff`, or copy as a bitmap.
+
+<span style="font-size: 10pt;">(Some of this information refers to `base-R`, but
+can also be useful for fine-tuning colours using `ggplot2`.)</span>
+</div>
+
+<p>&nbsp;</p>
+
+## Getting started
+
+Before we start we load some **packages** (which we need to have installed
+previously).  We also need to load a **dataset** that we may have seen before
+(the Smith's Lake & Charles Veryard Reserves data from 20217 &ndash; we
+use it a lot for illustrating environmental statistics and plotting).
+
+```{r load-packages-invisibly, message=FALSE, warning=FALSE, include=FALSE}
+library(ggplot2)
+library(viridis)  # colourblind-friendly colour palettes
+library(scico)    # 'scientific' colour palettes
+library(sf)       # spatial package - used later
+library(GGally)   # used later for scatter plot matrix
+library(ggpubr)
+```
+
+```{r read-sv2017, message=FALSE, warning=FALSE, results='hold'}
+library(ggplot2)  # the plotting package used in this page
+library(viridis)  # colourblind-friendly colour palettes
+library(scico)    # 'scientific' colour palettes
+sv2017 <- read.csv(file="sv2017_original.csv", stringsAsFactors = TRUE)
+sv2017$Group <- as.factor(sv2017$Group)
+```
+
+We then make an *xy*-plot (Figure \@ref(fig:ggplot-scatter-reglines)) using the 
+`geom_point()` function from the `ggplot2` package, making a custom palette with 
+`scale_color_viridis_d()`.
+
+```{r ggplot-scatter-reglines, fig.height=3.5, fig.width=5, message=FALSE, warning=FALSE, fig.cap="Plot of calcium (Ca) vs. pH for different sample types from Smith's Lake and Charles Veryards Reserves in 2017 (`sv2017`), showing regression lines by Type."}
+spgg <- ggplot(sv2017, aes(x=pH, y=Ca, col=Type, shape=Type)) +
+  geom_point(size=2.2) +
+  scale_y_log10() + 
+  scale_color_viridis_d(end=0.55, 
+                      option="inferno") +
+  theme_bw()
+spgg + geom_smooth(method="lm", se=F, linewidth=0.5)
+```
+
+<p>&nbsp;</p>
+
+```{r pch-map-png, message=FALSE, warning=FALSE, include=FALSE}
+png(filename="./Learn_R-2023-Week_1a_graphs_files/figure-html/pch_map.png",
+    width = 1920, height = 300)
+x <- rep(1:13,2)
+y <- rep(seq(2,1,-1),each=13)
+par(mar=c(1,1,1,1), lend="square", ljoin="mitre")
+plot(x, y,
+     pch=0:25,xlim=c(0.5,13.5),ylim=c(0.5,2.5),col="navy",bg="gold", lwd=3,
+     xaxt="n",xlab="",yaxt="n",ylab="", cex=6, bty="n")
+text(x, y, labels=0:25, cex=3, pos=2, offset = 2)
+dev.off()
+```
+
+<div style="border: 2px solid #039; padding: 8px;">
+### Plot symbols
+
+**R** has a set of 26 built-in plotting symbols which can be specified using the 
+`shape = ` argument in many `ggplot2` functions.<br /> 
+In `base-R`, the outline colour is set for symbols 0-20 using the argument `col
+=`. For symbols 21-25 `col =` sets the border colour, and the fill colour is set
+with `bg =`.
+
+![](./Learn_R-2023-Week_1a_graphs_files/figure-html/pch_map.png)
+
+<center>For all symbols above, `col="navy"` and for pch 21-25 `bg="gold"`.</center>
+
+```{r just-to-see-it-dontrun, eval=FALSE, fig.height=3, fig.width=3, include=FALSE}
+ggpubr::show_point_shapes() + theme_void()
+```
+</div>
+
+<p>&nbsp;</p>
+
+### Histogram with density line
+
+Adding a density line to a histogram like the one in Figure 
+\@ref(fig:gg-hist-density) can help us identify *bimodal distributions*, or see 
+more easily if the distribution is symmetrical or not.
+
+```{r gg-hist-density, message=FALSE, warning=FALSE, fig.cap="Histogram of EC from the sv2017 data with density line plot added."}
+ggh <- ggplot(data=sv2017, mapping=aes(x=log10(EC))) +
+  geom_histogram(fill="lightgray", color="black", linewidth=0.3,
+                 binwidth = 0.1, boundary=0) + 
+  theme_bw()
+ggh + geom_density(col="blue3")
+```
+
+<p>&nbsp;</p>
+
+### Boxplot by groups
+
+We also made a grouped box plot like the one in Figure \@ref(fig:boxplot-by-groups) in a previous session.
+
+```{r boxplot-by-groups, fig.cap="Boxplot of Cu by Type created using `ggplot2`, showing mean values as blue plus (+)  This version is drawn to resemble a `base-R` plot.", fig.height=3.5, fig.width=5, message=FALSE, warning=FALSE}
+# make an object containing a table of means
+Cu_means <- data.frame(meanCu=tapply(log10(sv2017$Cu), sv2017$Type, mean, na.rm=T))
+# plot the boxplot with nice axis titles etc.
+ggbx <- ggplot(data=sv2017, mapping = aes(x=Type, y=log10(Cu))) +
+  geom_boxplot(fill="seashell")
+ggbx <- ggbx + geom_point(data=Cu_means, mapping=aes(x=c(1:nrow(Cu_means)),
+                  y=meanCu), shape=3, size=2.5, col="royalblue", stroke=1)
+ggbx + geom_hline(yintercept = log10(65), col="red3",size=0.3,
+                  linetype="dashed") + 
+  annotate("text", x=2.9, y = log10(65), label = "Sediment DGV Cu 65 mg/kg", 
+           vjust = -0.5, col="red3", size=3) + 
+  annotate("text", x=2.2, y=0.4, label = "+", 
+           hjust = 0, col="royalblue", size=6.5) + 
+  annotate("text", x=2.2, y=0.4, label = " \u00a0 \u00a0 Mean Cu concentrations", 
+           hjust = 0, col="royalblue", size=3.5) +
+  theme_bw()
+```
+
+<hr style="height: 1px; background-color: #5560A4;" />
+
+```{r boxplot-groups-gg2, fig.cap="Boxplot of Cu by Type created using `ggplot2`, showing mean values as blue plus (+)  This version is drawn in a style more closely resembling a `ggplot2` style.", fig.height=3.5, fig.width=5, message=FALSE, warning=FALSE}
+# make an object containing a table of means
+Cu_means <- data.frame(meanCu=tapply(log10(sv2017$Cu), sv2017$Type, mean, na.rm=T))
+# plot the boxplot with nice axis titles etc.
+cols <- c("Mean"="royalblue", "DGV"="red3")
+lineTypes <- c("DGV"=2)
+ggplot(data=sv2017, mapping = aes(x=Type, y=log10(Cu))) +
+  geom_boxplot(fill="seashell", shape=1) +
+  labs(y=expression(paste(log[10],"[Cu]"))) +
+  geom_point(data=Cu_means, mapping=aes(x=c(1:nrow(Cu_means)),
+                  y=meanCu, col="Mean"), shape=3, size=2.5, stroke=1) +
+  geom_hline(yintercept = log10(65), col="red3", size=0.3,
+                  linetype=2) + 
+  scale_color_manual(name="", values=cols, 
+                     guide=guide_legend()) +
+  annotate("text", x=2.9, y = log10(65), label = "Sediment DGV\nCu 65 mg/kg", 
+           vjust = 0.5, col="red3", size=3.5) + 
+  theme_bw()
+```
+
+```{r rm-Cu-means, message=FALSE, warning=FALSE, include=FALSE}
+rm(Cu_means)
+```
+
+<p>&nbsp;</p>
+
+### Scatterplot of water sample points by group
+
+First read the water data (from Smith's Lake, North Perth, sampled in 2018). 
+We convert to a spatial object to use the `geom_sf()` function in `ggplot2`, as
+this makes the most sense for these data (we need to load the `sf` package first).
+
+```{r}
+SL_water <- read.csv(file="SL18.csv", stringsAsFactors = TRUE)
+SL_water$Group <- as.factor(SL_water$Group)
+library(sf)
+SL_water_sf <- sf::st_as_sf(SL_water, coords=c("Easting","Northing"), 
+                            remove=FALSE, crs=sf::st_crs(32750))
+```
+
+We can then use `geom_sf()` from the `ggplot2` package to plot the points. 
+Other important statements in the `ggplot2` code in this example (Figure 
+\@ref(fig:gg-SL-water)) are:
+
+- use `fill=Group` instead of `color=Group` since we are using fillable symbols (numbers 21-25, see **Plot symbols** section above)
+- `coord_sf(...)` to use UTM Zone 50S coordinates (otherwise `geom_sf()` will convert to Longitude-Latitude)
+- `scale_shape_manual(...)` to manually set which plot symbols we want (otherwise some groups will be omitted by `ggplot2`)
+- `scale_x_continuous(...)` to ‘declutter’ the x-axis labels
+- `annotate(...)` to add text labels
+- `scale_color_viridis_d()` to choose our colour palette
+- `theme_bw()` to use a plot theme other than the `ggplot2` default
+
+```{r gg-SL-water, fig.height=5, fig.width=5, message=FALSE, warning=FALSE, fig.cap="Map-style plot of water sampling points in Smith's Lake in 2018."}
+ggplot(data=SL_water_sf, 
+       mapping=aes(x=Easting, y=Northing, fill=Group, shape=Group)) +
+  geom_sf(size=2.5) + # set symbol size and outline width 
+  coord_sf(datum=st_crs(32750)) +
+  scale_shape_manual(values=c(21:25,21:24)) +
+  scale_x_continuous(breaks=seq(391325,391450,25)) +
+  annotate("text", x=c(391385,391390), y = c(6466515,6466403), 
+           label = c("Inlet","Outlet"), 
+           vjust = 0.5, col="steelblue4", size=3.5) + 
+  scale_fill_viridis_d(alpha=0.8) + theme_bw()
+```
+
+<p>&nbsp;</p>
+
+<hr />
+
+> "...when we look at the **graphs of rising ocean temperatures**, rising carbon 
+> dioxide in the atmosphere and so on, we know that they are climbing far more 
+> steeply than can be accounted for by the natural oscillation of the weather ... 
+> What people (must) do is to change their behavior and their attitudes ... If 
+> we do care about our grandchildren then we have to do something, and we have 
+> to demand that our governments do something."
+>
+> &mdash; David Attenborough
+
+<hr />
+
+## Customising `ggplot2` features
+
+In contrast with `base-R` plotting, we don't use the `par()` function to control
+any plotting features. One of the ideas of `ggplot2` is to produce plots which 
+look good without customisation &ndash; but we still often need to “tweak” the 
+output. Actually, we have done this with some of the examples above already: 
+*e.g*. Figures \@ref(fig:ggplot-scatter-reglines), \@ref(fig:boxplot-groups-gg2), and \@ref(fig:gg-SL-water).
+
+First we read some more data to illustrate some ideas:
+
+```{r}
+sv18 <- read.csv("sv18.csv", stringsAsFactors = TRUE)
+sv18$Group <- as.factor(sv18$Group)
+```
+
+In the plots that follow, our "default setting" will be to use the `theme_bw()` 
+theme to set the plot appearance. Otherwise we will build on the usual `ggplot2` 
+default settings.
+
+### 1. Using *xy*-plot (`geom_point`) to explore ways of changing plot features
+
+```{r Ca-pH-gg-basic, fig.height=3.5, fig.width=5, fig.cap="Default ggplot of Ca *vs*. pH.", message=FALSE, warning=FALSE}
+ggplot(data=sv18, mapping=aes(x=pH, y=Ca)) +
+    theme_bw() +
+    geom_point()
+```
+
+<p>&nbsp;</p>
+
+### 2. Resizing axis labels in `ggplot2`
+
+For many plot features in `ggplot2` we need to customise the plot `theme`. An 
+axis label is referred to as an **`axis.title`** in `ggplot2`.
+
+```{r Ca-pH-gg-big-labels, fig.height=3.5, fig.width=5, fig.cap="Plot of Ca *vs*. pH using `ggplot2`, showing how to resize axis labels (we've also made them a different colour to be really obvious).", message=FALSE, warning=FALSE}
+ggplot(data=sv18, mapping=aes(x=pH, y=Ca)) +
+  geom_point() + 
+  theme_bw() +
+  theme(axis.title = element_text(size=18, colour="red2")) # text size in points
+```
+
+<p>&nbsp;</p>
+
+### 3. Resizing axis labels, tick labels, and symbol sizes in `ggplot2`
+
+For many plot features in `ggplot2` we need to customise the plot `theme`. An 
+axis label is referred to as an **`axis.title`** in `ggplot2`.
+
+```{r Ca-pH-gg-resizing, fig.height=3.5, fig.width=5, fig.cap="Plot of Ca *vs*. pH using `ggplot2`, showing how to resize axis labels (and symbol sizes).", message=FALSE, warning=FALSE}
+ggplot(data=sv18, mapping=aes(x=pH, y=Ca)) +
+  geom_point(size=2.5) + # default size = 1.5 
+  theme_bw() +
+  theme(axis.title = element_text(size=18), # axis.title is axis label
+        axis.text = element_text(size=16)) # axis.text is the tick labels
+```
+
+<p>&nbsp;</p>
+
+### 4. Transforming plot axes in `ggplot2`
+
+To log~10~-transform axis scales in `ggplot2` we add a statement using the 
+`scale_x_log10()` and/or the `scale_y_log10()` functions. There are several 
+different types of scaling function available, *e.g*., `scale_x_sqrt()`, 
+`scale_y_reverse()`.
+
+```{r Ca-pH-gg-logy, fig.height=3, fig.width=4, fig.cap="Plot of Ca *vs*. pH using `ggplot2`, showing how to log10-transform an axis scale.", message=FALSE, warning=FALSE}
+ggplot(data=sv18, mapping=aes(x=pH, y=Ca)) +
+  geom_point(colour="dodgerblue") + # changing the default symbol colour too! 
+  scale_y_log10() +
+  theme_bw() +
+  theme(axis.title = element_text(face="bold")) # # axis.title is axis label
+```
+
+<p>&nbsp;</p>
+
+### 5. Plots in `ggplot2` which show grouping by factor levels
+
+To group points or other plot features by a factor, we need to associate that
+factor with the property we want to change (*e.g*. `colour`, `shape`, `size`) 
+in the `aes()` statement. In Figure \@ref(fig:Zn-Fe-gg-by-groups) below, we plot 
+zinc (Zn) *vs*. iron (Fe), showing points in different sample types by including 
+`colour=Type, shape=Type` in the `aes()` statement.
+
+If we associate a variable with `size`, we can create a bubble plot &ndash; this
+is useful for [making distribution maps of variables](https://lms.uwa.edu.au/bbcswebdav/xid-45554160_1){target="_blank"}. Try it!
+
+```{r Zn-Fe-gg-by-groups, fig.height=3, fig.width=4.5, fig.cap="Plot of Ca *vs*. pH using `ggplot2`, showing how to separate points into different groups based on factor levels.", message=FALSE, warning=FALSE}
+ggplot(data=sv18, mapping=aes(x=Fe, y=Zn, colour=Type, shape=Type)) +
+  geom_point() + 
+  scale_x_log10() + scale_y_log10() +
+  theme_bw() +
+  theme(axis.title = element_text(face="bold"))
+```
+
+<p>&nbsp;</p>
+
+### 5. Using custom colours in `ggplot2` 
+
+If we're not happy with the default colours, there are many different ways to
+customise plot colours in `ggplot2`. The statements needed are all of the type
+`scale_color_xxxxx()`, depending on what type of colour scale or palette is
+needed.
+
+The code for the plot in Figure \@ref(fig:Zn-Fe-gg-groups-recol) uses 
+`scale_color_manual` to specify custom colours for the points. If we didn't 
+include enough colours for the levels in the factor (*i.e*. 3 levels in `Type`), 
+we would get an error message.
+
+```{r Zn-Fe-gg-groups-recol, fig.height=3, fig.width=4.5, fig.cap="Plot of Ca *vs*. pH using `ggplot2`, showing how to separate points into different groups based on factor levels.", message=FALSE, warning=FALSE}
+ggplot(data=sv18, mapping=aes(x=Fe, y=Zn, colour=Type, shape=Type)) +
+  geom_point(size=2) + 
+  scale_color_manual(values=c("darkred","gold3","royalblue")) +
+  scale_x_log10() + scale_y_log10() +
+  theme_bw() +
+  theme(axis.title = element_text(face="bold"))
+```
+
+<p>&nbsp;</p>
+
+### 5. Multiple-frame plots in `ggplot2` 
+<p>If we want to plot multiple plots on a page, we can't do this in `ggplot2` 
+using the `mfrow` argument in `par()`.</p>
+<p>Instead, we would need to use another **R** package in the `gg` family 
+called `ggpubr`, which has the `ggarrange` function allowing multiple ggplots on
+the same page. An example is shown in Figure \@ref(fig:ggplot-3x1).
+
+```{r ggplot-3x1, fig.height=3, fig.width=9, fig.cap="Example of multiple `ggplot2` plots per frame using `ggarrange()` from the `ggpubr` package.", message=FALSE, warning=FALSE}
+library(ggpubr)
+scatter <- ggplot(data=sv18, mapping=aes(x=Al, y=Fe)) + geom_point()
+boxes <- ggplot(data=sv18, mapping = aes(x=Type, y=Fe)) +   geom_boxplot()
+histo <- ggplot(data=sv18, mapping=aes(x=Al)) + geom_histogram()
+ggarrange(scatter, boxes, histo, nrow=1)
+```
+
+<p>&nbsp;</p>
+
+### Plots of variable distributions
+
+Cumulative Distribution Function using `plot.ecdf()`. The custom *y*-axis label
+explains the plot! <br>
+(note use of `\u` to insert a Unicode character by its 4-digit code 
+[Unicode character 2264 is 'less than or equal to' (&le;)] )
+
+```{r ecdfPlot-pH, fig.height=3, fig.width=4, fig.cap="Cumulative distribution of pH in the sv18 dataset.", message=TRUE, warning=FALSE}
+ggplot(sv18, aes(pH)) + stat_ecdf(geom="step") + 
+  labs(y="Proportion of samples with pH \u2264 x")
+```
+
+<p>&nbsp;</p>
+
+A better cumulative plot is the normal quantile or 'q-q' plot
+specially transformed axes mean that a normally distributed variable
+will plot as a straight line. We use `geom_qq()` too add the points and 
+`geom_qq_line()` to show the theoretical line for a normal distribution.
+
+```{r qqplot-pH, fig.cap="Normal quantile (QQ) plot of soil pH in the sv18 dataset.", fig.height=3, fig.width=4, message=FALSE, warning=FALSE}
+ggplot(data=sv18, aes(sample=pH)) + geom_qq() + geom_qq_line() + 
+  labs(x="Theoretical normal distribution quantiles", y="pH") + theme_bw()
+```
+
+<p>&nbsp;</p>
+
+We can group q-q&ndash;plots by a factor:
+
+```{r qq-byfactor, fig.height=3, fig.width=4.5, message=FALSE, warning=FALSE}
+ggplot(data=sv18, aes(sample=Fe, col=Type)) + geom_qq() + geom_qq_line() + 
+  labs(x="Theoretical normal distribution quantiles", 
+       y="pH") + theme_bw()
+# with(sv18, qqPlot(Na ~ Type, 
+#        xlab="Theoretical normal distribution quantiles",
+#        ylab="Soil pH"))
+```
+
+<p>&nbsp;</p>
+
+Here's another customization of **histograms** &ndash; we've seen these in a previous
+Workshop. Adding a reference concentration shows what proportion of samples have
+concentrations exceeding this value (or not).
+
+```{r hist-abline, fig.cap="Histogram of Zn in the sv18 data with a vertical line representing an environmental threshold.", fig.height=3, fig.width=4}
+ggplot(data=sv18, aes(x=log10(Zn))) + 
+  geom_histogram(fill="lightgray", color="black", linewidth=0.3,
+                 binwidth = 0.2, boundary=0) + 
+  labs(x = expression(paste(log[10],"Zn")), y = "Frequency") + 
+  geom_vline(xintercept = log10(410), col="red3", size=0.3,
+                  linetype="dashed") + 
+  annotate("text", x=log10(450), y = 10, label = "Sediment DGV\nZn 410 mg/kg", 
+           hjust = 0, col="red3", size=3) +
+  theme_classic()
+```
+
+<p>&nbsp;</p>
+
+### Depth profile scatter plots in `ggplot2`
+
+In this plot we show one way to informatively plot a concentration
+*vs*. sediment/soil depth, with depth displayed vertically, and increasing 
+downwards, as we would expect in the real world. Note:
+
+- `x=Fe, y=Depth.mean` to have our dependent variable (Fe) on the *x*-axis
+- `col=Group, shape=Group` to have colours and symbols differ by group
+- use of the `scico 'lajolla'` palette for nice soil-y colours!
+- `scale_shape_manual(values=seq(0:12))` so we have enough plot symbols available
+- `scale_y_reverse()` so depth increases **downwards**
+- `scale_x_continuous(position="top")` gets the *x*-axis on the top
+
+```{r gg-depth-profile, fig.height=5, fig.width=3.6, fig.cap="Plots of Fe vs. depth measurements in the sv18 data."}
+sv18$Depth.mean <- (sv18$Depth_upper+sv18$Depth_lower)/2
+ggplot(data=sv18, mapping=aes(x=Fe, y=Depth.mean, col=Group, shape=Group)) + 
+  labs(x="Fe (mg/kg)", y="Mean sample depth (cm)") +
+  geom_point(stroke=1.2) +
+  scale_color_scico_d(palette="lajolla", direction=-1, begin=0.2, end=0.8) +
+  scale_shape_manual(values=seq(0:12)) +
+  scale_y_reverse(limits=c(100,0)) +
+  scale_x_continuous(position="top") + 
+  theme_bw() + theme(axis.title = element_text(face="bold"))
+```
+
+<p>&nbsp;</p>
+
+### Scatterplot matrices
+
+A scatterplot matrix can be a very useful data exploration tool (for the most
+effective visualization, you might need to change the default colours).
+
+Scatterplot matrices are available using the `ggpairs()` function from the 
+`GGally` package. 
+
+The most basic implementation is plotting without grouping by a Factor variable.
+Note the different way in which the variables (a list starting with `~` and separated by `+`) and data frame (`data=`) are specified. 
+The smoothed trend through the points can be included by changing the `smooth=`
+argument to `smooth=TRUE`.
+
+A very useful feature of scatter plot matrices is the display of each variable's
+*distribution along the diagonal* of the plot matrix. In the example in Figure \@ref(fig:spm-ungrouped), we can see that all variables have a positively skewed distribution (which might be made more symmetrical by log-transformation).
+
+```{r spm-ungrouped, fig.height=7, fig.width=7.5, fig.cap="Scatter plot matrix of Al, Ca, Fe, and Na concentrations in sediment + soil + street dust samples from Smith's Lake and Charles Veryard Reserves, North Perth, WA, sampled in 2018. Note the log10-transformed axes.", warning=FALSE, message=FALSE}
+library(GGally)
+ggpairs(sv18, columns = c("Al","Ca","Fe","S")) +
+  scale_x_log10() + scale_y_log10() + theme_bw()
+```
+
+<p>&nbsp;</p>
+
+To distinguish the points according to the categories in a Factor variable, we
+(as usual) associate the factor with plot properties within `aes(...)`. 
+We also see the distributions separated by group along the diagonal, but this 
+looks a bit weird, unfortunately (probably because we used `scale_?_log10()` for
+both *x* and *y* axes).
+
+Separating the plots by a factor allows us to see if trends are consistent
+between groups, or if groups behave very differently. [If you don't want to
+bother with the `scico` package, use `col = c("#EDB256", "#AC4A44", "#191900")`
+for the same result.]
+
+```{r spm-by-group, fig.height=6, fig.width=6, fig.cap="Scatter plot matrix of Al, Ca, Fe, and Na concentrations in samples from Smith's Lake and Charles Veryard Reserves, North Perth, WA, sampled in 2018 and grouped by sample type (sediment, soil, or street dust). Note the log10-transformed axes.", message=FALSE, warning=FALSE}
+ggpairs(sv18, columns = c("Al","Ca","Fe","S"), aes(color=Type, shape=Type)) +
+  scale_color_viridis_d(option="plasma", begin=0.2, end=0.7) +
+  scale_x_log10() + scale_y_log10() + theme_bw()
+```
+
+<p>&nbsp;</p>
+
+### Simple maps
+
+```{r ggmap-fyi, fig.height=4, fig.width=4.5, message=FALSE, warning=FALSE, echo=FALSE}
+library(ggmap)
+register_google(key=read.csv("gmapskey.csv")[1,1])
+slmap <- get_googlemap(center=c(115.851,-31.9325), zoom = 19, maptype="terrain")
+SL_water_ll <- st_transform(SL_water_sf, crs=st_crs(4326))
+SL_water_ll$lon <- st_coordinates(SL_water_ll)[,1]
+SL_water_ll$lat <- st_coordinates(SL_water_ll)[,2]
+ggmap(slmap) + 
+  #coord_sf(datum=st_crs(32750)) +
+  geom_sf(data=SL_water_ll,
+          aes(fill=Group, shape=Group), size=2, inherit.aes = F) +
+  annotate("text", x=c(115.85101,115.85105), y = c(-31.93215,-31.93315), 
+           label = c("Inlet","Outlet"), 
+           vjust = 0.5, col="steelblue4", size=3.5) + 
+  scale_shape_manual(values=c(21:25,21:24)) +
+  scale_fill_viridis_d(alpha=0.8) + theme_void()
+```
+
+Maps are [mostly] just scatterplots with a map background &ndash; we will spend 
+a [separate session on maps in R
+later](https://lms.uwa.edu.au/bbcswebdav/xid-45554160_1){target="_blank"} making
+use of the `ggmap` **R** package, which has a lot in common with `ggplot2`
+including use of `geom_sf()`.
+
+<hr style="height: 1px; background-color: #5560A4;" />
+
+### Pretty palettes
+
+(See the code at the end)
+
+![](images/pretty-palettes.png){align="center"}
+
+## References and R Packages
+
+Garnier S, Ross N, Rudis R, Camargo AP, Sciaini M, Scherer C (2021). *Rvision - Colorblind-Friendly Color Maps for R*. R package version 0.6.2. [https://sjmgarnier.github.io/viridis/](https://sjmgarnier.github.io/viridis/){target="_blank"} (`viridis` package).
+
+Kahle, D. and Wickham, H. `ggmap`: Spatial Visualization with `ggplot2`. *The R Journal*, **5**(1), 144-161. [http://journal.r-project.org/archive/2013-1/kahle-wickham.pdf](http://journal.r-project.org/archive/2013-1/kahle-wickham.pdf){target="_blank"}.
+
+Kassambara, A. (2020). *`ggpubr`: `ggplot2` Based Publication Ready Plots*. R package version 0.4.0, [https://CRAN.R-project.org/package=ggpubr](https://CRAN.R-project.org/package=ggpubr){target="_blank"}.
+
+Pebesma, E., 2018. Simple Features for R: Standardized Support for
+Spatial VectorData. *The R Journal* **10** (1), 439-446,
+[https://doi.org/10.32614/RJ-2018-009](https://doi.org/10.32614/RJ-2018-009){target="_blank"} . (package `sf`)
+
+Pedersen T, Crameri F (2023). *scico: Colour Palettes Based on the Scientific Colour-Maps*. R package version 1.4.0, [https://CRAN.R-project.org/package=scico](https://CRAN.R-project.org/package=scico){target="_blank"}.
+
+Schloerke B, Cook D, Larmarange J, Briatte F, Marbach M, Thoen E, Elberg A, Crowley J (2021). *GGally: Extension to `ggplot2`*. R package version 2.1.2, [https://CRAN.R-project.org/package=GGally](https://CRAN.R-project.org/package=GGally){target="_blank"}.
+
+Wickham, H. *`ggplot2`: Elegant Graphics for Data Analysis*. Springer-Verlag New York, 2016. [https://ggplot2.tidyverse.org](https://ggplot2.tidyverse.org){target="_blank"}.
+
+<p>&nbsp;</p>
+
+```{r fave-palettes-notrun, eval=FALSE}
+# first load and run code to make UWAcolgrad() function
+# for help download the UWAcolgrad.R file itself and look inside!
+source("https://github.com/Ratey-AtUWA/Learn-R/raw/main/UWAcolgrad.R")
+np <- 32
+par(mar=rep(0.5,4), xpd=TRUE)
+plot(0:1, 0:1, ann=F, axes = F, type="n", ylim=c(-0.1,1))
+points(seq(0,1,l=np),rep(1,np),pch=22,bg=viridis(np),cex=4)
+text(0.5,0.98,labels=paste0("viridis::viridis(",np,")"),pos=1, cex=1.4, family="mono")
+points(seq(0,1,l=np),rep(0.85,np),pch=22,bg=plasma(np),cex=4)
+text(0.5,0.83,labels=paste0("viridis::plasma(",np,")"),pos=1, cex=1.4, family="mono")
+points(seq(0,1,l=np),rep(0.7,np),pch=22,bg=cividis(np),cex=4)
+text(0.5,0.68,labels=paste0("viridis::cividis(",np,")"),pos=1, cex=1.4, family="mono")
+points(seq(0,1,l=np),rep(0.55,np),pch=22,bg=scico(np, palette = "hawaii"),cex=4)
+text(0.5,0.53,labels=paste0("scico(",np,", palette='hawaii')"),pos=1, cex=1.4, family="mono")
+points(seq(0,1,l=np),rep(0.4,np),pch=22,bg=scico(np, palette = "lajolla"),cex=4)
+text(0.5,0.38,labels=paste0("scico(",np,", palette='lajolla')"),pos=1, cex=1.4, family="mono")
+points(seq(0,1,l=np),rep(0.25,np),pch=22,bg=scico(np, palette = "batlow"),cex=4)
+text(0.5,0.23,labels=paste0("scico(",np,", palette='batlow')"),pos=1, cex=1.4, family="mono")
+points(seq(0,1,l=np),rep(0.1,np),pch=22,bg=UWAcolgrad(np),cex=4)
+text(0.5,0.08,labels=paste0("UWAcolgrad(",np,")"),pos=1, cex=1.4, family="mono")
+points(seq(0,1,l=np),rep(-0.05,np),pch=22,bg=UWAcolgrad(np, saturated = TRUE),cex=4)
+text(0.5,-0.07,labels=paste0("UWAcolgrad(",np,", saturated=TRUE)"),pos=1, cex=1.4, family="mono")
+```
+
+<p>&nbsp;</p>
