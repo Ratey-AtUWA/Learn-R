@@ -1,5 +1,5 @@
 ---
-title: "Week 1 ENVT3361 Workshop"
+title: "R Basics with base-R and ggplot2 plotting"
 output: 
   bookdown::html_document2:
     fig_width: 6.16
@@ -196,6 +196,12 @@ into R. [NOTE that other variable types are possible such as character
   > &mdash; Mark Twain
 
 <hr style="height: 1px; background-color: #5560A4;" />
+
+<div style="border: 2px solid #039; background-color:#e8e8e8; padding: 8px;">
+The following section describes how to make graphs and plots in base-**R** and 
+in the `ggplot2` package. [Go to this page](Learn_R-2023-Week_1_basics.html) if
+you want base-R only, without the `ggplot2` material. 
+</div>
 
 # Base R plotting: x-y plot using `plot()`
 
@@ -495,9 +501,10 @@ bps <- with(hubbard[which(hubbard$Rel.To.Brook=="South"),],
             boxplot.stats(MOISTURE.pct))
 arrows(rep(2.7,5), bps$stats, c(2.22,2.4,2.4,2.4,2.22), bps$stats, angle=15, 
        length=0.08, col="steelblue")
-text(c(rep(2.7,5),2), c(bps$stats, mean(bps$out)), pos=4, 
+text(c(rep(2.7,5),2), c(bps$stats, 19.7), pos=4, 
      labels=c("lower whisker","lower hinge","median","upper hinge",
-              "upper whisker","\u2191\npotential\noutliers\n\u2193"), col="steelblue")
+              "upper whisker","\u2510\nsymbols\nare\npotential\noutliers\n\u2518"), 
+     col="steelblue")
 ```
 
 <p>&nbsp;</p>
@@ -623,6 +630,11 @@ write.table(mytable,"clipboard",sep="\t")
 cat("\nThe table has now been copied to the clipboard, so you can paste it into Excel!\n")
 ```
 
+&#185;Hints: we have made two data frame objects, one from the output of
+`numSummary()`; `t()` is the transpose function; there are also some other
+useful functions which might be new to you like: `row.names()`, `cbind()`,
+`print()`, `write.table()` . . .
+
 If you want to take this further, we can start making really nice Tables for
 reports with various **R** packages. I use the `flextable` package (Gohel &
 Skintzos, 2022) and sometimes the `kable()` function from the `knitr` package.
@@ -631,29 +643,22 @@ table object `mytable` made above:
 
 ```{r flextable-demo, message=FALSE, warning=FALSE, paged.print=FALSE}
 library(flextable)
-flextable(data.frame(Statistic=row.names(mytable),mytable)) |>
+flextable(data.frame(Statistic=row.names(mytable),signif(mytable,3))) |>
   bold(bold=TRUE, part="header") |>
-  set_caption(caption="Table created by the flextable R package. Many more table formatting options are available in this package.")
+  set_caption(caption="Table created by the `flextable` R package. Many more table formatting, text formatting, and number formatting options are available in this package.")
 ```
 
 <p>&nbsp;</p>
 
-<hr style="height: 2px; background-color: #5560A4;" />
-
-&#185;Hints: we have made two data frame objects, one from the output of
-`numSummary()`; `t()` is the transpose function; there are also some other
-useful functions which might be new to you like: `row.names()`, `cbind()`,
-`print()`, `write.table()` . . .
-
-<table border=1><tr><td>
+<div style="border: 2px solid #039; padding: 8px;">
 <span style="font-size: 14pt;">The following two excellent websites can extend your basic knowledge of using **R** and RStudio:</span>
 
 - A great free resource for **R** beginners is [An Introduction to R](https://intro2r.com/) by Alex Douglas, Deon Roos, Francesca Mancini, Ana Couto & David Lusseau.
  
 - [Getting used to R, RStudio, and R Markdown](https://bookdown.org/chesterismay/rbasics/){target="_blank"} is an awesome (and free) eBook by Chester Ismay which is super-helpful if you want to start using **R Markdown** for reproducible coding and reporting.
-</td></tr></table>
+</div>
 
-<p>&nbsp;</p>
+<hr style="height: 2px; background-color: #5560A4;" />
 
 ## References
 

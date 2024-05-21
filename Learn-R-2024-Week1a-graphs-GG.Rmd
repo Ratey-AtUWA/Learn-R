@@ -1,5 +1,5 @@
 ---
-title: "Graphs in R"
+title: "Graphs in R using ggplot2"
 output:
   bookdown::html_document2:
     fig_width: 6
@@ -63,7 +63,7 @@ layout(matrix(c(1),nrow = 1))
 
 <p><span style="font-size: medium;"><a alt="" href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035953_1/xid-45035953_1" target="_blank" rel="noopener">![](images/csv.png){alt="CSV icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;SL18.csv</a><br />used in Annotated code</span> &nbsp; &nbsp; &nbsp; <span style="font-size: 12pt;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035961_1/xid-45035961_1" target="_blank" rel="noopener">![](images/csv.png){alt="CSV icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;sv2017_original.csv</a><br />(just in case!)</span></p>
 
-<p><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035966_1/xid-45035966_1" target="_blank" rel="noreferrer noopener"> <span style="font-size: medium;">![](images/rcode.png){alt="R code icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;Complete R code (script) used in video</span>&nbsp;2</a></span> &nbsp; &nbsp; &nbsp; <a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035853_1/xid-45035853_1" target="_blank" style="font-family: sans-serif; text-shadow: none !important; letter-spacing: normal; margin: 0px; padding: 0px; border: 0px; outline: 0px; font-weight: 400; font-style: normal; font-size: 13px; color: #1874a4; text-decoration: underline; font-variant-ligatures: normal; font-variant-caps: normal; orphans: 2; text-align: left; text-indent: 0px; text-transform: none; white-space: normal; widows: 2; word-spacing: 0px; -webkit-text-stroke-width: 0px;" rel="noopener">![](images/rcode.png){alt="R code icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;<span style="font-size: 12pt; font-family: sans-serif;">R code for adding mean symbols to boxplots</span></a><br /><span style="color: #ff0000;">(worth trying!)</span></p>
+<p><span style="font-size: medium;"><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035966_1/xid-45035966_1" target="_blank" rel="noreferrer noopener"> <span style="font-size: medium;">![](images/rcode.png){alt="R code icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;Complete R code (script) used in video</span>&nbsp;2</a></span> &nbsp; &nbsp; &nbsp; <a href="https://lms.uwa.edu.au/bbcswebdav/pid-3577359-dt-content-rid-45035853_1/xid-45035853_1" target="_blank" >![](images/rcode.png){alt="R code icon" style="border: 0px solid #000000;" height="32" width="32"}&nbsp;<span style="font-size: 12pt; font-family: sans-serif;">R code for adding mean symbols to boxplots</span></a> <span style="color: #ff0000;">(worth trying!)</span></p>
 </div>
 
 <p>&nbsp;</p>
@@ -96,12 +96,46 @@ layout(matrix(c(1),nrow = 1))
 
 # More basic information on plots in **R**
 
-This is a supplement to the other preliminary material on **R** graphics with a
-focus on using the `ggplot2` package. We have tried to avoid too much overlap
-with other sessions.
+This is a complement to the other preliminary material on **R** graphics with a
+focus on using the **`ggplot2`** package. We have tried to avoid too much
+overlap with other sessions.
 
 For the **videos and other materials**, you can visit the 
-<a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-42740881_1/xid-42740881_1" target="_blank" rel="noopener">base-R graphics page</a>.
+<a href="https://lms.uwa.edu.au/bbcswebdav/pid-3355656-dt-content-rid-42740881_1/xid-42740881_1">
+base-R graphics page</a>. Or, go to the 
+[base-R graphics page](Learn_R-2023-Week_1a_graphs.html) if you're not 
+interested in using `ggplot2`.
+
+<p>&nbsp;</p>
+
+<div style="border: 2px solid #039; background-color: #e8e8e8; padding: 8px;">
+## Graphical Excellence
+
+<span style="font-size: 14pt; background-color:#FFFF80;">In Environmental 
+Science at UWA we try to promote the principles of "**graphical excellence**". 
+This means:</span>
+
+* **Show the data** &ndash; <span style="font-size:10pt; color:#404040;">that is, the data are the important thing we want to communicate in graphics; "looking good" is only useful if it shows the data better!</span>.
+* Give your viewer the **greatest number of ideas** in the **shortest time** with the **least ink** in the **smallest space** (Tufte,&nbsp;1983)^1^
+* Graphical excellence is
+    - almost always **multivariate**...
+    - ...requires **telling the truth** about the data <span style="font-size:10pt; color:#404040;">(no distortions, fair comparisons, *etc*.)</span>.
+    
+**Some practical tips**:
+
+- Increase the default text and symbol sizes 
+- Remove unnecessary lines (*e.g*. `smooth`, `spread` in `car::scatterplot()`)
+- In RStudio, use the Export▾ button » Copy to clipboard » select &#9673;Metafile (best pasting into Word, *etc.*)
+- **Don't** use screen shots, and avoid `.jpg` files, as both can be blurry or grainy
+- Graph plus caption should be self-contained &ndash; we should only need to refer to these to fully understand the graph
+- **Don't** include a title above the plot (in many **R** plots, use the option `main=""`) &ndash; any information describing the plot should be in the caption
+- Transform axes if necessary (using arguments in **R** plotting functions)
+- Use appropriate proportions (width/height) for the plot you are creating
+- Change the default colour palette to a colourblind-friendly palette, *e.g*. from the **R** packages `viridis` or `scico` (see examples [for viridis here](https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html#the-color-scales){target="_blank"} and [for scico here](https://repec.sowi.unibe.ch/stata/palettes/colors.html#scico){target="_blank"})
+    
+<span style="font-size:10pt">^1^ Tufte, E.R., 1983. *The visual display of quantitative information*. Graphics Press, Cheshire, Connecticut, USA.
+</span>
+</div>
 
 <p>&nbsp;</p>
 
@@ -149,8 +183,9 @@ can also be useful for fine-tuning colours using `ggplot2`.)</span>
 
 Before we start we load some **packages** (which we need to have installed
 previously).  We also need to load a **dataset** that we may have seen before
-(the Smith's Lake & Charles Veryard Reserves data from 20217 &ndash; we
-use it a lot for illustrating environmental statistics and plotting).
+(the Smith's Lake & Charles Veryard Reserves data from 2017 &ndash; we
+use it a lot for illustrating environmental statistics and plotting &ndash; 
+you'll need to download it to your working directory first).
 
 ```{r load-packages-invisibly, message=FALSE, warning=FALSE, include=FALSE}
 library(ggplot2)
@@ -568,12 +603,16 @@ Scatterplot matrices are available using the `ggpairs()` function from the
 `GGally` package. 
 
 The most basic implementation is plotting without grouping by a Factor variable.
-Note the different way in which the variables (a list starting with `~` and separated by `+`) and data frame (`data=`) are specified. 
-The smoothed trend through the points can be included by changing the `smooth=`
-argument to `smooth=TRUE`.
+Note the different way in which the variables are specified (*i.e*. including a 
+vector of columns, in this example `columns = c("Al","Ca","Fe","S")` &ndash; the vector can be of column names or column indices/numbers).
 
 A very useful feature of scatter plot matrices is the display of each variable's
-*distribution along the diagonal* of the plot matrix. In the example in Figure \@ref(fig:spm-ungrouped), we can see that all variables have a positively skewed distribution (which might be made more symmetrical by log-transformation).
+*distribution along the diagonal* of the plot matrix. In the example in Figure 
+\@ref(fig:spm-ungrouped), we can see from the diagonal of density plots that all
+variables have approximately symmetrical distributions when
+log~10~-transformed). The scatter plot matrix drawn by `GGally::ggpairs()` also
+includes another useful feature &ndash; the correlation coefficients for each
+pair of variables in the upper triangle of the matrix.
 
 ```{r spm-ungrouped, fig.height=7, fig.width=7.5, fig.cap="Scatter plot matrix of Al, Ca, Fe, and Na concentrations in sediment + soil + street dust samples from Smith's Lake and Charles Veryard Reserves, North Perth, WA, sampled in 2018. Note the log10-transformed axes.", warning=FALSE, message=FALSE}
 library(GGally)
@@ -615,12 +654,15 @@ ggmap(slmap) +
   #coord_sf(datum=st_crs(32750)) +
   geom_sf(data=SL_water_ll,
           aes(fill=Group, shape=Group), size=2, inherit.aes = F) +
-  annotate("text", x=c(115.85101,115.85105), y = c(-31.93215,-31.93315), 
+  annotate("text", x=c(115.85101,115.85105), y = c(-31.93212,-31.93315), 
            label = c("Inlet","Outlet"), 
            vjust = 0.5, col="steelblue4", size=3.5) + 
   scale_shape_manual(values=c(21:25,21:24)) +
-  scale_fill_viridis_d(alpha=0.8) + theme_void()
+  scale_fill_viridis_d(alpha=0.8) + theme_void() +
+  theme(panel.border = element_rect(color="grey40", linewidth=0.5, fill="#ffffff00"))
 ```
+
+<p>&nbsp;</p>
 
 Maps are [mostly] just scatterplots with a map background &ndash; we will spend 
 a [separate session on maps in R
@@ -628,13 +670,19 @@ later](https://lms.uwa.edu.au/bbcswebdav/xid-45554160_1){target="_blank"} making
 use of the `ggmap` **R** package, which has a lot in common with `ggplot2`
 including use of `geom_sf()`.
 
-<hr style="height: 1px; background-color: #5560A4;" />
+<p>&nbsp;</p>
 
 ### Pretty palettes
 
 (See the code at the end)
 
 ![](images/pretty-palettes.png){align="center"}
+
+<p>&nbsp;</p>
+
+> Go to the [base-R graphics page here](Learn_R-2023-Week_1a_graphs.html).
+
+<p>&nbsp;</p>
 
 ## References and R Packages
 
