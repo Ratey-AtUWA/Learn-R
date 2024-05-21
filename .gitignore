@@ -9,7 +9,7 @@ LMSicons.txt
 *.zip
 *.html
 ~$*.*
-/Learn_R*/
+/*_files/
 /eDNA*
 /afw24-plots/
 /Wh*
