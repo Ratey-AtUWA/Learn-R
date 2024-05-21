@@ -286,7 +286,7 @@ by making use of the factors (categories) in the dataset.
 We also need to learn these graphics parameters:
 
 - `col =` plotting colour(s) - it's easiest to use words like "red", "darkblue" and so on<br>
-see https://www.statmethods.net/advgraphs/images/colorchart.png <br>
+see [this R colour chart](https://lms.uwa.edu.au/bbcswebdav/xid-47078256_1){target="_blank"} <br>
 or just run the R function `colors()` for a list of all 657 names!
 
 - `pch =` plot character(s) - numbers from 0 to 24 (run `help(points)` or see <a href="https://bookdown.org/ndphillips/YaRrr/scatterplot-plot.html#symbol-types-pch" target="_blank">this page from YaRrr</a>).
