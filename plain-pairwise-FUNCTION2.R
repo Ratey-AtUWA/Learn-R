@@ -12,7 +12,7 @@ plainPW2 <- function(PWobj){
   colnames(ptable) <- c(1:n0)+1
   r0 <- 1 ; rn <- n0
   for(i in 1:n0){
-    ptable[i,] <- c(rep(NA,16-((rn-r0)+1)),as.numeric(c(tablout[r0:rn,2])))
+    ptable[i,] <- c(rep(NA,n0-((rn-r0)+1)),as.numeric(c(tablout[r0:rn,2])))
     r0 <- rn+1
     rn <- rn+(n0-i)
     }
