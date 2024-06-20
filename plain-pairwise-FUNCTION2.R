@@ -36,7 +36,7 @@ plainPW2 <- function(x, ns.rm=TRUE, alpha=0.05){
     r0 <- rn+1
     rn <- rn+(n0-i)
     }
-  if(ns.rm=TRUE){
+  if(ns.rm==TRUE){
     for(i in 1:ncol(ptable)){
       ptable[which(ptable[, i] > alpha), i] <- "ns"
       }
