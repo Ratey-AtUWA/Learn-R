@@ -8,7 +8,7 @@
 #' at https://github.com/Ratey-AtUWA/eDNA/raw/master/FUN_pairwise_adonis2.R
 #' (must be specified; no default).
 #'
-#' @param ns.rm A logical value which if TRUE (the default) will convert p-values
+#' @param ns.repl A logical value which if TRUE (the default) will convert p-values
 #' less than `alpha` to the string "ns".
 #'
 #' @param alpha The numeric value of the p-value threshold for (non)acceptance of
@@ -20,7 +20,7 @@
 #'
 #' @export
 
-plainPW2 <- function(x, ns.rm=TRUE, alpha=0.05){
+plainPW2 <- function(x, ns.repl=TRUE, alpha=0.05){
   tablout <- data.frame(Pair=rep(NA, length(x)-1),
                         P_value=rep(NA, length(x)-1))
   for(i in 2:length(x)){
@@ -36,7 +36,7 @@ plainPW2 <- function(x, ns.rm=TRUE, alpha=0.05){
     r0 <- rn+1
     rn <- rn+(n0-i)
     }
-  if(ns.rm==TRUE){
+  if(ns.repl==TRUE){
     for(i in 1:ncol(ptable)){
       ptable[which(ptable[, i] > alpha), i] <- "ns"
       }
