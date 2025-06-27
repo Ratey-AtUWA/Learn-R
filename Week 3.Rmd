@@ -1,0 +1,350 @@
+---
+title: "Workshop 3"
+subtitle: "Making and describing data frames"
+author: "Andrew Rate"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+**Scope from LMS Class Schedule**
+
+#### Learning goals
+
+* Making data in R: vectors & data frames
+* Adding new data frame columns
+* Generating basic descriptive statistics
+* Summarising variables in different ways
+
+## Making data in R
+
+In the previous session we covered creating of vector objects and data 
+frames using R code, so here we will do some quick revision.
+
+### Vectors
+
+We've seen how to make vectors using the `c()` function to combine
+vector elements; below we make a vector from a sequence using the
+`seq()` function:
+
+```{r make-vector-using-seq}
+# make a vector called x1
+x1 <- seq(from=10, to=200, by=10)
+x1
+```
+
+We could abbreviate `x1 <- seq(from=10, to=200, by=10)` to 
+`x1 <- seq(10, 200, 10)`, since `from`, `to`, and `by` are the first 
+3&nbsp;options in the `seq()` function, so this is what R expects.
+
+You could also try making a vector using the `rep()` (replicate)
+function (run `?rep` in the console for help).
+
+### Data frames
+
+We made a data frame `brightstars` in the previous sessions using the 
+`data.frame()` function (review that if you need to). Here's another 
+example:
+
+```{r make-data-frame-using-cbind, paged.print=FALSE}
+x2 <- rep(c("a", "b", "c", "d"), 5)
+x3 <- rep(c(TRUE, FALSE), each=10) # note the difference!
+new_data <- data.frame(x1, x2, x3)
+print(new_data)
+```
+
+Instead of defining the contents of the data frame in the
+`data.frame()` function itself, we have used vectors of equal length
+that already exist (`x1`, `x2`, and `x3`).
+
+We can also name the data frame columns if desired, e,g.: 
+
+```{r eval=FALSE}
+new_data <- data.frame(Numbers=x1, Letters=x2, Logical=x3)
+```
+
+**OR** if we already have made the data frame:
+
+```{r eval=FALSE}
+colnames(new_data) <- c("Numbers", "Letters", "Logical")
+```
+
+If we wanted column 2 `x2` to be a factor, we would include the option 
+`stringsAsFactors = TRUE`:
+
+```{r make-data-frame-with-factor}
+new_data <- data.frame(x1, x2, x3, stringsAsFactors = TRUE)
+str(new_data)
+```
+
+### Adding new columns to a data frame
+
+We often add columns to a data frame to calculate a new column from 
+existing data. For example, we may want to log-transform a variable to 
+make its distribution more symmetrical:
+
+```{r add-log-column}
+new_data$x1_log <- log10(new_data$x1) # note we prefer log to base 10
+new_data$x1_log
+cat("\n") # insert line break to separate output
+str(new_data)
+```
+
+Note that there are equivalent ways to do this, as is often the case 
+in R!
+
+```{r add-log-a-different-way}
+new_data$x1_log <- log10(new_data[,1])
+new_data$x1_log
+```
+
+```{r add-log-another-way}
+new_data$x1_log <- with(new_data, log10(x1))
+new_data$x1_log
+```
+
+We can also add new column(s) from an existing object (the added
+object must have the same number of values as each data frame column):
+
+```{r add-colums-using-cbind}
+x4 <- rep(c("V","W","X","Y","Z"), each=4)
+new_data <- cbind(new_data, x4)
+str(new_data)
+```
+
+Finally we can remove unwanted columns from a data frame by assigning
+the special value `NULL` to them. For example, to return to our
+initial data frame:
+
+```{r remove-columns}
+new_data[,4:5] <- NULL
+str(new_data)
+```
+
+## Calculating basic statistics
+
+### Averages and spreads
+
+We're often interested in the distribution of a numeric variable,
+expressed by the central "average" value and the spread of values
+around the average. Average values are commonly the *mean* or
+*median*, and the spread of values is often given as the
+*standard deviation* or *variance*. We also get useful information on
+the spread of values from the *minimum* and *maximum*.
+
+First let's read in some data from a previous session:
+
+```{r read-cities-data, paged.print=FALSE}
+cities <- read.csv("cities.csv", stringsAsFactors = TRUE)
+cities$City <- as.character(cities$City)
+str(cities)
+```
+
+```{r mean}
+mean(cities$Compact)
+```
+
+```{r median}
+median(cities$Compact)
+```
+
+```{r standard-deviation}
+sd(cities$Compact) # standard deviation
+```
+
+```{r variance}
+var(cities$Compact) # variance
+```
+
+```{r minimum}
+min(cities$Compact) # minimum
+```
+
+```{r maximum}
+max(cities$Compact) # maximum
+```
+
+```{r range}
+range(cities$Compact) # maximum AND minimum
+```
+
+Some of this information is calculated by using `summary()` for a 
+single variable (i.e. column in a data frame):
+
+```{r summary-numeric-var}
+sum0 <- summary(cities$Compact)
+sum0
+```
+
+We can access individual statistics this way, but it's easier to use
+the individual functions.
+
+```{r summary-extract-values}
+sum0["Mean"]
+```
+
+> 💡Try calculating some basic statistics for other numeric variables 
+> in the `cities` data frame...
+
+**NOTE**: Some of these simple statistical functions will not handle 
+missing values by default. In R the missing value code is `NA`. 
+For example:
+
+```{r mean-with-missing-value}
+x5 <- c(1,2,4,8,16,NA,32,64,128)
+mean(x5)
+cat("\nNow add the na.rm=TRUE option\n")
+mean(x5, na.rm = TRUE)
+```
+
+> 💡Try calculating the `median`, `sd`, `min`, `max`, 
+> and `range` for `x5`!
+
+
+### Other useful functions
+
+```{r sum-numeric-columns}
+sum(cities$Open)
+sum(x5, na.rm=TRUE)
+```
+
+We can find missing (`NA`) values, or non-missing:
+
+```{r find-missing}
+is.na(x5)
+```
+
+```{r find-non-missing}
+!is.na(x5)
+```
+
+If we want to know the row index number of any missing observation(s), 
+we use `which()`:
+
+```{r using-which}
+which(is.na(x5))
+cat("\n")
+which(!is.na(x5))
+```
+
+### Using `which()` to count values matching a condition
+
+This is an R method we will make use of to make tables for reports 
+later. We just used `which()` above to find the rows which did not 
+contain a missing value `NA` for a variable. In this case the 
+*condition* was `!is.na()`, but we can impose any condition that makes 
+sense for our data. Here are some examples:
+
+```{r which-over-threshold}
+c500 <- which(cities$Compact > 500)
+c500
+```
+
+The next example uses the function `substr()` (*substring*) to shorten
+city names to just the first letter:
+
+```{r which-initial-letter}
+# which city names begin with a selected letter?
+let1 <- "N"
+first <-which(substr(cities$City,1,1)==let1) 
+first
+```
+
+We can use the object containing the row numbers in an index to view
+the rows matching the condition (we also introduce another very useful
+function, `length()`). See if you can follow what is happening here:
+
+```{r which-in-index, paged.print=FALSE}
+len1 <- length(c500)
+cities[c500,1:5]
+cat("There are",len1,"cities with Compact land use > 500.","\n")
+
+len2 <- length(first)
+cat("\nThere are",len2,"cities with English names beginning with",let1,"\n")
+cities[first,1]
+```
+
+### Summaries for non-numeric data
+
+In the `cities` data, we have three factor columns, `Type`, `Global`, 
+and `Region`. The `table()` function will count the number of
+observations in each category (this is called a *contingency table*):
+
+```{r table, echo=-1}
+options(width=100)
+table(cities$Type)
+```
+
+This is similar to using `summary()`...
+
+```{r summary-vs-table, echo=-1}
+options(width=100)
+summary(cities$Type)
+```
+
+...except that `table()` can handle combinations of categories:
+
+```{r two-factor-table}
+table(cities$Type,cities$Global)
+```
+
+> 💡You might like to try different combinations of the factors in the 
+> `cities` data.
+
+## Summaries using `apply()` and related functions
+
+We use the `apply()` function to apply another function over whole 
+columns or rows in a data frame.
+
+Remember that we can calculate the mean for a column like this:
+
+```{r mean2}
+mean(cities$Compact)
+```
+
+The `apply()` function lets us do this calculation for several columns 
+at once. Things to note about the code below:
+
+* we restrict the data to just the numeric columns in `cities` using 
+  the column indices, i.e. `cities[,2:5]`
+* `MARGIN=2` means columns (`MARGIN=1` means rows)
+* `FUN` identifies the function we want to apply – here we calculate 
+  the `mean` of each column
+
+```{r apply-column-means}
+apply(cities[,2:5], MARGIN=2, FUN=mean)
+```
+
+> 💡 try using `apply` to calculate a different statistic for each column
+
+There are several variations on the basic `apply()` function in R. One 
+of the most useful is `tapply()`, which calculates values of a
+function depending on the levels (categories) of a Factor column. For
+example, to calculate the `median` industrial land area (km²) for the
+different levels of city `Type`:
+
+```{r tapply-Industry-Type, echo=-1}
+options(width=100)
+tapply(cities$Industry, INDEX=cities$Type, FUN=median)
+```
+
+> 💡 try using `tapply` with a different column and factor...
+
+Remember that instead of using the `data$column` syntax, we can use
+indices. Check that this code gives the same answer (we're also
+omitting argument names in the `tapply()` function):
+
+```{r tapply using indices}
+tapply(cities[,5], cities[,6], median)
+```
+
+An advantage of using indices is that this form makes it easier to 
+write **programming code** in R using counter variables and loops – 
+as we'll see later!
+
+🔚

@@ -1,0 +1,663 @@
+---
+title: "Workshop 4"
+subtitle: "R programming and high-quality tables"
+author: "Andrew Rate"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*Scope from LMS Class Schedule*
+
+### Learning goals
+
+* Simple R programming: `for()` loops 
+* Indexing using `which()`; transposing using `t()`
+* Making *reporting tables* in R and/or Excel
+
+## Simple programming concepts
+
+There are two key features of programming that enable us to perform 
+quite complex tasks using R (or any programming language). These are:
+
+1. *Loops*, which are sections of code that are repeated for a 
+   selected number of times;
+   
+2. *Conditional statements*, where different code gets run depending 
+on the value of a variable or the results of a calculation 
+(i.e. whether the R code *expression* testing if the condition is
+met results in `TRUE` or `FALSE`).
+
+Loops and conditional statements are examples of 
+"*control structures*" in programming. If you are familiar 
+with another programming language, you will probably recognise some 
+similarities!
+
+## Loops
+
+In ENVT4461 we will use loops generated with the function `for()`. 
+Here's a very simple example for illustration. Take your time with the 
+code so that you understand what is happening.
+
+```{r simple-for-loop}
+my.vector <- c("A",'B','C','D',"E","F","G","H","I","J")
+for(i in 1:10){
+  print(my.vector[i])
+}
+```
+
+> 💡 Try changing `1:10` to `1:5` or `c(2,4,6,8,10)` to 
+> see what happens
+
+Let's examine how `for(i in 1:10) ...` works:
+
+1. We include in the `for()` function a count variable `i` ...
+
+2. ... which takes values `in` (that is, *from*) ...
+
+3. ... a vector defined by 1:10  
+   (this is shorthand for `c(1,2,3,4,5,6,7,8,9,10)`)
+   
+4. After the `for()` function, we enclose the *expression* to be 
+   repeated within curly brackets `{ }`
+   
+5. The opening curly bracket `{` goes on the same line and after the 
+   `for()` statement
+   
+6. The closing curly bracket `}` goes on a new line at the end  
+   (this is conventional and makes the code easier to read.  
+    The format `for(i in 1:10){print(my.vector[i])}` works, but is 
+    congested, and we may want several lines of code between the `{ }`)
+    
+7. The code repeats for all the values in `1:10`, and i takes the 
+   i^th^ value of the vector in each iteration ...
+   
+8. ... so the expression `print(my.vector[i])` outputs the i^th^ item 
+   in `my.vector` each iteration of the loop, since we have made the 
+   index `[i]` 😊
+
+## Conditional statements
+
+The conditional statements we will use have an *if-else* 
+structure. They are built around the R function `if()`. Let's look at 
+a simple example:
+
+```{r simple-if}
+letter <- "L"            # can be upper or lower case in this example!
+FIRST13 <- LETTERS[1:13] # LETTERS and letters are built-in to R
+first13 <- letters[1:13]
+if(letter %in% FIRST13 | letter %in% first13){
+  cat("The letter",letter,"is in the first half of the alphabet")
+} else {
+  cat("The letter",letter,"is in the second half of the alphabet")
+}
+```
+
+> 💡 Try changing the letter (e.g. `letter <- "X"`) to see what 
+> happens
+
+Important things to notice about the `if` code example above:
+
+1. We include an expression to be evaluated inside the `if()` function
+
+2. The code expression(s) to be run depending on the outcome of `if()` 
+   go between `{ }`, similar to the `for()` function
+
+3. In our case, we check if a letter exists in (`%in%`) either of the 
+   vectors `FIRST13` or `first13` (the `|` operator indicates *or*)
+   
+4. If the result of `letter %in% FIRST13 | letter %in% first13` is 
+   `TRUE`, R runs the next line of code, which is  
+   `cat("The letter",letter,"is in the first half of the alphabet")`
+
+5. If the result of `letter %in% FIRST13 | letter %in% first13` is 
+   `FALSE`, R runs the line of code after `} else {`, which is  
+   `cat("The letter",letter,"is in the second half of the alphabet")`
+
+6. *Note* that `} else {` *must* go on its own line
+
+&nbsp;
+
+We can stack several `} else {` lines (combined with `if()`) as in 
+the following example:
+
+```{r}
+char1 <- "2"  # can any character string in this example!
+if(char1 %in% LETTERS){
+  cat(paste0("The character string '", char1,
+             "' is a single upper case letter."),"\n")
+} else if(char1 %in% letters){
+  cat(paste0("The character string '",char1,
+             "' is a single lower case letter."),"\n")
+} else {
+  cat(paste0("The character string '",char1,
+             "' is not a single letter."),"\n")
+}
+```
+
+> 💡 Try changing the `2` in the code `char1 <- "2"` to another 
+> character from your keyboard, and see what happens
+
+With this type of *control structure*, our computer is even starting 
+to look a little intelligent 😉!
+
+Before we start making tables in R, there are a few other things we 
+need to know or revise.
+
+## Using the `which()` function
+
+Remember from the last session that which finds the observations (e.g.
+elements in a vector or rows in a data frame) that meet a certain
+condition. For our examples, we read in some data from a previous
+session -- here we're reading directly from a URL or internet address.
+
+* The URL is a long string, so we combine the path `git` and file name 
+  using the `paste0()` function which does not include spaces.
+* We enclose the line creating the `gitURL` object completely in 
+  parentheses -- this will automatically `print` the object so we 
+  can check it.
+
+```{r read-cities-data, paged.print=FALSE, results='hold'}
+git <- "https://github.com/Ratey-AtUWA/Learn-R-web/raw/refs/heads/main/"
+(gitURL <- paste0(git,"cities_Hu_etal_2021.csv"))
+cities <- read.csv(gitURL, stringsAsFactors = TRUE)
+cities$City <- as.character(cities$City)
+str(cities)
+```
+
+Now let's revise the use of the `which()` function. Check that you 
+understand what is happening in each example.
+
+```{r which-greater}
+# show row indices for observations matching the condition
+which(cities$Industry > 500)
+```
+
+```{r which-length}
+# count observations matching condition
+length(which(cities$Industry > 500))
+```
+
+```{r which-index}
+# use which in rows part of index to display observations that
+# match the condition
+cities[which(cities$Industry > 500), c("City","Type")]
+```
+
+## Using the transpose function `t()`
+
+Sometimes a table is easier to interpret if we 'flip' it to make the
+rows into columns and the columns into rows. This is what the `t()`
+function does to two-dimensional objects like data frames and
+matrices. Here's an example:
+
+```{r transpose}
+(m <- matrix(LETTERS[1:9], ncol=3))
+cat("\n") # insert blank line
+t(m)
+```
+
+We need to be careful when transposing data frames, as these can
+contain multiple classes in separate columns. A session or two ago we
+made the `brightstars` data frame:
+
+```{r brightstars, paged.print=FALSE}
+# making a data frame by directly inputting values
+brightstars <- data.frame(Star=c("Alpha Centauri","Betelgeuse","Canopus","Sirius"),
+                   Magnitude=c(-0.1, 0.42, -0.74, -1.46),
+                   Light.Years=c(4.395, 427.5, 312.7, 8.611),
+                   Planets=c(TRUE,FALSE,FALSE,FALSE))
+brightstars
+```
+
+Look what happens when we transpose:
+
+```{r transpose-brightstars, paged.print=FALSE}
+t(brightstars)
+```
+
+At first glance it looks like transposing worked; the column names 
+have become row names, which we can use an an alternative index 
+(e.g. try running `t(brightstars)["Star",]` and `t(brightstars)[1,]`)
+
+We notice, however, that all the values have been changed to
+`character`, since each column now contains at least one character
+value. We can get around this by transposing data frame columns
+separately (especially if we have large blocks of numeric columns). 
+Also note that the transposed data frame is now a `matrix` object, 
+which we will need to remember for later.
+
+```{r transpose-columns, paged.print=FALSE}
+t(brightstars[,2:3])
+cat("\nThe transposed object is of class",class(t(brightstars)))
+```
+
+There is one more thing to look at before we start making reporting 
+tables &ndash; *R packages*.
+
+## R Packages
+
+Packages in R are libraries that contain additional functions, which
+makes R more powerful, allowing us to complete additional tasks. There
+are thousands of packages which all provide additional functions,
+usually with a theme. For example, we're going to use the
+*`flextable`* package which has many functions for formatting
+publication-quality tables.
+
+You might not have noticed, but R comes with several packages when you 
+first install it: for example
+
+| Package    | Contains...                                                         |
+|:-----------|:--------------------------------------------------------------------| 
+| `base`     | basic arithmetic, input/output, basic programming functions, *etc*. | 
+| `stats`    | functions for statistical calculations                              |
+| `graphics` | functions for ‘base’ graphics and plotting                          |
+
+&nbsp;
+
+Before we can use a package we need to do two things:
+
+### 1. Installing R packages
+
+We can do this from the `Packages` tab in RStudio &ndash; click
+`Install`, and type in the package name that you want (e.g.
+`flextable`).
+
+You only need to do this *once* -- the package files are now stored 
+on your computer, so you don't need to install again unless the 
+package needs updating.
+
+We can also install with code:
+
+```{r install-package, eval=FALSE}
+install.packages("flextable")
+```
+
+If you think you might have a package installed and don't want to do 
+it again just in case, you can make the installation conditional using 
+an `if()` control function:  
+`if(!require(flextable)) install.packages("flextable")`
+
+### 2. Loading R packages
+
+Each time we use R we need to load the packages we want to use (we 
+must have installed them previously!). We do this using the 
+`library()` function which loads the package into our current R 
+session, and makes all its functions and help available.
+
+```{r library-load}
+library(flextable)
+```
+
+## Making Tables
+
+Before using the `flextable` package we need to generate the contents 
+of the table by analysing some data. We will use data of the type you 
+will generate in this unit, from Ashfield Flats in 2023.
+
+```{r read-afs23}
+afs23 <- read.csv(paste0(git,"afs23.csv"), stringsAsFactors = TRUE)
+str(afs23)
+```
+
+Our task is to make a table which summarizes the concentrations of
+potential contaminants arsenic (As), chromium (Cr), copper (Cu),
+manganese (Mn), nickel (Ni), lead (Pb), and zinc (Zn). We also want to
+present the number of samples which exceed relevant environmental
+guidelines.
+
+We also need to load the `officer` package to make use of some
+additional formatting options in `flextable`. The code actually used
+to make the summary table object(s) makes use of some functions in
+base R, with the `apply()` and `which()` functions doing most of the
+hard work.
+
+```{r load-officer}
+library(officer)
+```
+
+### Importing environmental guideline data
+
+In this example we are looking at data on analysis of sediments and
+soils, for which environmental guideline values exist in Australia.
+For *sediments* we use the guidelines provided by Water Quality
+Australia (2024), which were derived from the interim sediment quality
+guidelines (ISQG) (hence the name of the file and data frame!). *Soil*
+guideline values are from NEPC (2011).
+
+In the code chunk below we make use of the ability to name rows in R data
+frames. This will be useful later on as we can include the row names in indices
+to interrogate the data frame for the correct environmental threshold.
+
+```{r import-guidelines}
+# reading directly from a web server
+ISQG <- read.csv("https://github.com/Ratey-AtUWA/bookChapters/raw/main/ISQG.csv")
+row.names(ISQG) <- ISQG$Tox
+HIL <- read.csv("https://github.com/Ratey-AtUWA/bookChapters/raw/main/HIL_NEPM.csv")
+row.names(HIL) <- HIL$Tox
+```
+
+```{r show-ISQG, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+print(ISQG)
+cat("\nNOTES:\nDGV = Default Guideline Value; GV_high = Upper Guideline Value; \n")
+cat("Tox = Toxicant\n")
+```
+
+```{r name-HIL-columns-hide, echo=FALSE}
+colnames(HIL)[3:6] <- 
+  c("Resid...A","Resid...B","Recreat...C","Industr...D" )
+```
+
+
+```{r show-HIL, echo=1, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+print(HIL)
+cat("\nNOTES:\nTox = Toxicant; Resid = Residential; \n")
+cat("Recreat = Recreational / Public Open Space; Industr = Industrial\n")
+```
+
+```{r revert-HIL-colnames-hide, echo=FALSE}
+colnames(HIL)[3:6] <- 
+  c("Residential_A","Residential_B","Recreational_C","Industrial_D" )
+```
+
+## Generate summary statistics
+
+```{r select-variables-make-summtable, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold'}
+# first define the variables we want to summarise, and 
+# make the basic summary
+elem0 <- c("As","Cr","Cu","Mn","Ni","Pb","Zn")
+(summ0 <- 
+    data.frame(tox=elem0,
+      mean=apply(afs23[,elem0], 2, function(x){mean(x, na.rm=T)}),
+      sd = apply(afs23[,elem0], 2, function(x){sd(x, na.rm=T)}),
+      min = apply(afs23[,elem0], 2, function(x){min(x, na.rm=T)}),
+      median = apply(afs23[,elem0], 2, function(x){median(x, na.rm=T)}),
+      max = apply(afs23[,elem0], 2, function(x){max(x, na.rm=T)}),
+      n = apply(afs23[,elem0], 2, function(x){length(na.omit(x))}),
+      nNA = apply(afs23[,elem0], 2, function(x){sum(is.na(x))})))
+```
+
+We use a *function* to implement each summary statistic function like
+`mean()`, since the form of the `apply()` function doesn't allow us to
+include options such as `na.rm=TRUE`, which we need. We have used  
+`apply()` to calculate *column* statistics since the second option is 
+`2`, shorthand for `MARGIN=2`.
+
+If you want more information on writing functions, see 
+<https://rstudio.github.io/r-manuals/r-intro/Writing-your-own-functions.html>
+(You can also find this by running `help.start()` from the RStudio
+console.)
+
+Instead of making multiple usage of the `apply()` function, we could
+use the convenient `numSummary()` function in the `RcmdrMisc::`
+package (Fox & Marquez 2023). To look at how that's done, look at the
+[alternative version of this page](https://ratey-atuwa.github.io/Learn-R-web/tablesRCM.html){target="_blank"}.
+
+
+
+## Add the count information
+
+To perform the actual counting of sample numbers, we use base R's `which()` 
+function and the customised column and row names we generated earlier, e.g.,
+`which(afs23[,elem0[i]] > ISQG[elem0[i],"DGV"])`.  
+
+* The code `afs23[,elem0[i]]` selects the column from `afs23` with the same name as the i^th^ element of the list of variables `elem0`, i.e. `elem0[i]`.  
+
+* The code `ISQG[elem0[i],"DGV"]` find the desired value from the ISQG table using the row index `elem0[i]`, and the column index `"DGV"`.  So, the variable names in the data must match the toxicant names in the thresholds table!!
+
+* So, `which(afs23[,elem0[i]] > ISQG[elem0[i],"DGV"])` will give the row indices in `afs23` for which the condition is `TRUE`, and the code then simply counts these using `length(which(afs23[,elem0[i]] > ISQG[elem0[i],"DGV"]))`
+
+```{r make-output-DF, paged.print=FALSE, resize.width=120}
+OutputDF <- summ0
+
+# add blank columns in data frame for environmental thresholds
+
+OutputDF$DGV <- rep(NA,length(elem0))
+OutputDF$GV_high <- rep(NA,length(elem0))
+OutputDF$HIL_C <- rep(NA,length(elem0))
+
+# count the values for each element exceeding the various thresholds
+# and populate the data frame
+
+for(i in 1:length(elem0)){
+  if(elem0[i] %in% row.names(ISQG)){    # check if guideline exists!
+    OutputDF$DGV[i] <- 
+      length(which(afs23[,elem0[i]] > ISQG[elem0[i],"DGV"]))
+    OutputDF$GV_high[i] <- 
+      length(which(afs23[,elem0[i]] > ISQG[elem0[i],"GV_high"]))
+  }
+  if(elem0[i] %in% row.names(HIL)){     # check if guideline exists!
+    OutputDF$HIL_C[i] <- 
+      length(which(afs23[,elem0[i]] > HIL[elem0[i],"Recreational_C"]))
+  }
+}
+
+# rename the columns to more understandable names
+
+colnames(OutputDF)[9:11] <- c("n > DGV","n > GV-high", "n > HIL(C)")
+print(OutputDF, row.names = F)
+```
+
+We could stop here, but this is not an attractively-formatted table.
+To make a publication-quality table, we first make a new data frame
+with columns and rows transposed (using `t()`), with the previous
+column names as the first column.
+
+## Publication-quality table
+
+To avoid lots of nesting of `flextable` functions, we find it easiest
+to pipe the successive lines of code containing formatting
+modifications, using the R pipe operator `|>` (show the hidden code 
+chunk below): 
+
+```{r pipes-explained, eval=FALSE, class.source='fold-hide'}
+# PIPES
+which(afs23$Zn > 410) |> length()
+                           # gives the same result as
+length(which(afs23$Zn > 410))
+# run ?pipeOp for more information
+```
+
+Where we need the
+`officer` package is to interpret the formatting option
+`fp_p=fp_par(text.align = "left", padding.bottom = 6)` in the
+`set_caption()` function.
+
+```{r final-flextable}
+# make a new data frame with columns and rows transposed, and the 
+# previous column names as the first column:
+ft <- data.frame(Statistic=colnames(OutputDF[,2:ncol(OutputDF)]),
+                 t(signif(OutputDF[,2:ncol(OutputDF)],3)))
+
+# Then, use flextable to output a table in publication-quality form
+
+flextable(ft) |>
+  width(j=c(1:7), width=c(3,rep(2.2,6)), unit="cm") |>
+  set_header_labels(values=list(V1="")) |>
+  align(j=2:8, align="right", part="all") |>
+  padding(i=8, padding.top = 8) |>
+  bold(bold=TRUE, part="header") |>
+  set_formatter(As=function(x){sprintf("%.03g",x)},
+                Cr=function(x){sprintf("%.0f",x)},
+                Cu=function(x){sprintf("%.03g",x)},
+                Mn=function(x){sprintf("%.03g",x)},
+                Ni=function(x){sprintf("%.03g",x)},
+                Pb=function(x){sprintf("%.0f",x)}) |> 
+  set_caption(caption="Table 1: Summary statistics for trace element concentrations (mg/kg) in sediment or soil at Ashfield Flats in 2023. Abbreviations: n = number of valid observations; nNA = number of missing observations; n > DGV is number of samples exceeding the sediment Default Guideline Value; n > GV-high is number of samples exceeding the sediment upper Guideline Value at which toxicity effects might be expected (Water Quality Australia, 2024). HIL(C) is the human-health based investigation level for Recreational (public open space) land use (NEPC, 2011).", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
+```
+
+<p>&nbsp;</p>
+
+The final table could now go into a report, and most readers would be
+happy with its appearance. We could probably do something about the
+alignment of the numeric columns, but decimal point alignment is not
+available in `flextable` yet.
+
+The next really useful type of information to obtain would be
+*where* the samples which exceed environmental thresholds are. That
+question leads us to another more basic question: "*How can we
+map our data in R*," and so other sessions cover preparing maps
+in R, and from there we can move on to spatial analysis.
+
+&nbsp;
+
+## *Raw data* tabulation
+
+In environmental consultancy reports, it's common to tabulate the raw
+data and indicate which individual samples exceed environmental
+guidelines ("*assessment criteria*"). This final section
+shows a way we can do this in R, using similar concepts to the summary
+statistics table above, but also including some R programming
+structures such as `for()` and `if()` functions.
+
+### Defining input data
+
+We will use a subset of the data we've already used, so that our raw
+data table does not get too large! By running `table()` on the `Type`
+column, we see that we have 21 Core samples, which won't be too
+big.
+
+```{r nSamples-by-Year, results='hold'}
+table(afs23$Type)
+```
+We can then subset the `afs23` data frame to include just the Core
+data, using `droplevels()` to remove any unused factor levels (e.g.
+Types other than Core):
+
+```{r subset-to-core, paged.print=FALSE}
+core23 <- droplevels(afs23[which(afs23$Type=="Core"),])
+str(core23) # check it
+```
+```{r copy-of-data-to-tabulate, paged.print=FALSE}
+colz <- c("Sample_ID","Depth_upper","Depth_lower",
+          "As","Cr","Cu","Mn","Ni","Pb","Zn")
+head(core23[,colz])
+data0 <- core23[ ,colz]
+```
+### Making the data table showing samples exceeding guidelines
+
+We need to use a somewhat complex control structure in our code, as shown below
+
+```{r make-data-table-show-exceedances, message=FALSE, warning=FALSE, paged.print=FALSE}
+data0 <- core23[ ,colz]
+for(j in 2:ncol(data0)){
+  if(colnames(data0)[j] %in% row.names(ISQG)){ # check guideline exists!
+  for(i in 1:nrow(data0)){
+    # first check if guideline value or observation not missing!
+    if(!is.na(data0[i,j]) & !is.na(ISQG[colnames(data0)[j],1]) 
+                          & !is.na(ISQG[colnames(data0)[j],2])) {
+      # then add symbols to observations exceeding GV-high or DGV
+      if(as.numeric(data0[i,j]) >= ISQG[colnames(data0)[j],2]) {
+        data0[i,j] <- paste0(data0[i,j],"\u26A0")
+      } else if(as.numeric(data0[i,j]) < ISQG[colnames(data0)[j],2] &
+           as.numeric(data0[i,j]) >= ISQG[colnames(data0)[j],1]) {
+          data0[i,j] <- paste0(data0[i,j],"\u2191")
+        } # close if() sequence for GV.high ≥ observation > DGV or obs ≥ DGV
+      } # close if() statement for missing guideline or observation
+    } # close for(i...) loop
+  }
+} # close for(j...) loop
+```
+
+Once we have made the table with values exceeding guidelines identified, we 
+again use `flextable()` to format our output nicely (Table 2).
+
+```{r flextable-raw-data, message=FALSE, warning=FALSE, paged.print=FALSE}
+flextable(data0) |> bold(bold=T, part="header") |> 
+  width(width=c(3,rep(2,9)), unit="cm") |> 
+  set_header_labels(Sample_ID="Sample code", Depth_upper="Top",
+                    Depth_lower="Bottom") |> 
+  align(align="left", part="all") |> 
+  valign(valign = "bottom", part="header") |> 
+  set_header_labels(Sample_ID="Sample ID") |> 
+  set_caption(caption="Table 2: Concentrations of selected elements (mg/kg) in Ashfield Flats sediment cores sampled in March 2023. Concentrations followed by (↑) exceed the Default Guideline Value (DGV), or with (⚠) exceed the GV-high value for that column's element (sediment guidelines from Water Quality Australia, 2024).", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
+```
+
+Tables 1 and 2 are the main types of Table which might be presented in
+environmental consultancy reports such as a Detailed Site
+Investigation, or reports on ongoing monitoring.
+
+&nbsp;
+
+### Different ways to make a raw data table, showing guideline exceedances
+
+#### 1. Using `flextable()` conditional formatting
+
+This is logical, but the code gets a bit lengthy since there are
+different conditions for each column> We also need to [conditionally]
+apply the different formats for each condition separately (i.e.
+`bg()`, `bold()`). Here we also use the `flextable` `set_fomatter()`
+function to round to a fixed number (0 or 1) decimal places, but this
+is optional.
+
+```{r flextable-raw-data-2, message=FALSE, warning=FALSE, paged.print=FALSE}
+flextable(core23[ ,colz]) |> bold(bold=T, part="header") |> 
+  width(width=c(3,rep(2,9)), unit="cm") |> 
+  set_header_labels(Sample_ID="Sample code") |> 
+  align(align="center", j=2:8, part="all") |> 
+  valign(valign = "bottom", part="header") |> 
+  bg(~ As > ISQG["As","DGV"], j="As", bg="#ffff60", part="body") |> 
+  bg(~ Cr > ISQG["Cr","DGV"], j="Cr", bg="#ffff60", part="body") |> 
+  bg(~ Cu > ISQG["Cu","DGV"], j="Cu", bg="#ffff60", part="body") |> 
+  bg(~ Ni > ISQG["Ni","DGV"], j="Ni", bg="#ffff60", part="body") |> 
+  bg(~ Pb > ISQG["Pb","DGV"], j="Pb", bg="#ffff60", part="body") |> 
+  bg(~ Zn > ISQG["Zn","DGV"], j="Zn", bg="#ffff60", part="body") |> 
+  bold(~ As > ISQG["As","GV_high"], j="As", bold=TRUE, part="body") |> 
+  bold(~ Cr > ISQG["Cr","GV_high"], j="Cr", bold=TRUE, part="body") |> 
+  bold(~ Cu > ISQG["Cu","GV_high"], j="Cu", bold=TRUE, part="body") |> 
+  bold(~ Ni > ISQG["Ni","GV_high"], j="Ni", bold=TRUE, part="body") |> 
+  bold(~ Pb > ISQG["Pb","GV_high"], j="Pb", bold=TRUE, part="body") |> 
+  bold(~ Zn > ISQG["Zn","GV_high"], j="Zn", bold=TRUE, part="body") |> 
+  bg(~ As > ISQG["As","GV_high"], j="As", bg="orange", part="body") |> 
+  bg(~ Cr > ISQG["Cr","GV_high"], j="Cr", bg="orange", part="body") |> 
+  bg(~ Cu > ISQG["Cu","GV_high"], j="Cu", bg="orange", part="body") |> 
+  bg(~ Ni > ISQG["Ni","GV_high"], j="Ni", bg="orange", part="body") |> 
+  bg(~ Pb > ISQG["Pb","GV_high"], j="Pb", bg="orange", part="body") |> 
+  bg(~ Zn > ISQG["Zn","GV_high"], j="Zn", bg="orange", part="body") |> 
+  set_formatter(As=function(x){sprintf("%.03g",x)},
+                Cr=function(x){sprintf("%.03g",x)},
+                Cu=function(x){sprintf("%.03g",x)},
+                Mn=function(x){sprintf("%.03g",x)},
+                Ni=function(x){sprintf("%.03g",x)},
+                Pb=function(x){sprintf("%.03g",x)},
+                Zn=function(x){sprintf("%.04g",x)}) |>
+  set_caption(caption="Table 3: Concentrations of selected elements (mg/kg) in Ashfield Flats sediments sampled in March 2022. Light shaded (yellow) cells show concentrations exceeding the Default Guideline Value (DGV); darker shading (orange) + bold exceed the GV-high value for that column's element (sediment guidelines from Water Quality Australia, 2024).", align_with_table=F, fp_p=fp_par(text.align = "left", padding.bottom = 6))
+```
+
+&nbsp;
+
+#### 2. Using conditional formatting in Microsoft Excel®
+
+1. Create an Excel workbook containing the table (e.g. values as in Table 2 or Table 3 above)
+
+2. Select the range of your Excel worksheet to be formatted (i.e. one of the concentration columns)
+
+3. In the upper &lsquo;ribbon&rsquo; menu select Home » Conditional Formatting » 
+<u>H</u>ighlight cells rules » *<u>G</u>reater than...*
+
+4. In the dialog box which appears, enter the value relevant to the column 
+selected (e.g. DGV from the Sediment quality Guidelines), and choose a 
+highlight style
+
+![Figure 1: Animation of conditional formatting in Excel showing highlighting of zinc concentrations above both the DGV and GV-high guideline values.](./images/ConditionalFormatExel.gif){alt="Figure 1: Animation of conditional formatting in Excel showing highlighting of zinc concentrations above both the DGV and GV-high guideline values." width=600 height=450}  
+
+&nbsp;
+
+## References and R packages
+
+Fox J, Marquez M (2023). `RcmdrMisc`: _R Commander Miscellaneous Functions_. R package version 2.9-1, <https://CRAN.R-project.org/package=RcmdrMisc>.
+
+Gohel D, Moog S (2024). `officer`: *Manipulation of Microsoft Word and PowerPoint Documents*. R package version 0.6.6, <https://CRAN.R-project.org/package=officer>.
+
+Gohel D, Skintzos P (2024). `flextable`: *Functions for Tabular Reporting*. R package version 0.9.6, <https://CRAN.R-project.org/package=flextable>. see also David Gohel's free eBook *Using the flextable R package* <https://ardata-fr.github.io/flextable-book/index.html>
+
+NEPC (National Environment Protection Council). (2011). Schedule B(1): Guideline on the Investigation Levels for Soil and Groundwater. *In* *National Environment Protection (Assessment of Site Contamination) Measure (Amended)*. Commonwealth of Australia. 
+
+Water Quality Australia. (2024). *Toxicant default guideline values for sediment quality.* Department of Climate Change, Energy, the Environment and Water, Government of Australia. Retrieved 2024-04-11 from <https://www.waterquality.gov.au/anz-guidelines/guideline-values/default/sediment-quality-toxicants>
+
+🔚

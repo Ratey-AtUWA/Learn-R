@@ -1,0 +1,41 @@
+City,Compact,Open,Lightweight,Industry,Type,Global,Region
+New York,610.41,1041.08,0.01,317.63,Compact-Open,North,North America
+Sao Paulo,1122.36,619.8,0.01,218.86,Compact-Open,South,South America
+Shanghai,165.96,832.96,0.01,947.26,Industrial,South,Eastern Asia
+Beijing,542.9,1038.96,0.01,288.76,Compact-Open,South,Eastern Asia
+Jakarta,1195.5,12.31,0.01,519.77,Compact,South,South Asia
+Guangzhou,736.99,203.64,0.01,766.71,Compact,South,Eastern Asia
+Melbourne,939.52,265.05,0.01,382.67,Compact,North,Australia
+Paris,180.03,1121.7,0.01,147.88,Open,North,Europe
+London,11.25,1031.39,0.01,128.99,Open,North,Europe
+Moscow,28.13,894.69,0.01,124.67,Open,North,Europe
+Cairo,559.77,131.49,0.01,357.58,Compact,South,Africa
+Sydney,371.31,399.3,0.01,135.2,Compact-Open,North,Australia
+Nanjing,39.38,366.9,0.01,484.69,Industrial,South,Eastern Asia
+Istanbul,486.64,245.11,0.01,145.72,Compact-Open,South,Western Asia
+Milan,222.22,268.26,0.01,337.07,Industrial,North,Europe
+Washington DC,160.34,511.5,0.01,147.61,Open,North,North America
+Qingdao,120.96,320.94,0.01,262.85,Industrial,South,Eastern Asia
+Wuhan,14.06,311.25,0.01,360.54,Industrial,South,Eastern Asia
+Berlin,36.57,526.78,0.01,64.49,Open,North,Europe
+Santiago de Chile,444.44,68.7,0.01,91.75,Compact,South,South America
+Cape Town,126.58,292.65,23.75,149.78,Open-Lightweight,South,Africa
+Mumbai,81.58,292.32,36.7,151.13,Open-Lightweight,South,South Asia
+Madrid,67.51,366.29,0.01,110.37,Open,North,Europe
+Vancouver,334.74,35.91,0.01,165.42,Compact,North,North America
+Tehran,272.86,49.22,0.01,189.71,Compact,South,Western Asia
+Changsha,115.33,163.03,0.01,198.35,Industrial,South,Eastern Asia
+Rome,95.64,341.4,0.01,41.01,Open,North,Europe
+San Francisco,272.86,18.46,0.01,169.2,Compact,North,North America
+Rio de Janeiro,334.74,56.96,0.01,64.76,Compact,South,South America
+Islamabad,202.53,82.3,50.2,36.43,Open-Lightweight,South,South Asia
+Amsterdam,14.06,97.51,0.01,246.39,Industrial,North,Europe
+Nairobi,67.51,202.75,20.24,58.02,Open-Lightweight,South,Africa
+Lisbon,168.78,107.96,0.01,59.63,Compact-Open,North,Europe
+Munich,14.06,214.09,0.01,70.43,Open,North,Europe
+Dongying,28.13,164.41,0.01,57.47,Open,South,Eastern Asia
+Cologne,0.01,179.57,0.01,51.54,Open,North,Europe
+Kyoto,168.78,5.95,0.01,49.65,Compact,North,Eastern Asia
+Shenzhen,36.57,97.67,0.01,73.94,Industrial,South,Eastern Asia
+Zurich,14.06,155.8,0.01,26.17,Open,North,Europe
+Hong Kong,67.51,58.64,0.01,18.61,Compact-Open,South,Eastern Asia
