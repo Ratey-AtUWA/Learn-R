@@ -64,7 +64,7 @@ par(mar = c(3.5,3.5,0.5,0.5))
 <ul>
 <li><span style="font-size: 12pt;">conduct relevant pairwise comparisons<br /><br /></span></li>
 </ul>
-<li><span style="font-size: 12pt;"> Make *relevant high-quality graphics* to illustrate means comparisons: box plots with means, and plots-of-means [`plotMeans()`] </span></li>
+<li><span style="font-size: 12pt;"> Make *relevant high-quality graphics* to illustrate means comparisons\, *e.g*. box plots with means</span></li>
 </ol>
 <p>**<span style="font-size: 12pt;">Last week we asked you to learn:</span>**</p>
 <ol>
@@ -134,7 +134,6 @@ As usual, we first need to read the data and load the necessary packages:
 
 ```{r load workspace and packages invisibly, echo=FALSE, include=FALSE}
 # load("//uniwa.uwa.edu.au/userhome/staff8/00028958/My Documents/_R Projects/Learning R/.RData")
-setwd("C:/Users/00028958/OneDrive - The University of Western Australia/R Projects/Learning R")
 sv2017 <- read.csv("sv2017_original.csv", stringsAsFactors = TRUE)
 sv2017$Reserve <- cut(sv2017$Northing,
                       breaks = c(0,6466530,9999999),
@@ -142,11 +141,10 @@ sv2017$Reserve <- cut(sv2017$Northing,
 sv17_soil <- subset(sv2017, subset=sv2017$Type=="Soil")
 library(png)
 library(car)
-library(RcmdrMisc)
 library(effsize)
 library(rcompanion)
 library(multcompView)
-knitr::opts_chunk$set(comment="")
+library(PMCMRplus) 
 ```
 
 ```{r load workspace and packages visible notrun, eval=FALSE}
@@ -156,11 +154,11 @@ sv2017$Reserve <- cut(sv2017$Northing,
                       labels = c("Smiths","Veryard"))
 sv17_soil <- subset(sv2017, subset=sv2017$Type=="Soil")
 
-library(car)
-library(effsize)
-library(rcompanion)
-library(multcompView)
-library(RcmdrMisc)
+library(car)           # utility functions like powerTransform()
+library(effsize)       # effect size calculations
+library(rcompanion)    # utility functions for pairwise comparisons
+library(multcompView)  # utility functions for pairwise comparisons
+library(PMCMRplus)     # full range of non-parametric functions incl. pairwise
 ```
 
 ## Non-Parametric Comparisons
@@ -172,7 +170,7 @@ are calculated using the *ranking* (numerical ordering) of each observation.
 
 ### 1. Wilcoxon test
 
-<center>![](distributions-clique.png){width=500 height=240}</center>
+<center>![](images/distributions-clique.png){width=500 height=240}</center>
 
 From previous sessions we know that most untransformed variables are not
 normally distributed. For comparison between exactly 2 groups we use the
@@ -199,6 +197,11 @@ rm(meansNa) # remove temporary object(s)
 ```
 
 #### Effect size
+
+**NOTE** ❗ Although Cohen's d is OK for now, strictly speaking we should use 
+non-parametric effect sizes for non-parametric comparisons - see
+[https://ratey-atuwa.github.io/Learn-R-web/nonparam.html](https://ratey-atuwa.github.io/Learn-R-web/nonparam.html){target="_blank"}
+
 ```{r}
 require(effsize)
 cohen.d(sv17_soil$Na.pow ~ sv17_soil$Reserve)
@@ -235,8 +238,8 @@ in the R package `PMCMRplus`).
 
 ### Pairwise comparisons following a Kruskal-Wallis test
 
-```{r Kruskal-Wallis-test-wilcox-pairwise-comps, echo=FALSE, warning=FALSE, results='hold'}
-with(sv2017, pairwise.wilcox.test(Fe, Type))
+```{r Kruskal-Wallis-test-wilcox-pairwise-comps, warning=FALSE, results='hold'}
+with(sv2017, kwAllPairsConoverTest(Fe, Type, p.adjust.method="holm"))
 ```
 
 The pairwise comparisons show that only Soil and Street dust have significantly 
@@ -250,7 +253,7 @@ non-parametric tests. As before, we need the **R** packages `rcompanion` and
 ```{r}
 require(rcompanion)
 require(multcompView)
-pwFe_Type <- with(sv2017, pairwise.wilcox.test(Fe, Type)) 
+pwFe_Type <- with(sv2017, kwAllPairsConoverTest(Fe, Type)) 
 pwFe_Type_pv <- fullPTable(pwFe_Type$p.value)               # from rcompanion
 multcompLetters(pwFe_Type_pv)                               # from multcompView
 ```
@@ -258,6 +261,14 @@ multcompLetters(pwFe_Type_pv)                               # from multcompView
 The output from `kwAllPairsConoverTest()` shows that p &le; 0.05 only for the
 Soil-Street dust comparison (`"ab"` matches `"a"` OR `"b"`). We can't reject 
 H~0~ for any other pairwise comparisons. 
+
+We can also use the pairwise Wilcoxon test:
+
+```{r pairwise-wilcoxon, results='hold'}
+(pwx <- with(sv2017, pairwise.wilcox.test(Fe, Type)))
+cat("\n   === Compact Letters ===\n")
+fullPTable(pwx$p.value) |> multcompLetters()
+```
 
 <p>&nbsp;</p>
 
@@ -273,7 +284,6 @@ Sawilowsky, S.S. (2009). New Effect Size Rules of Thumb. *Journal of Modern Appl
 
 ```{r R package citations, eval=FALSE}
 citation("car", auto = TRUE)
-citation("RcmdrMisc", auto = TRUE)
 citation("effsize", auto = TRUE)
 citation("multcomp", auto = TRUE)
 citation("PMCMRplus", auto = TRUE)

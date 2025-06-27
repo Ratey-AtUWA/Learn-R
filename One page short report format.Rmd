@@ -19,7 +19,8 @@ header-includes:
 library(RcmdrMisc)
 library(knitr)
 library(Rmisc)
-metal <- read.csv("metal.csv", stringsAsFactors = TRUE)
+rdir <- "C:/Users/00028958/OneDrive - The University of Western Australia/R Projects/Learn-R/"
+metal <- read.csv(paste0(rdir,"metal.csv"), stringsAsFactors = TRUE)
 metal$Title <- as.character(metal$Title)
 ```
 

@@ -88,7 +88,7 @@ legend("bottomleft", legend = levels(sv17_soil$Reserve),
 #   Of course, we still need to use appropriately transformed 
 # variables!
 
-require(car)
+library(car)
 powerTransform(sv17_soil$Na)
 sv17_soil$Na.pow <- sv17_soil$Na^0.127
 
@@ -102,20 +102,17 @@ t.test(sv17_soil$Na.pow ~ sv17_soil$Reserve)
 
 # =+=+=+=+=+=+=+= start code block for 3 plots =+=+=+=+=+=+=+=
 # =+=+=+=+=+=+=+=+=+=+= (scroll down) =+=+=+=+=+=+=+=+=+=+=+=+
+
+# the code plots 2 options side by side - for a report you would choose only one!
+
 # visualising differences in means - 2 groups
-par(mfrow=c(1,3), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.6,0.5,0),
+par(mfrow=c(1,2), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.6,0.5,0),
     font.lab=2, font.main=3, cex.main=0.8, tcl=-0.2,
     ljoin = "mitre", lend = "square")
 boxplot(sv17_soil$Na.pow ~ sv17_soil$Reserve, 
         notch=T, col="grey92",
         xlab="Reserve", ylab="Na (power-transformed)")
-require(RcmdrMisc)
-plotMeans(sv17_soil$Na.pow, sv17_soil$Reserve, 
-          error.bars="conf.int",
-          xlab="Reserve", ylab="Na (power-transformed)",
-          main = "Don't include plot titles for reports!")
-#
-# the third plot is a box plot with the means overplotted
+# the 2nd plot is a box plot with the means overplotted
 boxplot(sv17_soil$Na.pow ~ sv17_soil$Reserve, 
         notch=F, col="thistle",
         xlab="Reserve", ylab="Na (power-transformed)")
@@ -142,10 +139,10 @@ with(sv17_soil, bartlett.test(Na.pow ~ Reserve))
 with(sv17_soil, var.test(Na.pow ~ Reserve))
 
 # The Bartlett test shows that H0 (that variances are equal) 
-# can be rejected. We can visualise this with (for instance) 
+# can NOT be rejected. We can visualise this with (for instance) 
 # a boxplot or density plot:
 
-require(car)
+library(car)
 par(mfrow=c(1,2), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.6,0.5,0),
     font.lab=2, font.main=3, cex.main=0.8, tcl=-0.2,
     cex.lab = 1, cex.axis = 1)
@@ -168,7 +165,7 @@ par(mfrow=c(1,1)) # reset multiple graphics panes
 # The Cohen's d statistic is a standardised measure 
 # of effect size available in the 'effsize' R package.
 
-require(effsize)
+library(effsize)
 cohen.d(sv17_soil$Na.pow ~ sv17_soil$Reserve)
 
 # The calculated value of Cohen's d is 
@@ -210,18 +207,16 @@ rm(list=c("anova_Al","meansAl")) # tidy up
 
 ## Visualising differences in means - 3 or more groups ####
 
+# the code plots 2 options side by side - for a report you would choose only one!
+
 # =+=+=+=+=+=+=+= start code block for 3 plots =+=+=+=+=+=+=+=
 # =+=+=+=+=+=+=+=+=+=+= (scroll down) =+=+=+=+=+=+=+=+=+=+=+=+
-par(mfrow=c(1,3), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.6,0.5,0),
+par(mfrow=c(1,2), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.6,0.5,0),
     font.lab=2, font.main=3, cex.main=0.8, tcl=-0.2)
 boxplot(sv2017$Al.pow ~ sv2017$Type, 
         notch=T, col="grey92", cex = 1.4,
         xlab="Sample type", ylab="Al (power-transformed)",
         ylim = c(13,64))
-require(RcmdrMisc)
-plotMeans(sv2017$Al.pow, sv2017$Type, error.bars="conf.int",
-          xlab="Sample type", ylab="Al (power-transformed)",
-          ylim = c(13,64))
 #
 boxplot(sv2017$Al.pow ~ sv2017$Type, 
         notch=F, col="thistle", cex = 1.4,
@@ -230,7 +225,7 @@ boxplot(sv2017$Al.pow ~ sv2017$Type,
 meanz <- tapply(sv2017$Al.pow, sv2017$Type, mean, na.rm=T)
 points(seq(1, nlevels(sv2017$Type)), meanz, 
        col = 4, pch = 3, lwd = 2, cex = 1.2)
-legend("bottomright", "Mean values", 
+legend("topright", "Mean values", 
        pch = 3, pt.lwd = 2, col = 4, pt.cex = 1.2,
        bty = "n", inset = 0.03)
 rm(meanz) # tidy up
@@ -243,7 +238,7 @@ rm(meanz) # tidy up
 bartlett.test(sv2017$Al.pow~sv2017$Type)
 
 ## Visualise variance for each group
-require(car)
+library(car)
 par(mfrow=c(2,1), mar=c(3.5,3.5,1,1), mgp=c(1.6,0.5,0),
     font.lab=2, font.main=3, cex.main=0.8, tcl=-0.2)
 boxplot(sv2017$Al.pow ~ sv2017$Type, 
@@ -255,7 +250,9 @@ densityPlot(sv2017$Al.pow ~ sv2017$Type, adjust=2,
 par(mfrow=c(1,1)) # reset multiple graphics panes
 
 # In each case it's apparent that the variance in Al is 
-# Sediment > Street dust > soil.
+# Sediment > Soil > Street dust. We can check this:
+
+with(sv2017, tapply(Al.pow, Type, function(x){var(x, na.rm=TRUE)}))
 
 # Analysis of variance with unequal variances ####
 # We can use the Welch f-test (oneway.test(...)) if 
@@ -301,10 +298,10 @@ with(sv2017, oneway.test(Al.pow ~ Type))
 
 # Pairwise compact letter display (cld)
 sv2017$Ba.log <- log10(sv2017$Ba) # make transformed variable
-require(multcomp)
 # N.B. we have to use the function inside with() so 
 # that the variable names are consistent in the next 
 # functions [ glht() and cld() ]
+
 anovaBa <- with(sv2017, aov(Ba.log ~ Type))
 cat("==== Analysis of Variance ====\n");summary(anovaBa)
 
@@ -312,12 +309,15 @@ cat("==== Analysis of Variance ====\n");summary(anovaBa)
 # function from the rcompanion package and multcompLetters() 
 # from the multcompView package:
 
+if(!require(rcompanion)) install.packages("rcompanion")
+if(!require(multcompView)) install.packages("multcompView")
+
 library(rcompanion)
 library(multcompView)
 (pwBa <- with(sv2017, pairwise.t.test(Ba.log, Type)))
-cat("\n==== Compact letters ====\n") 
 pwBa_pv <- fullPTable(pwBa$p.value)                 # from rcompanion
-multcompLetters(pwBa_pv)                            # from multcompView
+# multcompLetters function from multcompView package
+cat("\n==== Compact letters ====\n"); multcompLetters(pwBa_pv)
 
 # In the output above, the table of p-values show a significant 
 # difference (p < 0.05) between Sediment and Soil, and Sediment 
@@ -328,15 +328,15 @@ multcompLetters(pwBa_pv)                            # from multcompView
 # have the same letter ("b"), they are not significantly 
 # different, which matches the p-value (0.3634).
 
-# OPTIONAL: Pairwise compact letter display ####
+# OPTIONAL: alternative Pairwise compact letter display ####
 
 # This method using the cld() function is way harder to 
 # make sense of… it’s probably more rigorous, but leads 
 # to the same conclusion. We need to load the 'multcomp 
 # package.
 
-require(multcomp)
-pwise0 <- glht(anova0, linfct = mcp(Type="Tukey"))
+library(multcomp)
+pwise0 <- glht(anovaBa, linfct = mcp(Type="Tukey"))
 cld(pwise0)
 
 # Groups assigned a different letter are significantly 
@@ -356,8 +356,8 @@ cld(pwise0)
 # above, we need to have a normally-distributed, homoskedastic, 
 # variable. Usually we don’t.
 
-TukeyHSD(anova0)
-rm(list=c("anova0","pwise0"))
+TukeyHSD(anovaBa)
+rm(pwise0)
 
 # The table of output (after '$Type') shows the 
 # differences between mean values for each pairwise 
@@ -430,8 +430,12 @@ wilcox.test(sv17_soil$Na.pow ~ sv17_soil$Reserve)
 rm(meansNa) # remove temporary object(s)
 
 # effect size
-require(effsize)
+library(effsize)
 cohen.d(sv17_soil$Na.pow ~ sv17_soil$Reserve)
+
+### NOTE ❗ Although Cohen's d is OK for now, strictly speaking we should use 
+# non-parametric effect sizes for non-parametric comparisons - see
+# <https://ratey-atuwa.github.io/Learn-R-web/nonparam.html>
 
 #                 _                                             _     ___  
 #                | |                                           | |   |__ \ 
@@ -465,7 +469,8 @@ rm(meansFe)
 # Pairwise comparisons following a Kruskal-Wallis test ####
 
 # Conover pairwise comps
-require(PMCMRplus)
+if(!require(PMCMRplus)) install.packages("PMCMRplus")
+library(PMCMRplus)
 kwAllPairsConoverTest(Fe~Type, data=sv2017)
 
 # The output above shows that p<=0.05 only for the 
@@ -480,6 +485,11 @@ kwAllPairsDunnTest(Fe~Type, data=sv2017)
 cat('\n-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-\n')
 kwAllPairsNemenyiTest(Fe~Type, data=sv2017)
 
+# We can also use the pairwise Wilcoxon test:
+
+(pwx <- with(sv2017, pairwise.wilcox.test(Fe, Type)))
+fullPTable(pwx$p.value) |> multcompLetters()
+
 # _______ _            ______           _ 
 # |__   __| |          |  ____|         | |
 #    | |  | |__   ___  | |__   _ __   __| |
@@ -489,3 +499,4 @@ kwAllPairsNemenyiTest(Fe~Type, data=sv2017)
 
 #             [end code]
 
+)

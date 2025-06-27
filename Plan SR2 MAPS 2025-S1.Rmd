@@ -1,0 +1,32 @@
+---
+title: "plan SR2 maps"
+author: "Andrew Rate"
+date: "`r Sys.Date()`"
+output:
+  bookdown::html_document2:
+    fig_width: 6.4
+    fig_height: 4.8
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    smart: no
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r load-packages-notrun, results='hide'}
+library(sf)          # analysing and managing spatial data
+library(maptiles)    # downloading and plotting map tiles for map backgrounds
+library(ggmap)       # plotting spatial data
+library(prettymapr)  # adding annotations to maps
+library(viridis)     # accessible colour palettes
+library(shadowtext)  # shadowed text for greater contrast in ggplot/ggmap
+```
+
+```{r read-data}
+afw25 <- read.csv("afw25all.csv", stringsAsFactors = TRUE)
+```
+

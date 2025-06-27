@@ -32,6 +32,13 @@
 # ...also read some *data* we need for map annotations, make some *colour*
 #   *palettes* to use later, and set any alternative Windows *fonts*:
 
+if(!require(sf)) install.packages("sf")            
+if(!require(maptiles)) install.packages("maptiles")     
+if(!require(prettymapr)) install.packages("prettymapr") 
+if(!require(viridis)) install.packages("viridis") 
+if(!require(scico)) install.packages("scico")  # OPTIONAL
+if(!require(ggmap)) install.packages("ggmap") 
+
 library(sf)            # Simple Features spatial data in R
 library(maptiles)      # get open-source map tiles for background maps
 library(prettymapr)    # add scale bar and north arrows to maps
@@ -173,14 +180,11 @@ extent <- st_as_sf(data.frame(x=c(399800,400700),y=c(6467900,6468400)),
 # the `extent` object. If we leave it out, the map may change shape as it will
 # use only square (uncropped) map tiles.
 
-# The map tile style we have selected is the `OpenStreetmap.HOT` style, where
-# the suffix `HOT` reflects its development by the Humanitarian OpenStreetMap
-# Team in France.
-# https://www.hotosm.org/updates/2013-09-29_a_new_window_on_openstreetmap_data
+# The map tile style we have selected is the default `OpenStreetmap` style.
 
 # get_tiles, warning=FALSE, error=FALSE, results='hold'}
 # NOTE: projection of input object e.g. 'extent' sets map projection
-aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap.HOT", crop = TRUE)
+aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap", crop = TRUE)
 
 ### Plotting the map ####
 
@@ -188,12 +192,12 @@ aftiles <- maptiles::get_tiles(extent, provider = "OpenStreetMap.HOT", crop = TR
 # `maptiles` (or `terra`) package loaded to be able to plot it - see 
 # the code & output below.
 
-par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
-plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,1,1)) # use axes = TRUE
-
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 3.2, font=2)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 2.3, font=2)
-# 
+par(mar==c(3.5,3.5,0.5,0.5), lend="square", font.lab=2)
+plot(st_coordinates(extent), type="n", asp=1, xaxs="i", yaxs="i",
+     xlab="Easting (UTM Zone 50, m)", ylab="Northing (UTM Zone 50, m)")
+plot_tiles(aftiles, add=TRUE)
+box()
+ 
 # The next chunk of code adds the `prettymapr` features shown in Figure 2. In this
 # code, `plotepsg = 32750` refers to the EPSG code for the UTM projection in Zone
 # 50 (EPSG 32750), which we need to include so that the scale bar shows the
@@ -231,11 +235,11 @@ addscalebar(plotepsg = 32750, label.col = 1, linecol = 1,
 # The positions of the north arrow and scale bar are adjusted with the `padin=` option in the `addnortharrow()` and `addscalebar()` functions.
 # -=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-=+=-
 
-par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
-plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,0.5,0.5)) # use axes = TRUE
-
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 3.2, font=2)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 2.3, font=2)
+par(mar==c(3.5,3.5,0.5,0.5), lend="square", font.lab=2)
+plot(st_coordinates(extent), type="n", asp=1, xaxs="i", yaxs="i",
+     xlab="Easting (UTM Zone 50, m)", ylab="Northing (UTM Zone 50, m)")
+plot_tiles(aftiles, add=TRUE)
+box()
 addnortharrow(text.col=1, border=1)
 addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, 
             label.cex = 1.2, htin=0.15, widthhint = 0.15)
@@ -252,11 +256,10 @@ addscalebar(plotepsg = 32750, label.col = 1, linecol = 1,
 # the points from `afs19utm`, with the `add=TRUE` option. We add a legend to the
 # plot in the usual way.
 
-par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
-plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,0.5,0.5)) # use axes = TRUE
-
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 3.2, font=2)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 2.3, font=2)
+plot(st_coordinates(extent), type="n", asp=1, xaxs="i", yaxs="i",
+     xlab="Easting (UTM Zone 50, m)", ylab="Northing (UTM Zone 50, m)")
+plot_tiles(aftiles, add=TRUE)
+box()
 addnortharrow(text.col=1, border=1)
 addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, 
             label.cex = 1.2, htin=0.15, widthhint = 0.15)
@@ -273,11 +276,11 @@ legend("bottomright", legend=levels(as.factor(afs19$Group)),
 # plotting the data, to avoid the type of overplotting shown in the output of
 # the code below.
 
-par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
-plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,0.5,0.5)) # use axes = TRUE
-
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 3.2, font=2)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 2.3, font=2)
+par(mar==c(3.5,3.5,0.5,0.5), lend="square", font.lab=2)
+plot(st_coordinates(extent), type="n", asp=1, xaxs="i", yaxs="i",
+     xlab="Easting (UTM Zone 50, m)", ylab="Northing (UTM Zone 50, m)")
+plot_tiles(aftiles, add=TRUE)
+box()
 addnortharrow(text.col=1, border=1)
 addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, 
             label.cex = 1.2, htin=0.15, widthhint = 0.15)
@@ -297,11 +300,11 @@ with(afr_map, lines(wetland_E, wetland_N, col = "cadetblue",
 # be added *before* plotting the data. The final map is shown in the output of
 # the code below.
 
-par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
-plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,0.5,0.5)) # use axes = TRUE
-
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 3.2, font=2)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 2.3, font=2)
+par(mar==c(3.5,3.5,0.5,0.5), lend="square", font.lab=2)
+plot(st_coordinates(extent), type="n", asp=1, xaxs="i", yaxs="i",
+     xlab="Easting (UTM Zone 50, m)", ylab="Northing (UTM Zone 50, m)")
+plot_tiles(aftiles, add=TRUE)
+box()
 addnortharrow(text.col=1, border=1)
 addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, 
             label.cex = 1.2, htin=0.15, widthhint = 0.15)
@@ -333,11 +336,11 @@ text(c(400263, 399962, 400047), c(6468174, 6468083, 6468237),
 # tool, as even without the legend it shows any unevenness in concentrations,
 # including where high concentrations are located.
 
-par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
-plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,0.5,0.5)) # use axes = TRUE
-
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 3.2, font=2)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 2.3, font=2)
+par(mar==c(3.5,3.5,0.5,0.5), lend="square", font.lab=2)
+plot(st_coordinates(extent), type="n", asp=1, xaxs="i", yaxs="i",
+     xlab="Easting (UTM Zone 50, m)", ylab="Northing (UTM Zone 50, m)")
+plot_tiles(aftiles, add=TRUE)
+box()
 addnortharrow(text.col=1, border=1, padin = c(0.4,0.2))
 addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, 
             label.cex = 1.2, htin=0.15, widthhint = 0.15, padin = c(0.4,0.2))
@@ -367,11 +370,11 @@ text(c(400500,400520,400520),c(6468100,6468040,6467980),
 # in. We then use this factor to define symbols, sizes, and colours for each
 # sample location. We add a line break to text labels using \n.
 
-par(oma=c(0,0,0,0), lend="square", xpd=TRUE)
-plot_tiles(aftiles, adjust=F, axes=TRUE, mar=c(3,3,0.5,0.5)) # use axes = TRUE
-
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 3.2, font=2)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 2.3, font=2)
+par(mar==c(3.5,3.5,0.5,0.5), lend="square", font.lab=2)
+plot(st_coordinates(extent), type="n", asp=1, xaxs="i", yaxs="i",
+     xlab="Easting (UTM Zone 50, m)", ylab="Northing (UTM Zone 50, m)")
+plot_tiles(aftiles, add=TRUE)
+box()
 addnortharrow(text.col=1, border=1, padin = c(0.4,0.2))
 addscalebar(plotepsg = 32750, label.col = 1, linecol = 1, padin = c(0.4,0.2), 
             label.cex = 1.2, htin=0.15, widthhint = 0.15)

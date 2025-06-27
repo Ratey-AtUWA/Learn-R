@@ -49,9 +49,7 @@ par(mar = c(3.5,3.5,0.5,0.5))
 ```
 
 ## Activities for Week 1 of this Workshop
-<table border="0" style="width: 100%; padding: 10px; background-color: #e0e0ff;">
-<tr valign="top">
-<td colspan="2">
+<div style="border: 2px solid #039; background-color:#e8e8e8; padding: 5px;">
 1. Use a single-sided t- test to compare the mean of a variable with a fixed value (e.g. an environmental guideline)
 2. Use a two -sided Welch's t-test to compare the means of 2 groups of a variable (i.e. categorised with a two-two-level factor)
 3. Calculate a Cohen's d effect size for a 2-group mean comparison
@@ -62,33 +60,33 @@ par(mar = c(3.5,3.5,0.5,0.5))
 
 The R code we've supplied goes further than this, and we will look at the rest of the material (on non-parametric methods) in Week 6. Feel free to work ahead!
 <hr style="height: 4px; background-color: #5560A4;" />
-</td>
-</tr>
-<tr valign="top">
-<td><p>**Videos**</p>
+**Code and Data**
+<ul>
+<li><a href="https://lms.uwa.edu.au/bbcswebdav/courses/ENVT3361_SEM-1_2025/Data%20Analysis%20ENVT3361/Learn-R-CODE-meancomps.R"><span style="font-size: 12pt;">🔣&nbsp;R code file for this workshop session</span></a></li>
+<li><a href="https://lms.uwa.edu.au/bbcswebdav/courses/ENVT3361_SEM-1_2025/Data%20Analysis%20ENVT3361/afw19.csv"><span style="font-size: 12pt;">📊&nbsp;Ashfield flats water data (afw19) in CSV format</span></a></li>
+<li><a href="https://lms.uwa.edu.au/bbcswebdav/courses/ENVT3361_SEM-1_2025/Data%20Analysis%20ENVT3361/sv2017_original.csv"><span style="font-size: 12pt;">📊&nbsp;Smith's Lake / Veryard Reserve data (sv2017) in CSV format</span></a></li>
+</ul>
+<hr style="height: 4px; background-color: #5560A4;" />
+<p>**Videos**</p>
 <iframe height="240" width="320" allowfullscreen frameborder=0 src="https://echo360.net.au/media/53bcb4bc-bc82-4227-9134-ae5a2b2e91c8/public?autoplay=false&automute=false"></iframe>
 <p>&nbsp;</p>
 <iframe height="240" width="320" allowfullscreen frameborder=0 src="https://echo360.net.au/media/b92bf5fa-bbbb-42dd-9567-697591b2e6c9/public?autoplay=false&automute=false"></iframe>
 <p>&nbsp;</p>
-<iframe height="240" width="320" allowfullscreen frameborder=0 src="https://echo360.net.au/media/3a49397c-92c6-47a9-86e7-2c840fd19d81/public?autoplay=false&automute=false"></iframe></td>
-<td>**Code and Data**
-<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091993-dt-content-rid-40243070_1/xid-40243070_1"><span style="font-size: 12pt;">🔣&nbsp;R code file for this workshop session</span></a></p>
-<hr />
-<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091993-dt-content-rid-40243007_1/xid-40243007_1"><span style="font-size: 12pt;">📊&nbsp;Ashfield flats water data (afw19) in CSV format</span></a></p>
-<p><a href="https://lms.uwa.edu.au/bbcswebdav/pid-3091993-dt-content-rid-40243097_1/xid-40243097_1"><span style="font-size: 12pt;">📊&nbsp;Smith's Lake / Veryard Reserve data (sv2017) in CSV format</span></a></p>
-</td>
-</tr>
-</tbody>
-</table>
+<iframe height="240" width="320" allowfullscreen frameborder=0 src="https://echo360.net.au/media/3a49397c-92c6-47a9-86e7-2c840fd19d81/public?autoplay=false&automute=false"></iframe>
+
+&nbsp;
+
+</div>
 
 ```{r load workspace and packages, echo=FALSE, include=FALSE}
 # load("//uniwa.uwa.edu.au/userhome/staff8/00028958/My Documents/_R Projects/Learning R/.RData")
-setwd("C:/Users/00028958/LocalData/R Projects/Learning R")
 sv2017 <- read.csv("sv2017_original.csv", stringsAsFactors = TRUE)
 library(png)
 library(car)
-library(RcmdrMisc)
-library(effsize)
+library(effectsize)
+library(multcomp)
+library(rcompanion)
+library(multcompView)
 library(multcomp)
 library(PMCMRplus)
 ```
@@ -119,7 +117,7 @@ difference between means in each/all groups).
 
 *[Further down in this R Code Examples session, we'll look at 'non-parametric' ways of comparing means, to be used when our variable(s) don't meet all of the requirements of conventional (parametric) statistical tests.]*
 
-In this session we're going to use the 2017 Smith's Lake -- Charles Veryard 
+In this session we're going to use the 2017 Smith's Lake – Charles Veryard 
 Reserves dataset (see Figure \@ref(fig:SLCVR-map)) to compare means between
 groups for factors having:
 
@@ -129,35 +127,41 @@ groups for factors having:
 ```{r load map packages, include=FALSE}
 library(sf)            # Simple Features spatial data in R
 library(maptiles)      # get open-source map tiles for background maps
+library(prettymapr)    # north arrow and scale bar
 library(TeachingDemos) # for shadowtext() function
 ```
 
-```{r SLCVR-map, echo=FALSE, fig.width=6, fig.height=5.6, fig.cap="Map showing locations of Charles Veryard and Smiths Lake Reserves, North Perth, Western Australia.", results='hold',warning=FALSE}
-extent <- st_as_sf(data.frame(x=c(390910,391550),y=c(6466220,6466800)),
+```{r SLCVR-map, echo=FALSE, fig.width=4.7, fig.height=5.7, fig.cap="Map showing locations of Charles Veryard and Smiths Lake Reserves, North Perth, Western Australia.", results='hold',warning=FALSE}
+extent <- st_as_sf(data.frame(x=c(391000,391490),y=c(6466220,6466800)),
                    coords = c("x","y"), crs = st_crs(32750))
-SLtiles <- get_tiles(extent, provider = "OpenTopoMap", 
-                     zoom=16, crop = TRUE)
-par(oma=c(3,3,1,1), mgp=c(1.6,0.3,0), tcl=-0.25, lend="square")
-plot_tiles(SLtiles)
-axis(1);axis(2, at=seq(6466300,6466800,100), labels=seq(6466300,6466800,100))
-box()
-mtext("Easting (UTM Zone 50, m)", side = 1, line = 1.4, font=2, cex=1.1)
-mtext("Northing (UTM Zone 50, m)", side = 2, line = 1.4, font=2, cex=1.1)
-shadowtext(c(391365,391260), c(6466370,6466660),
-     labels=c("Smith's\nLake\nReserve","Charles Veryard\nReserve"),
-     col="darkgreen", bg="white", font=3, cex = 1.2)
-abline(h=6466530, lty=1, lwd=9, col="#FFFFFFC0")
-abline(h=6466530, lty="23", lwd=5, col="purple3")
-shadowtext(391480,6466532,label="Northing\n6466530", 
+secret <- readLines("../thunderforest-API-key.txt")[1]
+SLtiles <- get_tiles(extent, provider = "Thunderforest.Transport", 
+                     zoom=17, crop = TRUE, apikey = secret,
+                     forceDownload = TRUE)
+par(mar=c(3,3,2,0.5), mgp=c(1.6,0.3,0), tcl=-0.25, lend="square", font.lab=2,
+    lheight=0.8)
+plot(st_coordinates(extent), asp=1, type="n",, xaxs="i", yaxs="i",
+     xlab="Easting (UTM Zone 50, m)", ylab="Northing (UTM Zone 50, m)")
+plot_tiles(SLtiles, add=T); box()
+addnortharrow(scale=0.7)
+addscalebar(plotepsg=32750, pos="topleft")
+shadowtext(c(391355,391240), c(6466385,6466660), 
+           labels=c("Smith's\nLake\nReserve","Charles Veryard\nReserve"),
+     col="#409240", bg="honeydew2", font=3, cex = 1)
+abline(h=6466530, lty=1, lwd=7, col="#FFFFFFC0")
+abline(h=6466530, lty="23", lwd=3, col="purple3")
+shadowtext(391250,6466510,label="Northing 6466530", 
            col="purple3", bg="white", cex=1.2)
 ```
+
+&nbsp;
 
 ### Create a factor separating the two Reserves into groups AND limit the data to only soil
 
 We split the dataset at Northing = 6466530 m, which represents Bourke Street.
 
 ```{r create Reserves factor}
-require(car)
+library(car)
 sv2017$Reserve <- cut(sv2017$Northing,
                       breaks = c(0,6466530,9999999),
                       labels = c("Smiths","Veryard"))
@@ -184,6 +188,8 @@ legend("bottomleft", legend = c("Smiths Lake","Charles Veryard"),
        bty = "n", inset = 0.02)
 ```
 
+&nbsp;
+
 The plot in Figure \@ref(fig:xyMap) looks OK! You may have just made your first 
 **R** map!
 
@@ -207,36 +213,30 @@ values between Reserve. By default the R function `t.test()` uses the
 Of course, we still need to use **appropriately transformed variables**!
 
 ```{r Welch t-test}
-require(car)
+library(car)
 powerTransform(sv17_soil$Na)
 sv17_soil$Na.pow <- (sv17_soil$Na)^0.127
 t.test(sv17_soil$Na.pow ~ sv17_soil$Reserve)
 ```
 
-We can visualize means comparisons in a few different ways -- see Figure 
+We can visualize means comparisons in a few different ways – see Figure 
 \@ref(fig:meancomp-plots-2-groups). My favourite is the boxplot with means
 included as extra information - with a bit of additional coding we can include
 the 95% confidence intervals as well! (but this is not shown in this document).
 
 ### Visualising differences in means - 2 groups
-```{r meancomp-plots-2-groups, fig.height=3, fig.width=9, message=FALSE, warning=FALSE, fig.cap="Graphical comparison of means between groups using: (a) a standard box plot; (b) a plot of means showing 95% CI; (c) a box plot also showing mean values in each group."}
-par(mfrow=c(1,3), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.7,0.3,0),
+```{r meancomp-plots-2-groups, fig.height=3.2, fig.width=7, message=FALSE, warning=FALSE, fig.cap="Graphical comparison of means between groups using: (a) a standard box plot; (b) a box plot also showing mean values in each group. NOTE that you would never present both options in a Report - this is just for illustration."}
+par(mfrow=c(1,2), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.7,0.3,0),
     font.lab=2, font.main=3, cex.main=1, tcl=0.3,
-    cex.lab = 1.4, cex.axis = 1.4)
+    cex.lab = 1, cex.axis = 1)
 boxplot(sv17_soil$Na.pow ~ sv17_soil$Reserve, 
         notch=F, col="grey92",
         xlab="Reserve", ylab="Na (power-transformed)")
-mtext("(a)", 3, -1.5, adj=0.03, font=2)
-require(RcmdrMisc)
-plotMeans(sv17_soil$Na.pow, sv17_soil$Reserve, error.bars="conf.int",
-        xlab="Reserve", ylab="Na (power-transformed)",
-        main = "Don't include plot titles for reports!")
-mtext("(b)", 3, -1.5, adj=0.03, font=2)
-#
-# the third plot is a box plot with the means overplotted
+mtext("(a)", 3, -1.3, adj=0.03, font=2)
+# the 2nd plot is a box plot with the means overplotted
 boxplot(sv17_soil$Na.pow ~ sv17_soil$Reserve, 
-        notch=F, col="thistle",
-        xlab="Reserve", ylab="Na (power-transformed)")
+        notch=F, col="thistle", xlab="Reserve", 
+        ylim=c(1.4,2.2), ylab="Na (power-transformed)")
 # make a temporary object 'meanz' containing the means
 meanz <- tapply(sv17_soil$Na.pow, sv17_soil$Reserve, mean, na.rm=T)
 # plot means as points (boxplot boxes are centered on whole numbers)
@@ -244,12 +244,13 @@ points(seq(1, nlevels(sv17_soil$Reserve)), meanz,
        col = 6, pch = 3, lwd = 2)
 legend("bottomright", "Mean values", 
        pch = 3, pt.lwd = 2, col = 6,
-       bty = "n", inset = 0.03)
-mtext("(c)", 3, -1.5, adj=0.03, font=2)
-rm(meanz) # tidy up
+       bty = "n", inset = 0.01)
+mtext("(b)", 3, -1.3, adj=0.05, font=2)
 ```
 
 [skip to Figure \@ref(fig:meancomp-plots-3groups) for a 3-group comparison]
+
+&nbsp;
 
 ### Homogeneity of variance using the variance ratio test or Bartlett's Test
 
@@ -266,18 +267,20 @@ Both the variance-ratio and Bartlett tests show that H~0~ (that variances are
 equal) can **not** be rejected. We can visualise this with (for instance) a
 boxplot or density plot (Figure \@ref(fig:vis-variance-2group)):
 
-```{r vis-variance-2group, fig.height=4.5, fig.width=8, fig.cap="Graphical visulaization of variance (the 'spread' of the distribution) in each group using (left) a box plot and (right) a density plot."}
-require(car)
-par(mfrow=c(1,2), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.6,0.5,0),
+```{r vis-variance-2group, fig.height=4, fig.width=8, fig.cap="Graphical visulaization of variance (the 'spread' of the distribution) in each group using (left) a strip chart and (right) a density plot.", echo=-5}
+library(car)
+par(mfrow=c(1,2), mar=c(3,3,1,1), mgp=c(1.6,0.5,0),
     font.lab=2, font.main=3, cex.main=0.8, tcl=-0.2,
     cex.lab = 1, cex.axis = 1)
-boxplot(sv17_soil$Na.pow ~ sv17_soil$Reserve, 
-        notch=FALSE, col="grey92",
-        xlab="Reserve", ylab="Na (power-transformed)")
-densityPlot(sv17_soil$Na.pow ~ sv17_soil$Reserve, 
-            xlab="Na (power transformed)", adjust=1.5, ylim=c(0,5))
+with(sv17_soil, stripchart(Na.pow ~ Reserve, method="jitter", vertical=T, 
+        xlim=c(0.25,2.75), pch=15, col=c("#0000b080","#A0522D80"),
+        xlab="Reserve", ylab="Na (power-transformed)"))
+with(sv17_soil, densityPlot(Na.pow ~ Reserve, col=c("blue3","sienna"), 
+            xlab="Na (power transformed)", adjust=1.5, ylim=c(0,5)))
 par(mfrow=c(1,1)) # reset multiple graphics panes
 ```
+
+&nbsp;
 
 In each case it's apparent that the variance in Na in the Veryard soil is 
 similar to that at Smith's Lake, illustrating the conclusion from the 
@@ -288,11 +291,12 @@ statistical tests.
 Statistical tests which compare means only estimate if there is a difference or
 not. We would also usually like to know how big the difference (or '**effect**')
 is! The Cohen's *d* statistic is a standardised measure of effect size available
-in the `effsize`h R package.
+in the `effectsize` R package.
 
-```{r}
-require(effsize)
-cohen.d(sv17_soil$Na.pow ~ sv17_soil$Reserve)
+```{r cohensd-powNa, message=FALSE, warning=FALSE, echo=-1, results='hold'}
+# sv17_soil$Na.pow <- sv17_soil$Na^0.127
+library(effectsize)
+effectsize::cohens_d(sv17_soil$Na.pow, sv17_soil$Reserve) |> interpret_cohens_d()
 ```
 
 The calculated value of Cohen's *d* is 0.5 &le; *d* < 0.8, which is medium. The
@@ -311,13 +315,15 @@ not include zero, so we can probably rely on it.
   <td align="right">&nbsp;     </td><td align="center"> d </td><td> &gt; 2.0 </td><td> huge</td></tr>
 </table>
 
+&nbsp;
+
 ## Means comparisons for 3 or more groups
 
-If we have a factor with 3 or more levels (*a.k.a*. groups, or categories), we can use analysis of variance (ANOVA) to compare means of a normally distributed variable. In this example we'll use the factor 'Type' (= sample type) from the Smith's -- Veryard data (not just soil!). <br>
+If we have a factor with 3 or more levels (*a.k.a*. groups, or categories), we can use analysis of variance (ANOVA) to compare means of a normally distributed variable. In this example we'll use the factor 'Type' (= sample type) from the Smith's – Veryard data (not just soil!). <br>
 We still need to use **appropriately transformed variables**!
 
 ```{r one-way analysis of variance, results='hold'}
-require(car)
+library(car)
 powerTransform(sv2017$Al)
 sv2017$Al.pow <- (sv2017$Al)^0.455
 anova_Al <- aov(sv2017$Al.pow ~ sv2017$Type)
@@ -329,7 +335,6 @@ print(signif(meansAl,3)) # output means with appropriate significant digits
 cat("\nMeans for original (untransformed) variable\n");
 meansAl <- tapply(sv2017$Al, sv2017$Type, mean, na.rm=TRUE);
 print(signif(meansAl,4)) # output means with appropriate significant digits
-rm(list=c("anova_Al","meansAl")) # tidy up
 ```
 
 In the output above, the p-value in the ANOVA table `Pr(>F)` is less than 0.05
@@ -339,35 +344,31 @@ can visualize the differences in means in different ways (Figure
 
 ### Visualising differences in means - 3 or more groups
 
-```{r meancomp-plots-3groups, fig.height=3, fig.width=9, fig.cap="Graphical comparison of means between 3 or more groups, in three ways: (a) a notched box plot; (b) a plot of means with 95% CI error bars; (c) a box plot also showing mean values in each group.", message=FALSE, warning=FALSE}
-par(mfrow=c(1,3), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.7,0.3,0),
+```{r meancomp-plots-3groups, fig.height=3.2, fig.width=7, fig.cap="Graphical comparison of means between 3 or more groups, in three ways: (a) a notched box plot; (b) a box plot also showing mean values in each group. NOTE that you would never present both options in a Report - this is just for illustration.", message=FALSE, warning=FALSE, results='hold', echo=-10}
+par(mfrow=c(1,2), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.7,0.3,0),
     font.lab=2, font.main=3, cex.main=1, tcl=0.3,
-    cex.lab = 1.4, cex.axis = 1.4, lend = "square", ljoin = "mitre")
+    cex.lab = 1, cex.axis = 1, lend = "square", ljoin = "mitre")
 boxplot(sv2017$Al.pow ~ sv2017$Type, notch=T, 
         cex = 1.2, col="grey92", ylim = c(15,61),
         xlab="Sample type", ylab="Al (power-transformed)")
-mtext("(a)", 3, -1.5, adj=0.97, font=2) # label each sub-plot
-require(RcmdrMisc)
-plotMeans(sv2017$Al.pow, sv2017$Type, error.bars="conf.int",
-        xlab="Sample type", ylab="Al (power-transformed)",
-        main = "Don't include plot titles in reports!",
-        ylim = c(15,61))
-mtext("(b)", 3, -1.5, adj=0.97, font=2) # label each sub-plot
+mtext("(a)", 3, -1.3, adj=0.97, font=2) # label each sub-plot
 boxplot(sv2017$Al.pow ~ sv2017$Type, notch=F, 
         col=c("cadetblue","moccasin","thistle"), 
         cex = 1.2, ylim = c(15,61),
         xlab="Reserve", ylab="Al (power-transformed)")
-mtext("(c)", 3, -1.5, adj=0.97, font=2) # label each sub-plot
+mtext("(b)", 3, -1.3, adj=0.97, font=2) # label each sub-plot
 meanz <- tapply(sv2017$Al.pow, sv2017$Type, mean, na.rm=T)
 points(seq(1, nlevels(sv2017$Type)), meanz, 
        col = "white", pch = 3, lwd = 4, cex = 1.3)
 points(seq(1, nlevels(sv2017$Type)), meanz, 
        col = "red3", pch = 3, lwd = 2, cex = 1.2)
-legend("bottomright", "Mean values", 
+legend("top", "Mean values", 
        pch = 3, pt.lwd = 2, col = "red3", pt.cex = 1.2,
-       bty = "n", inset = 0.03)
+       bty = "n", inset = 0.005)
 rm(meanz) # tidy up
 ```
+
+&nbsp;
 
 Look back at Figure \@ref(fig:meancomp-plots-2-groups). Why is Figure 
 \@ref(fig:meancomp-plots-3groups) better?
@@ -380,8 +381,8 @@ ANOVA also requires variance for each group to be (approximately) equal. Since t
 bartlett.test(sv2017$Al.pow~sv2017$Type)
 ```
 
-```{r vis-var-3groups, fig.height=4, fig.width=8, fig.cap="Graphical visulaization of variance (the 'spread' of the distribution) in 3 groups using (left) a box plot and (right) a density plot."}
-require(car)
+```{r vis-var-3groups, fig.height=4, fig.width=8, fig.cap="Graphical visulaization of variance (the 'spread' of the distribution) in 3 groups using (left) a box plot and (right) a density plot.", echo=-5}
+library(car)
 par(mfrow=c(1,2), mar=c(3.5,3.5,1.5,1.5), mgp=c(1.6,0.5,0),
     font.lab=2, font.main=3, cex.main=0.8, tcl=-0.2,
     cex.lab = 1, cex.axis = 1)
@@ -392,8 +393,10 @@ densityPlot(sv2017$Al.pow ~ sv2017$Type, adjust=2,
             xlab="Al (power transformed)")
 par(mfrow=c(1,1)) # reset multiple graphics panes
 ```
-In each case it's apparent that the variance in Al is Sediment > Street dust >
-soil (Figure \@ref(fig:vis-var-3groups)). We can check the actual variance
+&nbsp;
+
+In each case it's apparent that the variance in Al is Sediment > soil > Street
+dust (Figure \@ref(fig:vis-var-3groups)). We can check the actual variance
 values using `tapply()`:
 
 ```{r variance by Type, results='hold'}
@@ -425,7 +428,17 @@ reject the null hypothesis, so we find no difference between means.
 
 ### Effect sizes for 3 or more groups
 
-**It's not possible to calculate Effect sizes for 3 or more groups directly. We would need to create subsets of our dataset which include only two groups** (*e.g*., **with only Soil and Sediment), and then run** `cohen.d()` **from the 'effsize' R package.** Or we could do some custom coding...
+**NOTE** ❗ It is possible to calculate effect sizes for 3 or more groups &ndash; see
+[https://ratey-atuwa.github.io/Learn-R-web/nonparam.html](https://ratey-atuwa.github.io/Learn-R-web/nonparam.html){target="_blank"}
+&ndash; but we will not cover it in detail here. The code below shows how to do
+it as a *post-hoc* test to follow analysis of variance of power-transformed Al
+by Type that we did above:
+
+```{r eta2-follow-anova}
+effectsize::effectsize(anova_Al) |> effectsize::interpret_eta_squared()
+```
+
+&nbsp;
 
 ## Pairwise comparisons
 
@@ -437,7 +450,7 @@ show pairwise comparisons in an analysis of variance for Ba, in groups defined
 by the factor `Type`.
 
 The most straightforward way to conduct pairwise comparisons is with the 
-`pairwise.t.test()` function -- this is what we *recommend.* We can generate the
+`pairwise.t.test()` function – this is what we *recommend.* We can generate the
 convenient '*compact letter display*' using the **R** packages `rcompanion` and
 `multcompView`. With the compact letter display, factor levels (categories)
 having the same letter are **not** significantly different (pairwise p &ge;
@@ -482,15 +495,74 @@ interpretation from the compact letters; Sediment (`"a"`) is different from Soil
 and Street dust (both `"b"`). Since Soil and Street dust have the same letter 
 (`"b"`), they are not significantly different, which matches the p-value (0.3634).
 
-### OPTIONAL: Pairwise compact letter display
+Remember that for variables having unequal variance across groups 
+(Figure \@ref(fig:boxplot-logMg)), we need to use `oneway.test()` instead of
+`aov()`.
 
-This method using the `cld()` function is way harder to make sense of... it's
-probably more rigorous, but leads to the same conclusion. We need to load the
-`multcomp` package.
+```{r boxplot-logMg, fig.width=4, fig.height=3.2, message=FALSE, warning=FALSE, echo=-1, fig.cap="Boxplot comparing Mg in different sample types from Smiths Lake and Charles Veryard Reserves sampled in 2017."}
+par(mar=c(3,3,1,1), mgp=c(1.6,0.2,0), tcl=0.15, font.lab=2, lend="square")
+with(sv2017, boxplot(log10(Mg)~Type, col="lightblue", xlab="Sample Type",
+     ylab=expression(bold(paste(log[10],"(Mg, mg/kg)")))))
+points(1:nlevels(sv2017$Type), tapply(log10(sv2017$Mg), sv2017$Type, mean, na.rm=T),
+       pch=22, bg=7)
+legend("bottomright", bty="n", legend="Means", pch=22, pt.bg=7)
+```
+
+&nbsp;
+
+So, as before we check if the variable (log~10~(Mg)) has a normal distribution
+(it does), and whether it is homoscedastic when grouped by `Type` (it's not).
+
+```{r oneway-test-logMg, message=FALSE, warning=FALSE, results='hold'}
+with(sv2017, shapiro.test(log10(Mg)))
+with(sv2017, bartlett.test(log10(Mg) ~ Type))
+with(sv2017, oneway.test(log10(Mg) ~ Type, var.equal=FALSE))
+```
+
+The p-value for the overall comparison is &le;&nbsp;0.05, so we can reject H~0~
+and proceed with a pairwise comparison. Strictly speaking, for groups with
+unequal variance, we need to use the Games-Howell test for pairwise comparisons
+instead of a pairwise t-test. The function `games_howell_test()` is available in
+the `rstatix` package.
+
+```{r games-howell-logMg, message=FALSE, warning=FALSE, paged.print=FALSE, results='hold', echo=-10}
+if(!require(rstatix)) install.packages("rstatix") # check and possibly install
+library(rstatix)
+
+sv2017$Mg.log <- log10(sv2017$Mg)
+
+(ghtMg <- games_howell_test(sv2017, Mg.log~Type))
+cat("\nGames-Howell test with Welch's d.f. correction\n==============================================\n")
+# we need to get our pairwise table with an extra line of code:
+(pwpMg <- with(ghtMg, tapply(p.adj, list(group1,group2), function(x){x})))
+cat("\n")
+fullPTable(t(pwpMg)) |> multcompLetters()
+
+# pairwise t-test for comparison
+cat("\nCompare with:\nPairwise t-test with Holm's p-value adjustment\n==============================================\n")
+pwt <- with(sv2017, pairwise.t.test(Mg.log, Type, pool.sd=FALSE))
+fullPTable(pwt$p.value) |> multcompLetters()
+```
+
+In many cases, like this one, we arrive at the same conclusion from the pairwise
+t-test as the Games-Howell pairwise test. So for simplicity, we'll still be 
+**recommending the pairwise t-test with Holm's correction** (note that the 
+Games-Howell pairwise test has built-in Type 1 Error correction).
+
+&nbsp;
+
+<div style="border: 2px solid #444; background-color:#e8e8e8; padding: 8px;">
+### OPTIONAL material based on Tukey all-pair comparisons
+
+#### Pairwise compact letter display
+
+This method using the `glht()` and `cld()` functions is way harder to make sense
+of... it's more rigorous for normally distributed, homoscedastic data, but leads
+to the same conclusion. We need to load the `multcomp` package.
 
 ```{r pairwise compact letter display, message=FALSE, warning=FALSE}
-require(multcomp)
-pwise0 <- glht(anovaBa, linfct = mcp(Type="Tukey")) # anovaBa from above
+library(multcomp)
+pwise0 <- glht(anovaBa, linfct = mcp(Type="Tukey")) #   from above
 cld(pwise0)
 ```
 
@@ -502,10 +574,10 @@ in sediment (`a`) is significantly different from both Soil and Street dust
 We can get the confidence intervals and p-values for each pairwise comparison
 using the `TukeyHSD()` function (HSD='Honestly Significant Difference'):
 
-### OPTIONAL: Pairwise Tukey multiple comparisons of means
+#### Pairwise Tukey multiple comparisons of means
 
-Also more complicated to understand and, like the code above, we need to have a 
-normally-distributed, homoskedastic, variable. Usually we don't.
+Also more complicated to understand and, like in the code above, we need to have
+a normally-distributed, homoscedastic, variable. Usually we don't.
 
 ```{r Tukey multiple comparisons of means, results='hold'}
 TukeyHSD(anovaBa)
@@ -524,9 +596,11 @@ p-value of 0.633 (*i.e*. > 0.05) for the Street dust-Soil comparison. Also, as
 indicated by the 'compact letter display' from `cld()` above, any comparison
 including Sediment has p &le; 0.05.
 
-<hr style="height: 2px; background-color: #5560A4;" />
+</div>
 
-<center>![](distributions-clique.png){width=500 height=240}</center>
+&nbsp;
+
+<center>![](images/distributions-clique.png){width=500 height=240}</center>
 
 ## Non-Parametric Comparisons
 
@@ -535,7 +609,7 @@ including Sediment has p &le; 0.05.
 From previous sessions we know that most untransformed variables are not
 normally distributed. For comparison between exactly 2 groups we use the
 **Wilcoxon test** (via the `wilcox.test()` function). The Wilcoxon test is based 
-on ranking of observations, so should be independent of transformation -- as in 
+on ranking of observations, so should be independent of transformation – as in 
 the example below:
 
 ```{r wilcoxon rank sum test, results='hold'}
@@ -553,8 +627,13 @@ rm(meansNa) # remove temporary object(s)
 ```
 
 #### Effect size
+
+**NOTE** ❗ Although Cohen's d is OK for now, strictly speaking we should use 
+non-parametric effect sizes for non-parametric comparisons - see
+[https://ratey-atuwa.github.io/Learn-R-web/nonparam.html](https://ratey-atuwa.github.io/Learn-R-web/nonparam.html){target="_blank"}
+
 ```{r}
-require(effsize)
+library(effsize)
 cohen.d(sv17_soil$Na.pow ~ sv17_soil$Reserve)
 ```
 
@@ -564,7 +643,7 @@ We use the Kruskal-Wallis test (via the `kruskal.test()` function) for
 non-parametric comparisons between three or more groups defined by a factor.
 
 This example is testing differences in Fe between sample Types in the complete
-Smith's -- Veryard 2017 dataset.
+Smith's – Veryard 2017 dataset.
 
 ```{r Kruskal-Wallis test, results='hold'}
 kruskal.test(sv2017$Fe ~ sv2017$Type)
@@ -585,17 +664,17 @@ Kruskal-type ranked data).
 ### Pairwise comparisons following a Kruskal-Wallis test
 
 ```{r Kruskal-Wallis test - Conover pairwise dummy, eval=FALSE}
-require(PMCMRplus)
+library(PMCMRplus)
 kwAllPairsConoverTest(Fe~Type, data=sv2017)
 ```
 
 ```{r Kruskal-Wallis test - Conover pairwise comps, echo=FALSE, warning=FALSE, results='hold'}
-{require(PMCMRplus)
+{library(PMCMRplus)
 kwAllPairsConoverTest(Fe~Type, data=sv2017)}
 ```
 
 The pairwise comparisons show that only Soil and Street dust have significantly 
-different Fe concentration. *Note* the p-value adjustment -- not Holm's this
+different Fe concentration. *Note* the p-value adjustment – not Holm's this
 time.
 
 We can also get a pairwise compact letter display based on the results of
@@ -630,6 +709,16 @@ kwAllPairsDunnTest(Fe~Type, data=sv2017)
 kwAllPairsNemenyiTest(Fe~Type, data=sv2017)
 ```
 
+We can also use the pairwise Wilcoxon test:
+
+```{r pairwise-wilcoxon, results='hold'}
+(pwx <- with(sv2017, pairwise.wilcox.test(Fe, Type)))
+cat("\n   === Compact Letters ===\n")
+fullPTable(pwx$p.value) |> multcompLetters()
+```
+
+&nbsp;
+
 ## References and R Packages
 
 Cohen, J. (1988). *Statistical power analysis for the behavioral sciences (2nd ed.)*. 
@@ -637,12 +726,10 @@ New York:Academic Press.
 
 Sawilowsky, S.S. (2009). New Effect Size Rules of Thumb. *Journal of Modern Applied Statistical Methods* **8**:597-599.
 
-**Run the R code below to get citation information for the R packages used in** 
-**this document**.
+**Run the R code below to get citation information for the R packages used in this document 😎**.
 
 ```{r R package citations, eval=FALSE}
 citation("car", auto = TRUE)
-citation("RcmdrMisc", auto = TRUE)
 citation("effsize", auto = TRUE)
 citation("multcomp", auto = TRUE)
 citation("PMCMRplus", auto = TRUE)

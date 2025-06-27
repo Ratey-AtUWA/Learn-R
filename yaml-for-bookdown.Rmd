@@ -1,0 +1,20 @@
+---
+title: "yaml for bookdown"
+author: "Andrew Rate"
+date: "`r Sys.Date()`"
+output: 
+  bookdown::html_document2:
+    fig_width: 6.4
+    fig_height: 4.8
+    number_sections: no
+    self_contained: no
+    df_print: default
+    fig_caption: yes
+    tab_caption: yes
+    smart: no
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```

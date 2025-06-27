@@ -8,9 +8,7 @@ output:
     self_contained: no
     df_print: default
     fig_caption: yes
-  word_document: 
-    toc_depth: 2
-    fig_caption: yes
+    smart: no
 ---
 
 <style type="text/css">
